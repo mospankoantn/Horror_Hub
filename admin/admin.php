@@ -1,5 +1,7 @@
 <?php
 session_start();
+// Збільшуємо ліміт часу виконання на випадок, якщо статей дуже багато
+set_time_limit(300); 
 
 // ==========================================
 // НАЛАШТУВАННЯ АДМІН-ПАНЕЛІ
@@ -60,7 +62,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 }
 
 // ==========================================
-// ФУНКЦІЇ ДЛЯ РОБОТИ З JSON
+// ФУНКЦІЇ ДЛЯ РОБОТИ З JSON ТА ТЕЛЕГРАФОМ
 // ==========================================
 function getArticles($file) {
     if (!file_exists($file)) return [];
@@ -73,11 +75,128 @@ function saveArticles($file, $data) {
     return file_put_contents($file, $json);
 }
 
+// Рекурсивна функція парсингу вузлів Telegraph у HTML (для бекапу)
+function parseTelegraphNodeToHTML($node) {
+    if (is_string($node)) {
+        return htmlspecialchars($node);
+    }
+    
+    $html = "<{$node['tag']}";
+    if (isset($node['attrs'])) {
+        foreach ($node['attrs'] as $key => $value) {
+            if ($key === 'src' && strpos($value, '/') === 0) {
+                $value = 'https://telegra.ph' . $value;
+            }
+            $html .= " {$key}=\"" . htmlspecialchars($value) . "\"";
+        }
+    }
+    $html .= ">";
+    
+    if (isset($node['children'])) {
+        foreach ($node['children'] as $child) {
+            $html .= parseTelegraphNodeToHTML($child);
+        }
+    }
+    
+    $html .= "</{$node['tag']}>";
+    return $html;
+}
+
 $articles = getArticles($json_file);
 
 // ==========================================
-// ОБРОБКА ФОРМ (Додавання / Редагування / Видалення)
+// ОБРОБКА ФОРМ ТА AJAX
 // ==========================================
+
+// --- AJAX ОБРОБНИК: Зміна порядку перетягуванням ---
+if (isset($_POST['action']) && $_POST['action'] === 'reorder') {
+    header('Content-Type: application/json');
+    $new_order = json_decode($_POST['new_order'], true);
+    
+    if (is_array($new_order)) {
+        $reordered_articles = [];
+        foreach ($new_order as $old_index) {
+            if (isset($articles[$old_index])) {
+                $reordered_articles[] = $articles[$old_index];
+            }
+        }
+        saveArticles($json_file, $reordered_articles);
+        echo json_encode(['status' => 'success']);
+        exit;
+    }
+    echo json_encode(['status' => 'error']);
+    exit;
+}
+
+// --- СТВОРЕННЯ БЕКАПУ СТАТЕЙ ---
+if (isset($_POST['backup_articles'])) {
+    $backup_dir = '../articles';
+    // Створюємо папку, якщо її немає
+    if (!is_dir($backup_dir)) {
+        mkdir($backup_dir, 0777, true);
+    }
+
+    $saved = 0;
+    $skipped = 0;
+    $errors = 0;
+
+    foreach ($articles as $article) {
+        $path = basename(parse_url($article['url'], PHP_URL_PATH));
+        if (empty($path)) continue;
+
+        $file_path = $backup_dir . '/' . $path . '.html';
+
+        // Якщо файл вже існує — пропускаємо
+        if (file_exists($file_path)) {
+            $skipped++;
+            continue;
+        }
+
+        // Завантажуємо контент з Telegraph
+        $api_url = "https://api.telegra.ph/getPage/{$path}?return_content=true";
+        $response = @file_get_contents($api_url);
+        
+        if ($response) {
+            $data = json_decode($response, true);
+            if (isset($data['ok']) && $data['ok'] === true) {
+                $page = $data['result'];
+                
+                $content_html = "";
+                foreach ($page['content'] as $node) {
+                    $content_html .= parseTelegraphNodeToHTML($node);
+                }
+
+                // Шаблон локальної HTML сторінки
+                $full_html = "<!DOCTYPE html>\n<html lang='uk'>\n<head>\n";
+                $full_html .= "<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n";
+                $full_html .= "<title>" . htmlspecialchars($page['title']) . " - Локальна Копія</title>\n";
+                $full_html .= "<link rel='stylesheet' href='../style.css'>\n"; // Підключаємо основний стиль сайту
+                $full_html .= "<style>.single-article { background: var(--surface); border: 1px solid var(--border-red); padding: 3rem 2rem; border-radius: var(--radius); max-width: 900px; margin: 2rem auto; box-shadow: var(--shadow-card); color: #ddd; } .single-article img { max-width: 100%; border-radius: 4px; } .backup-notice { background: #9e0000; color: #fff; text-align: center; padding: 10px; font-weight: bold; }</style>\n";
+                $full_html .= "</head>\n<body>\n";
+                $full_html .= "<div class='backup-notice'>ЦЕ ЛОКАЛЬНА РЕЗЕРВНА КОПІЯ СТАТТІ. Оригінал: <a href='{$article['url']}' style='color: #fff; text-decoration: underline;'>Telegraph</a></div>\n";
+                $full_html .= "<main class='single-article'>\n";
+                $full_html .= "<h1 style='color: var(--red-bright); font-family: var(--font-headings);'>" . htmlspecialchars($page['title']) . "</h1>\n";
+                $full_html .= "<p style='color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 10px;'>Автор: " . htmlspecialchars($page['author_name'] ?? 'Невідомий') . "</p>\n";
+                $full_html .= "<div class='article-content'>\n" . $content_html . "\n</div>\n";
+                $full_html .= "</main>\n</body>\n</html>";
+
+                if (file_put_contents($file_path, $full_html)) {
+                    $saved++;
+                } else {
+                    $errors++;
+                }
+            } else {
+                $errors++;
+            }
+        } else {
+            $errors++;
+        }
+    }
+
+    $backup_status = "Бекап завершено! Збережено нових статей: <b>$saved</b>. Пропущено (вже існують): <b>$skipped</b>. Помилок: <b>$errors</b>.";
+    header("Location: admin.php?backup_status=" . urlencode($backup_status));
+    exit;
+}
 
 // ДОДАВАННЯ
 if (isset($_POST['add_article'])) {
@@ -87,7 +206,14 @@ if (isset($_POST['add_article'])) {
         "title" => trim($_POST['title']),
         "previewText" => trim($_POST['previewText'])
     ];
-    array_unshift($articles, $new_article);
+    
+    // Перевіряємо галочку "Додати в кінець"
+    if (isset($_POST['add_to_end'])) {
+        $articles[] = $new_article; 
+    } else {
+        array_unshift($articles, $new_article); 
+    }
+    
     saveArticles($json_file, $articles);
     header("Location: admin.php?status=added");
     exit;
@@ -152,6 +278,7 @@ if (isset($_GET['edit'])) {
         
         .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
         .alert-success { background: rgba(0, 128, 0, 0.2); color: #0f0; border: 1px solid #0f0; }
+        .alert-info { background: rgba(42, 171, 238, 0.2); color: #2AABEE; border: 1px solid #2AABEE; }
         
         .form-panel { background: #111; padding: 2rem; border: 1px solid #380000; border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.8); margin-bottom: 30px; }
         .form-panel h2 { color: #fff; margin-top: 0; }
@@ -160,23 +287,30 @@ if (isset($_GET['edit'])) {
         input:focus, textarea:focus { outline: none; border-color: #c0392b; }
         .help-text { font-size: 0.8rem; color: #666; margin-top: 3px; }
         
-        /* Блок для URL + Кнопка автозаповнення */
         .input-group { display: flex; gap: 10px; align-items: center; margin-top: 5px; }
         .input-group input { margin-top: 0; flex: 1; }
         .btn-autofill { background: #2AABEE; color: #fff; padding: 10px 15px; white-space: nowrap; transition: 0.3s; }
         .btn-autofill:hover { background: #1c88c7; }
         .btn-autofill:disabled { background: #555; cursor: not-allowed; }
 
-        .btn-submit { background: #9e0000; color: #fff; margin-top: 20px; padding: 12px 25px; text-transform: uppercase; width: 200px; font-size: 1rem; }
+        .btn-submit { background: #9e0000; color: #fff; margin-top: 20px; padding: 12px 25px; text-transform: uppercase; font-size: 1rem; }
         .btn-submit:hover { background: #c0392b; }
         .btn-cancel { background: #555; color: #fff; margin-top: 20px; padding: 12px 25px; margin-left: 10px; }
         .btn-cancel:hover { background: #777; }
+        .btn-backup { background: #f39c12; color: #000; margin-bottom: 15px; display: inline-block; padding: 10px 20px; }
+        .btn-backup:hover { background: #e67e22; }
 
         .table-panel { background: #111; padding: 1rem; border: 1px solid #380000; border-radius: 4px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; }
         th { background: #0a0a0a; color: #c0392b; font-family: 'Special Elite', cursive; letter-spacing: 1px; }
-        tr:hover { background: #1a1a1a; }
+        
+        .draggable-row { transition: background 0.2s; }
+        .draggable-row:hover { background: #1a1a1a; }
+        .draggable-row.dragging { opacity: 0.5; background: #222; }
+        .drag-handle { cursor: grab; font-size: 1.5rem; color: #555; text-align: center; width: 40px; user-select: none;}
+        .drag-handle:hover { color: #fff; }
+        .drag-handle:active { cursor: grabbing; }
         
         .thumb { width: 80px; height: 50px; object-fit: cover; border: 1px solid #333; border-radius: 3px; }
         .article-title { color: #fff; font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; }
@@ -187,6 +321,9 @@ if (isset($_GET['edit'])) {
         .btn-edit:hover { background: #1c88c7; }
         .btn-delete { background: #9e0000; color: #fff; font-size: 0.8rem; }
         .btn-delete:hover { background: #c0392b; }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: #2AABEE; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 1000; right: 30px; bottom: 30px; font-weight: bold; opacity: 0; transition: opacity 0.5s, bottom 0.5s; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
     </style>
 </head>
 <body>
@@ -205,6 +342,10 @@ if (isset($_GET['edit'])) {
         <?php if($_GET['status'] == 'added') echo '<div class="alert alert-success">Статтю успішно додано!</div>'; ?>
         <?php if($_GET['status'] == 'edited') echo '<div class="alert alert-success">Зміни успішно збережено!</div>'; ?>
         <?php if($_GET['status'] == 'deleted') echo '<div class="alert alert-success">Статтю видалено!</div>'; ?>
+    <?php endif; ?>
+
+    <?php if(isset($_GET['backup_status'])): ?>
+        <div class="alert alert-info"><?= $_GET['backup_status'] ?></div>
     <?php endif; ?>
 
     <!-- ФОРМА -->
@@ -232,6 +373,15 @@ if (isset($_GET['edit'])) {
             <label>Короткий опис (Анонс):</label>
             <textarea name="previewText" id="previewInput" rows="3" required><?= htmlspecialchars($edit_data['previewText']) ?></textarea>
 
+            <?php if(!$is_editing): ?>
+                <div style="margin-top: 15px; background: #000; padding: 10px; border: 1px solid #333; border-radius: 4px;">
+                    <label style="margin-top: 0; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: normal; color: #fff;">
+                        <input type="checkbox" name="add_to_end" value="1" checked style="width: auto; margin: 0; transform: scale(1.2);">
+                        Додати в кінець списку (вважатиметься найновішою статтею на сайті)
+                    </label>
+                </div>
+            <?php endif; ?>
+
             <?php if($is_editing): ?>
                 <button type="submit" name="save_edit" class="btn btn-submit">Зберегти зміни</button>
                 <a href="admin.php" class="btn btn-cancel">Скасувати</a>
@@ -241,25 +391,38 @@ if (isset($_GET['edit'])) {
         </form>
     </div>
 
-    <!-- ТАБЛИЦЯ -->
+    <!-- ТАБЛИЦЯ З DRAG & DROP -->
     <div class="table-panel">
-        <h2>Керування статтями (Всього: <?= count($articles) ?>)</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div>
+                <h2>Керування статтями (Всього: <?= count($articles) ?>)</h2>
+                <p class="help-text" style="margin-bottom: 15px;">💡 Затисніть іконку <b>☰</b> зліва, щоб перетягнути статтю і змінити її порядок.</p>
+            </div>
+            
+            <!-- КНОПКА БЕКАПУ -->
+            <form method="POST" action="admin.php" onsubmit="return confirm('Процес може зайняти хвилину. Продовжити?');">
+                <button type="submit" name="backup_articles" class="btn btn-backup">📥 Зберегти всі статті локально</button>
+            </form>
+        </div>
+        
         <table>
             <thead>
                 <tr>
+                    <th width="40"></th>
                     <th width="100">Зображення</th>
                     <th>Інформація про статтю</th>
                     <th width="180">Дії</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="sortable-tbody">
                 <?php if (empty($articles)): ?>
-                    <tr><td colspan="3" style="text-align:center;">Статей поки немає.</td></tr>
+                    <tr><td colspan="4" style="text-align:center;">Статей поки немає.</td></tr>
                 <?php else: ?>
                     <?php foreach($articles as $index => $article): ?>
-                        <tr>
+                        <tr draggable="true" data-index="<?= $index ?>" class="draggable-row">
+                            <td class="drag-handle" title="Потягніть, щоб змінити порядок">☰</td>
                             <td>
-                                <img src="<?= htmlspecialchars($article['imageUrl']) ?>" class="thumb" alt="preview">
+                                <img src="<?= htmlspecialchars($article['imageUrl']) ?>" class="thumb" alt="preview" draggable="false">
                             </td>
                             <td>
                                 <div class="article-title"><?= htmlspecialchars($article['title']) ?></div>
@@ -286,7 +449,9 @@ if (isset($_GET['edit'])) {
     </div>
 </div>
 
-<!-- МАГІЯ АВТОЗАПОВНЕННЯ (JavaScript) -->
+<div id="toast">✅ Порядок успішно збережено!</div>
+
+<!-- МАГІЯ АВТОЗАПОВНЕННЯ ТА DRAG&DROP -->
 <script>
 document.getElementById('autofillBtn').addEventListener('click', async function() {
     const urlInput = document.getElementById('urlInput').value.trim();
@@ -297,100 +462,123 @@ document.getElementById('autofillBtn').addEventListener('click', async function(
 
     try {
         const urlObj = new URL(urlInput);
-        const path = urlObj.pathname.substring(1); // Отримуємо 'Moya-stattya-11-04'
+        const path = urlObj.pathname.substring(1); 
 
-        // Змінюємо стан кнопки
         const btn = this;
         const originalText = btn.innerHTML;
         btn.innerHTML = '⏳ Шукаю...';
         btn.disabled = true;
 
-        // Звертаємось до API
         const response = await fetch(`https://api.telegra.ph/getPage/${path}?return_content=true`);
         const data = await response.json();
 
-        if (!data.ok) {
-            throw new Error("Не вдалося знайти статтю на Telegraph. Перевірте посилання.");
-        }
+        if (!data.ok) throw new Error("Не вдалося знайти статтю на Telegraph.");
 
         const page = data.result;
-
-        // 1. ЗАПОВНЮЄМО ЗАГОЛОВОК
         document.getElementById('titleInput').value = page.title;
 
-        // Змінні для пошуку
         let firstImageUrl = '';
         let firstParagraph = '';
 
-        // Рекурсивна функція для пошуку тексту та картинок всередині вузлів Telegraph
         function parseNode(node) {
-            if (typeof node === 'string') {
-                return node;
-            }
-            
+            if (typeof node === 'string') return node;
             let text = '';
-            
-            // Шукаємо першу картинку (зазвичай тег img)
             if (node.tag === 'img' && !firstImageUrl) {
                 let src = node.attrs.src;
-                if (src.startsWith('/')) {
-                    src = 'https://telegra.ph' + src;
-                }
+                if (src.startsWith('/')) src = 'https://telegra.ph' + src;
                 firstImageUrl = src;
             }
-
             if (node.children) {
-                for (let child of node.children) {
-                    text += parseNode(child);
-                }
+                for (let child of node.children) text += parseNode(child);
             }
             return text;
         }
 
-        // 2. ПРОХОДИМОСЬ ПО КОНТЕНТУ
         for (let node of page.content) {
-            // Шукаємо перший абзац (тег 'p' або 'aside'), який має текст
             if ((node.tag === 'p' || node.tag === 'aside') && !firstParagraph) {
                 let pText = parseNode(node).trim();
-                // Відсікаємо занадто короткі абзаци (наприклад, пусті рядки)
-                if (pText.length > 10) {
-                    firstParagraph = pText;
-                }
+                if (pText.length > 10) firstParagraph = pText;
             } else {
-                // Якщо це не абзац, все одно парсимо, щоб знайти картинки всередині (наприклад, у тегу figure)
                 parseNode(node);
             }
-
-            // Якщо знайшли і текст, і картинку — можемо зупинити цикл, щоб не сканувати всю статтю
-            if (firstImageUrl && firstParagraph) {
-                break;
-            }
+            if (firstImageUrl && firstParagraph) break;
         }
 
-        // 3. ЗАПОВНЮЄМО ІНШІ ПОЛЯ
         if (firstImageUrl) {
             document.getElementById('imageInput').value = firstImageUrl;
         } else {
-            document.getElementById('imageInput').value = '../images/article-fallback.jpg'; // Резервна картинка, якщо в статті немає
+            document.getElementById('imageInput').value = '../images/article-fallback.jpg';
         }
 
         if (firstParagraph) {
-            // Обрізаємо опис до 250 символів, щоб він гарно виглядав у карточці
             let shortDesc = firstParagraph.length > 250 ? firstParagraph.substring(0, 250) + '...' : firstParagraph;
             document.getElementById('previewInput').value = shortDesc;
         }
 
-        // Повертаємо кнопку в норму
         btn.innerHTML = '✨ Успішно!';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 2000);
+        setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
 
     } catch (error) {
-        alert(error.message || "Некоректне посилання. Використовуйте посилання формату https://telegra.ph/...");
+        alert(error.message || "Некоректне посилання.");
         this.innerHTML = '✨ Автозаповнити';
         this.disabled = false;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tbody = document.getElementById('sortable-tbody');
+    let draggedRow = null;
+
+    tbody.addEventListener('dragstart', function(e) {
+        draggedRow = e.target.closest('tr');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', draggedRow.innerHTML);
+        draggedRow.classList.add('dragging');
+    });
+
+    tbody.addEventListener('dragover', function(e) {
+        e.preventDefault(); 
+        e.dataTransfer.dropEffect = 'move';
+        const targetRow = e.target.closest('tr.draggable-row');
+        
+        if (targetRow && targetRow !== draggedRow) {
+            const bounding = targetRow.getBoundingClientRect();
+            const offset = bounding.y + (bounding.height / 2);
+            if (e.clientY - offset > 0) {
+                targetRow.after(draggedRow);
+            } else {
+                targetRow.before(draggedRow);
+            }
+        }
+    });
+
+    tbody.addEventListener('dragend', function(e) {
+        draggedRow.classList.remove('dragging');
+        saveNewOrder();
+    });
+
+    async function saveNewOrder() {
+        const rows = tbody.querySelectorAll('tr.draggable-row');
+        const newOrder = Array.from(rows).map(row => row.getAttribute('data-index'));
+        
+        const fd = new FormData();
+        fd.append('action', 'reorder');
+        fd.append('new_order', JSON.stringify(newOrder));
+
+        try {
+            const res = await fetch('admin.php', { method: 'POST', body: fd });
+            const data = await res.json();
+            
+            if (data.status === 'success') {
+                rows.forEach((row, i) => row.setAttribute('data-index', i));
+                const toast = document.getElementById('toast');
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Сталася помилка при збереженні порядку.');
+        }
     }
 });
 </script>

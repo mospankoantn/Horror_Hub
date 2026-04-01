@@ -6,14 +6,57 @@
   <title>Статті про хоррор — Horror Hub</title>
   <link rel="icon" type="image/png" href="images/favicon.png">
   <meta name="description" content="Статті про хоррор-ігри та фільми: від перших ігор 60-х до сучасних шедеврів. Крипіпасти, огляди, глибокий аналіз жанру.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://yoursite.com/articles.html">
-
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="js/auth.js"></script>
+
+  <style>
+    /* Стилі для панелі керування */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 2rem;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      padding: 1rem 1.5rem;
+      border: 1px solid var(--border-red);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+    .controls-bar input, .controls-bar select {
+      padding: 0.6rem 1rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .controls-bar input:focus, .controls-bar select:focus {
+      border-color: var(--red-main);
+      box-shadow: 0 0 10px var(--red-glow);
+    }
+    .controls-bar input { flex: 1; min-width: 200px; }
+    .filters-group { display: flex; gap: 15px; flex-wrap: wrap; }
+    
+    /* Пагінація */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 3rem;
+    }
+    .page-info { color: var(--text-muted); font-weight: bold; font-family: var(--font-headings); letter-spacing: 1px; }
+    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; background: transparent; color: var(--text-muted); border-color: var(--text-muted); box-shadow: none; transform: none; }
+  </style>
 </head>
 <body>
 
@@ -21,24 +64,22 @@
     <h1>Horror Hub</h1>
   </header>
 
-    <nav>
-        <a href="index.html">Головна</a>
-        <a href="horror_games.html">Ігри Жахів</a>
-        <a href="horror_movies.html">Фільми Жахів</a>
-        <a href="reviews.html">Огляди</a>
-        <a href="articles.html">Статті</a>
-        <a href="game.html">Ігрова Кімната</a>
-        <a href="contact.html">Контакти</a>
-        
-         <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК -->
-        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" title="Підписатися на наш Telegram">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-        Telegram
-        </a>
-        <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
-    </nav>
+  <nav>
+    <a href="index.html">Головна</a>
+    <a href="horror_games.html">Ігри Жахів</a>
+    <a href="horror_movies.html">Фільми Жахів</a>
+    <a href="reviews.html">Огляди</a>
+    <a href="articles.html" class="active">Статті</a>
+    <a href="game.html">Ігрова Кімната</a>
+    <a href="contact.html">Контакти</a>
+    
+    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" title="Підписатися на наш Telegram">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+      Telegram
+    </a>
+    <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+  </nav>
 
-  <!-- РЕКЛАМНИЙ БЛОК — під навігацією -->
   <div class="ad-zone">
     <div class="ad-placeholder">Рекламний простір — 728×90</div>
   </div>
@@ -47,52 +88,51 @@
     <h2 class="page-title">Статті</h2>
     <p class="page-subtitle">Від перших пікселів 1960-х до сучасних шедеврів хоррору</p>
 
-    <!--
-      Картки статей завантажуються через load_articles.js
-      Кожні 6 карток JS автоматично вставляє рекламну картку .ad-card
-    -->
-    <div class="articles-grid">
+    <!-- ПАНЕЛЬ КЕРУВАННЯ (Пошук, Сортування, Ліміт) -->
+    <div class="controls-bar">
+      <input type="text" id="searchInput" placeholder="Знайти статтю у темряві...">
+      
+      <div class="filters-group">
+        <select id="sortSelect">
+          <option value="newest" selected>Спочатку нові (останні)</option>
+          <option value="oldest">Спочатку старі (перші)</option>
+        </select>
+        
+        <select id="limitSelect">
+          <option value="5">5 на сторінці</option>
+          <option value="10" selected>10 на сторінці</option>
+          <option value="25">25 на сторінці</option>
+          <option value="50">50 на сторінці</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- СІТКА СТАТЕЙ -->
+    <div class="articles-grid" id="articlesGrid">
       <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 3rem 0;">
-        Завантаження статей...
+        Виклик духів... Завантаження...
       </p>
+    </div>
+
+    <!-- КНОПКИ ПАГІНАЦІЇ -->
+    <div class="pagination">
+      <button id="prevPage" class="read-more">← Попередня</button>
+      <span id="pageInfo" class="page-info">Сторінка 1 з 1</span>
+      <button id="nextPage" class="read-more">Наступна →</button>
     </div>
   </main>
 
-  <!-- РЕКЛАМНИЙ БЛОК — перед футером -->
   <div class="ad-zone">
     <div class="ad-placeholder">Рекламний простір — 728×90</div>
   </div>
 
-<footer>
+  <footer>
     <div class="footer-inner">
       <a href="index.html" class="footer-logo">Horror Hub</a>
-      
-      <nav>
-        <a href="index.html">Головна</a>
-        <a href="horror_games.html">Ігри Жахів</a>
-        <a href="horror_movies.html">Фільми Жахів</a>
-        <a href="reviews.html">Огляди</a>
-        <a href="articles.html">Статті</a>
-        <a href="game.html">Ігрова Кімната</a>
-        <a href="contact.html">Контакти</a>
-        
-        <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК У ФУТЕР -->
-        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-          Telegram
-        </a>
-      </nav>
-
-      <hr>
-
-      <p class="footer-copy">
-        &copy; 2026 Horror Hub. Всі права захищено.
-        &nbsp;|&nbsp; <a href="privacy.html">Конфіденційність</a>
-      </p>
+      <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
     </div>
   </footer>
 
-  <!-- load_articles.js завантажує articles_data.json і малює картки -->
   <script src="js/load_articles.js"></script>
 
 </body>
