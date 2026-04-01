@@ -1,0 +1,944 @@
+/* ═══════════════════════════════════════════════════════════════
+   HORROR HUB — style.css
+   Дизайн: "Кінематографічний готичний хоррор"
+   Шрифти: Nosifer (логотип) · Special Elite (заголовки) · Raleway (тіло)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- 1. ШРИФТИ --- */
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
+
+/* --- 2. КОЛЬОРОВА СИСТЕМА (CSS-змінні) ---
+   Змінюйте ці значення — решта оновиться автоматично.
+   Колір:     hex або rgb()
+   Тіні:      rgba() */
+:root {
+  /* Фони (від найтемнішого до світлішого) */
+  --bg:           #040404;
+  --surface:      #0c0c0c;
+  --surface-2:    #111111;
+  --surface-3:    #181818;
+
+  /* Акцент — криваво-червоний */
+  --red-dark:     #5a0000;
+  --red-main:     #9e0000;
+  --red-bright:   #c0392b;
+  --red-hot:      #f03030;
+  --red-glow:     rgba(158, 0, 0, 0.45);
+
+  /* Текст */
+  --text:         #c4c4c4;
+  --text-muted:   #666666;
+  --text-dim:     #393939;
+
+  /* Межі */
+  --border:       #1c1c1c;
+  --border-red:   #380000;
+
+  /* Шрифти */
+  --font-logo:      'Nosifer', cursive;      /* Крапаючий хоррор-шрифт для лого */
+  --font-headings:  'Special Elite', cursive;/* Друкарський thriller-стиль для заголовків */
+  --font-body:      'Raleway', sans-serif;   /* Чистий читабельний шрифт для тексту */
+
+  /* Тіні */
+  --shadow:       0 8px 32px rgba(0, 0, 0, 0.85);
+  --shadow-card:  0 4px 16px rgba(0, 0, 0, 0.7);
+  --shadow-red:   0 0 24px var(--red-glow);
+
+  /* Transitions */
+  --t-fast: 150ms ease;
+  --t-mid:  300ms ease;
+  --t-slow: 500ms ease;
+
+  /* Радіус кутів */
+  --radius: 4px;
+}
+
+/* --- 3. КАСТОМНИЙ СКРОЛБАР ---
+   Тонка червона смужка справа */
+::-webkit-scrollbar              { width: 5px; }
+::-webkit-scrollbar-track        { background: var(--bg); }
+::-webkit-scrollbar-thumb        { background: var(--red-main); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--red-bright); }
+
+/* --- 4. СКИДАННЯ ТА БАЗА --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html                   { scroll-behavior: smooth; }
+img                    { display: block; max-width: 100%; }
+a                      { text-decoration: none; }
+
+body {
+  font-family:     var(--font-body);
+  font-weight:     300;
+  line-height:     1.75;
+  color:           var(--text);
+  background-color: var(--bg);
+  min-height:      100vh;
+  display:         flex;
+  flex-direction:  column;
+  overflow-x:      hidden;
+
+  /* Ледь помітний шум-фон для текстури плівки */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Доступність: для користувачів, які вимикають анімації */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* --- 5. АНІМАЦІЇ ---
+   Глітч-ефект на логотипі — спрацьовує раз на ~12 секунд */
+@keyframes glitch {
+  0%, 88%, 100% {
+    text-shadow: 0 0 15px rgba(0,0,0,0.9);
+    transform: none;
+  }
+  89% {
+    text-shadow: -5px 0 var(--red-hot), 5px 0 rgba(0, 200, 255, 0.55);
+    transform: translate(3px, 0) skewX(2deg);
+  }
+  90.5% {
+    text-shadow: 5px 0 var(--red-hot), -5px 0 rgba(0, 200, 255, 0.55);
+    transform: translate(-2px, 0);
+  }
+  91% {
+    text-shadow: 0 0 15px rgba(0,0,0,0.9);
+    transform: none;
+  }
+  92% {
+    text-shadow: -2px 0 var(--red-hot);
+    transform: translate(1px, 0) scaleY(1.01);
+  }
+  93% {
+    text-shadow: 0 0 15px rgba(0,0,0,0.9);
+    transform: none;
+  }
+}
+
+/* Плавна поява знизу */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Пульс для червоного підсвічування */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 30px 8px var(--red-glow); }
+  50%       { opacity: 1;    box-shadow: 0 0 70px 20px var(--red-glow); }
+}
+
+/* Поява картки */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Повзуча червона лінія зверху картки */
+@keyframes slideRight {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* --- 6. ХЕДЕР ---
+   Чорний фон + крапаючі краплі крові знизу через clip-path */
+header {
+  position: relative;
+  background: linear-gradient(180deg, #000 0%, #060000 70%, #0c0000 100%);
+  text-align: center;
+  padding: 2rem 1rem 2.5rem;
+  border-bottom: 2px solid var(--red-dark);
+  overflow: visible; /* Дозволяємо крапати за межі */
+  z-index: 10;
+}
+
+/* Ефект крапель крові — clip-path формує нерівний нижній край */
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  width: 100%;
+  height: 18px;
+  background: var(--red-dark);
+  /* Кожна пара точок — одна "крапля" */
+  clip-path: polygon(
+    0% 0%,    2%  100%, 4%  0%,   7%  100%, 10% 0%,
+    13% 85%,  16% 0%,   19% 100%, 22% 0%,   25% 70%,
+    28% 0%,   31% 100%, 34% 0%,   38% 90%,  42% 0%,
+    45% 100%, 48% 0%,   51% 80%,  55% 0%,   58% 100%,
+    61% 0%,   64% 75%,  68% 0%,   71% 100%, 74% 0%,
+    78% 88%,  81% 0%,   84% 100%, 87% 0%,   91% 80%,
+    94% 0%,   97% 100%, 100% 0%,  100% 0%
+  );
+  z-index: 2;
+}
+
+/* Логотип з глітч-анімацією */
+header h1 {
+  font-family: var(--font-logo);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  color: var(--red-bright);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 18px var(--red-glow));
+  animation: glitch 12s infinite;
+}
+
+/* --- 7. НАВІГАЦІЯ ---
+   Sticky + glassmorphism blur (напівпрозоре скло) */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(4, 4, 4, 0.88);
+  backdrop-filter: blur(14px) saturate(160%);         /* Ефект скла */
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-bottom: 1px solid var(--border-red);
+  text-align: center;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+
+nav a {
+  position: relative;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius);
+  transition: color var(--t-mid);
+  z-index: 1;
+}
+
+/* Червоне тло — масштабується при наведенні */
+nav a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  background: var(--red-main);
+  opacity: 0;
+  transform: scaleX(0.5) scaleY(0.7);
+  transition: opacity var(--t-mid), transform var(--t-mid);
+  z-index: -1;
+}
+
+nav a:hover,
+nav a.active {
+  color: #fff;
+}
+
+nav a:hover::before,
+nav a.active::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- 8. РЕКЛАМНІ ЗОНИ ---
+
+   МОНЕТИЗАЦІЯ: Як додати Google AdSense:
+   1. Зареєструйтеся на https://adsense.google.com
+   2. Отримайте код Publisher ID (ca-pub-XXXXXXXXXX)
+   3. Замініть вміст .ad-placeholder на код AdSense
+
+   ПРИКЛАД:
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
+   <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+*/
+
+/* Горизонтальний банер (728×90 leaderboard) */
+.ad-zone {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 100px;
+  text-align: center;
+}
+
+/* Мітка "РЕКЛАМА" */
+.ad-zone::before {
+  content: 'Реклама';
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: block;
+}
+
+/* Заглушка — видалити після підключення AdSense */
+.ad-placeholder {
+  background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+  border: 1px dashed var(--border-red);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  padding: 1.2rem 2rem;
+  width: 100%;
+  max-width: 728px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Рекламна картка в сітці статей (через JS кожні 6 карток) */
+.ad-card {
+  background: var(--surface-2);
+  border: 1px dashed var(--border-red);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: 280px;
+  text-align: center;
+  position: relative;
+  gap: 0.5rem;
+}
+
+.ad-card::after {
+  content: 'Реклама';
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--surface-3);
+  padding: 0.2rem 0.45rem;
+  border-radius: 2px;
+}
+
+.ad-card p {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* --- 9. HERO (Головна сторінка) --- */
+.hero {
+  position: relative;
+  min-height: 68vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(4,0,0,0.88) 75%, var(--bg) 100%),
+    url('images/horror_background.jpg') center / cover no-repeat;
+  border-bottom: 2px solid var(--red-dark);
+}
+
+/* Пульсуюча червона підсвітка знизу */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 1px;
+  background: var(--red-main);
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 950px;
+  padding: 2rem 1.5rem;
+  animation: fadeInUp 1s ease both;
+}
+
+.hero h1 {
+  font-family: var(--font-logo);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  color: var(--red-bright);
+  line-height: 1.05;
+  margin-bottom: 1.2rem;
+  filter: drop-shadow(0 0 24px var(--red-glow));
+  animation: glitch 14s infinite 3s;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  color: var(--text);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  margin-bottom: 2.5rem;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Кнопка заклику до дії */
+.hero-cta {
+  display: inline-block;
+  background: var(--red-main);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 1rem 2.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--red-bright);
+  transition: background var(--t-mid), box-shadow var(--t-mid), transform var(--t-fast);
+}
+
+.hero-cta:hover {
+  background: var(--red-bright);
+  box-shadow: 0 0 30px var(--red-glow);
+  transform: translateY(-3px);
+}
+
+/* --- 10. КОНТЕЙНЕР --- */
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* --- 11. ЗАГОЛОВКИ СТОРІНОК --- */
+.page-title {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  text-align: center;
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Декоративна лінія під заголовком */
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--red-main), transparent);
+}
+
+/* Підзаголовок (опціонально) */
+.page-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  margin-bottom: 3rem;
+}
+
+/* --- 12. СІТКИ КОНТЕНТУ --- */
+.articles-grid,
+.games-grid,
+.movies-grid,
+.reviews-grid,
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 28px;
+}
+
+/* --- 13. КАРТКИ (СПІЛЬНІ СТИЛІ) --- */
+article.article,
+article.game,
+article.movie,
+article.review-card,
+article.feature {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform var(--t-mid), box-shadow var(--t-mid), border-color var(--t-mid);
+  animation: cardIn 0.55s ease both;
+}
+
+/* Затримки для stagger-ефекту (кожна наступна картка з'являється трохи пізніше) */
+article:nth-child(1)  { animation-delay: 0.05s; }
+article:nth-child(2)  { animation-delay: 0.10s; }
+article:nth-child(3)  { animation-delay: 0.15s; }
+article:nth-child(4)  { animation-delay: 0.20s; }
+article:nth-child(5)  { animation-delay: 0.25s; }
+article:nth-child(6)  { animation-delay: 0.30s; }
+
+/* Hover: картка підіймається, з'являється червоне сяйво */
+article.article:hover,
+article.game:hover,
+article.movie:hover,
+article.review-card:hover,
+article.feature:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 25px var(--red-glow);
+  border-color: var(--red-dark);
+}
+
+/* Червона лінія зверху — повзе справа наліво при hover */
+article.article::before,
+article.game::before,
+article.movie::before,
+article.review-card::before,
+article.feature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red-dark), var(--red-hot));
+  transition: width var(--t-slow);
+  z-index: 1;
+}
+
+article.article:hover::before,
+article.game:hover::before,
+article.movie:hover::before,
+article.review-card:hover::before,
+article.feature:hover::before {
+  width: 100%;
+}
+
+/* --- 14. ЗОБРАЖЕННЯ В КАРТКАХ --- */
+/* Обгортка для overflow:hidden (щоб transform scale не вилазив за межі картки) */
+.img-wrap {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+article.article img,
+article.game img,
+article.movie img {
+  width: 100%;
+  object-fit: cover;
+  /* Початково: знебарвлені, трохи темніші */
+  filter: grayscale(55%) contrast(1.1) brightness(0.8);
+  transition: filter var(--t-slow), transform var(--t-slow);
+}
+
+/* Hover: кольорові і збільшені */
+article.article:hover img,
+article.game:hover img,
+article.movie:hover img {
+  filter: grayscale(0%) contrast(1.05) brightness(0.95);
+  transform: scale(1.07);
+}
+
+article.article img { height: 220px; }
+article.game img    { height: 220px; }
+article.movie img   { height: 300px; }
+
+/* --- 15. КОНТЕНТ КАРТОК --- */
+.article-content,
+.game-content,
+.movie-content,
+.review-content,
+.feature-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовки карток */
+.article-content h2,
+.game-content h2 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.45rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+  transition: color var(--t-fast);
+}
+
+.movie-content h3,
+.review-content h3,
+.feature-content h3 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.3rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.3;
+  transition: color var(--t-fast);
+}
+
+/* Заголовки яскравіші при hover */
+article:hover .article-content h2,
+article:hover .game-content h2,
+article:hover .movie-content h3,
+article:hover .review-content h3,
+article:hover .feature-content h3 {
+  color: var(--red-hot);
+}
+
+/* Описи */
+.article-content p,
+.game-content p,
+.movie-content p,
+.review-content p,
+.feature-content p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  flex-grow: 1;
+  margin-bottom: 1.2rem;
+}
+
+.feature-content p { margin-bottom: 0; }
+
+/* --- 16. КНОПКИ "ЧИТАТИ ДАЛІ" / "ДІЗНАТИСЯ БІЛЬШЕ" --- */
+.read-more,
+.learn-more {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: auto;
+  color: var(--red-bright);
+  background: transparent;
+  border: 1px solid var(--red-dark);
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: background var(--t-mid), color var(--t-mid), border-color var(--t-mid),
+              box-shadow var(--t-mid), transform var(--t-fast);
+}
+
+.read-more:hover,
+.learn-more:hover {
+  background: var(--red-main);
+  color: #fff;
+  border-color: var(--red-main);
+  box-shadow: 0 0 18px var(--red-glow);
+  transform: translateY(-2px);
+}
+
+/* --- 17. КОНТАКТНА ФОРМА --- */
+/* Нова обгортка — додана в contact.html */
+.contact-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  padding: 3rem;
+  box-shadow: var(--shadow);
+}
+
+.contact-wrapper h1 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group { display: flex; flex-direction: column; }
+
+.contact-form label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  transition: border-color var(--t-mid), box-shadow var(--t-mid);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--red-main);
+  box-shadow: 0 0 12px var(--red-glow);
+}
+
+.contact-form textarea   { resize: vertical; min-height: 130px; }
+
+.contact-form button[type="submit"] {
+  background: var(--red-main);
+  color: #fff;
+  border: none;
+  padding: 0.95rem 2.2rem;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background var(--t-mid), box-shadow var(--t-mid), transform var(--t-fast);
+}
+
+.contact-form button[type="submit"]:hover:not(:disabled) {
+  background: var(--red-bright);
+  box-shadow: 0 0 22px var(--red-glow);
+  transform: translateY(-2px);
+}
+
+.contact-form button[type="submit"]:disabled {
+  background: #2a2a2a;
+  color: var(--text-dim);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Honeypot — приховане поле-пастка для ботів */
+.honeypot {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Статус-повідомлення після відправки форми */
+#statusMessage {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: none;
+}
+
+#statusMessage.success {
+  background: rgba(0, 90, 0, 0.18);
+  color: #72e672;
+  border: 1px solid #1e5a1e;
+}
+
+#statusMessage.error {
+  background: rgba(140, 0, 0, 0.18);
+  color: var(--red-hot);
+  border: 1px solid var(--red-dark);
+}
+
+/* --- 18. СЕКЦІЯ "FEATURES" (Головна) --- */
+.features-section {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 30%, var(--surface) 70%, var(--bg) 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* --- 19. ФУТЕР --- */
+footer {
+  background: linear-gradient(0deg, #000 0%, var(--surface) 100%);
+  border-top: 1px solid var(--border-red);
+  padding: 3rem 1.5rem 1.5rem;
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* Логотип у футері */
+.footer-logo {
+  font-family: var(--font-logo);
+  color: var(--red-main);
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px var(--red-glow));
+  transition: color var(--t-mid), filter var(--t-mid);
+}
+
+.footer-logo:hover {
+  color: var(--red-bright);
+  filter: drop-shadow(0 0 18px var(--red-glow));
+}
+
+/* Навігація в футері — скидаємо sticky-стилі */
+footer nav {
+  position: static;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+footer nav a {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  padding: 0.3rem 0.7rem;
+  letter-spacing: 1px;
+  transition: color var(--t-mid);
+}
+
+footer nav a:hover  { color: var(--red-bright); }
+
+/* Приховуємо червоний фон-квадрат у футері (він там не потрібен) */
+footer nav a::before { display: none; }
+
+/* Розділова лінія */
+footer hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+/* Нижній рядок */
+.footer-copy {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+}
+
+.footer-copy a {
+  color: var(--text-muted);
+  transition: color var(--t-fast);
+}
+
+.footer-copy a:hover { color: var(--red-bright); }
+
+/* --- 20. АДАПТИВНІСТЬ ---
+   Mobile-first підхід:
+   > 1024px — повний десктоп
+   768-1024px — планшет
+   480-768px — великий мобільний
+   < 480px — маленький мобільний */
+
+@media (max-width: 1024px) {
+  .articles-grid, .games-grid, .movies-grid,
+  .reviews-grid, .features-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  header h1         { font-size: 2rem; letter-spacing: 2px; }
+
+  nav               { gap: 0; }
+  nav a             { font-size: 0.72rem; padding: 0.35rem 0.65rem; letter-spacing: 0.8px; }
+
+  .container        { padding: 2rem 1rem; }
+
+  .hero             { min-height: 56vh; }
+  .hero h1          { font-size: 2.5rem; }
+
+  .articles-grid, .games-grid, .movies-grid,
+  .reviews-grid, .features-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+  }
+
+  .article-content,
+  .game-content,
+  .movie-content,
+  .review-content,
+  .feature-content  { padding: 1.2rem; }
+
+  .contact-wrapper  { padding: 2rem 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  header h1         { font-size: 1.65rem; }
+  header::after     { display: none; } /* Ховаємо краплі на малих екранах */
+
+  nav a             { font-size: 0.68rem; padding: 0.3rem 0.5rem; letter-spacing: 0; }
+
+  .hero             { min-height: 48vh; }
+  .hero h1          { font-size: 2rem; }
+
+  .articles-grid, .games-grid, .movies-grid,
+  .reviews-grid, .features-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  article.movie img { height: 240px; }
+
+  .contact-wrapper  { padding: 1.5rem 1rem; }
+  .contact-wrapper h1 { font-size: 1.7rem; }
+}
+/* --- 21. ТЕЛЕГРАМ ПОСИЛАННЯ --- */
+.tg-link {
+  color: #2AABEE !important; /* Фірмовий колір Telegram */
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700 !important;
+}
+
+.tg-link svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  transition: transform var(--t-fast);
+}
+
+/* Змінюємо червоний фон при наведенні на синій саме для Телеграму */
+nav a.tg-link::before {
+  background: #2AABEE;
+}
+
+nav a.tg-link:hover {
+  color: #fff !important;
+  text-shadow: 0 0 8px rgba(42, 171, 238, 0.8);
+}
+
+nav a.tg-link:hover svg {
+  transform: scale(1.2) rotate(-10deg); /* Іконка трохи підстрибує */
+}

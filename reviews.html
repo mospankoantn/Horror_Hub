@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="uk"> <!-- Змінено мову -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Огляди - Horror Hub</title> <!-- Оновлено title -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <!-- Підключення шрифтів (можна прибрати, якщо @import в CSS працює) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Підключення ЄДИНОГО зовнішнього CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Вбудовані стилі ВИДАЛЕНО -->
+    <script src="js/auth.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Horror Hub</h1>
+    </header>
+
+  <nav>
+      <a href="index.html">Головна</a>
+      <a href="horror_games.html">Ігри Жахів</a>
+      <a href="horror_movies.html">Фільми Жахів</a>
+      <a href="reviews.html">Огляди</a>
+      <a href="articles.html">Статті</a>
+      <a href="game.html">Ігрова Кімната</a>
+      <a href="contact.html">Контакти</a>
+      
+      <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК -->
+      <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" title="Підписатися на наш Telegram">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+        Telegram
+      </a>
+      <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+  </nav>
+      <!--
+    РЕКЛАМНИЙ БЛОК #1 — Під навігацією (Leaderboard 728×90)
+    Замініть .ad-placeholder на код Google AdSense:
+
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  -->
+  <div class="ad-zone">
+    <div class="ad-placeholder">Рекламний простір — 728×90 (підключіть Google AdSense)</div>
+  </div>
+
+    <!-- Використання <main> та h2.page-title -->
+    <main class="container">
+        <h2 class="page-title">Останні Огляди</h2>
+        <!-- Використання .reviews-grid та article.review-card -->
+        <div class="reviews-grid">
+            <!-- Review 1 -->
+            <article class="review-card">
+                <div class="review-content"> <!-- Обгортка для контенту -->
+                    <h3>Огляд рімейку "Silent Hill 2"</h3>
+                    <p>Глибоке занурення в моторошно красивий рімейк культової психологічної гри жахів.</p>
+                    <!-- Посилання стилізоване як кнопка -->
+                    <a href="review-sh2.html" class="read-more">Читати Далі &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Review 2 -->
+            <article class="review-card">
+                <div class="review-content">
+                    <h3>Огляд фільму "Відьма"</h3>
+                    <p>Тривожна історія про параною, чаклунство та розпад родини у 1600-х роках.</p>
+                    <a href="review-witch.html" class="read-more">Читати Далі &rarr;</a>
+                </div>
+            </article>
+
+            <!-- Review 3 -->
+            <article class="review-card">
+                 <div class="review-content">
+                    <h3>Огляд "Outlast Trials" (Ранній Доступ)</h3>
+                    <p>Чи виправдовує цей багатокористувацький хоррор спадщину своїх попередників?</p>
+                    <a href="review-outlast-trials.html" class="read-more">Читати Далі &rarr;</a>
+                 </div>
+            </article>
+
+            <!-- Review 4 -->
+            <article class="review-card">
+                 <div class="review-content">
+                    <h3>Огляд фільму "Спадковість"</h3>
+                    <p>Психологічний трилер, який досліджує руйнівний вплив горя та травми.</p>
+                    <a href="review-hereditary.html" class="read-more">Читати Далі &rarr;</a>
+                 </div>
+            </article>
+
+             <!-- Додайте більше оглядів -->
+
+        </div>
+    </main>
+  <!--
+    РЕКЛАМНИЙ БЛОК #2 — Між секціями (Rectangle 300×250 або великий банер)
+  -->
+  <div class="ad-zone">
+    <div class="ad-placeholder">Рекламний простір — 300×250 (підключіть Google AdSense)</div>
+  </div>
+
+<footer>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">Horror Hub</a>
+      
+      <nav>
+        <a href="index.html">Головна</a>
+        <a href="horror_games.html">Ігри Жахів</a>
+        <a href="horror_movies.html">Фільми Жахів</a>
+        <a href="reviews.html">Огляди</a>
+        <a href="articles.html">Статті</a>
+        <a href="game.html">Ігрова Кімната</a>
+        <a href="contact.html">Контакти</a>
+        
+        <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК У ФУТЕР -->
+        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+          Telegram
+        </a>
+      </nav>
+
+      <hr>
+
+      <p class="footer-copy">
+        &copy; 2026 Horror Hub. Всі права захищено.
+        &nbsp;|&nbsp; <a href="privacy.html">Конфіденційність</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

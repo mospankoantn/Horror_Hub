@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мій Профіль - Horror Hub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Підключаємо auth.js для верхнього меню -->
+  <script src="js/auth.js"></script>
+
+  <style>
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--red-main);
+      object-fit: cover;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 15px var(--red-glow);
+    }
+    .profile-name {
+      font-family: var(--font-headings);
+      color: var(--red-bright);
+      font-size: 1.8rem;
+    }
+    .profile-role {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .help-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Horror Hub</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Головна</a>
+    <a href="horror_games.html">Ігри Жахів</a>
+    <a href="horror_movies.html">Фільми Жахів</a>
+    <a href="reviews.html">Огляди</a>
+    <a href="articles.html">Статті</a>
+    <a href="game.html">Ігрова Кімната</a>
+    <a href="contact.html">Контакти</a>
+    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link">Telegram</a>
+    <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+  </nav>
+
+  <main class="container">
+    <div class="contact-wrapper">
+      <div class="profile-header" id="profile-info">
+        <!-- Аватар та ім'я підвантажаться через JS -->
+        <p style="color: var(--text-muted);">Завантаження душі...</p>
+      </div>
+
+      <form id="profileForm" class="contact-form" style="display: none;">
+        
+        <div class="form-group">
+          <label>URL нової аватарки:</label>
+          <input type="text" name="avatar" id="avatarInput" placeholder="https://example.com/my-scary-avatar.jpg">
+          <p class="help-text">Вставте пряме посилання на картинку з інтернету (jpg, png, gif).</p>
+        </div>
+
+        <div class="form-group">
+          <label>Новий пароль:</label>
+          <input type="password" name="new_password" placeholder="Введіть новий пароль">
+          <p class="help-text">Залиште пустим, якщо не хочете змінювати пароль.</p>
+        </div>
+
+        <button type="submit" id="saveBtn">Зберегти зміни</button>
+        <div id="profileMessage" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">Horror Hub</a>
+      <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const profileInfo = document.getElementById('profile-info');
+        const profileForm = document.getElementById('profileForm');
+        const avatarInput = document.getElementById('avatarInput');
+        const profileMessage = document.getElementById('profileMessage');
+
+        try {
+            // 1. Перевіряємо, чи юзер увійшов
+            const res = await fetch('api_auth.php?action=status');
+            const auth = await res.json();
+
+            if (!auth.logged_in) {
+                // Якщо не увійшов — викидаємо на сторінку логіну
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2. Виводимо інформацію про користувача
+            let roleName = auth.user.role === 'admin' ? '<span style="color:red;">Адміністратор</span>' : 'Жертва (Користувач)';
+            
+            profileInfo.innerHTML = `
+                <img src="${auth.user.avatar}" class="profile-avatar" alt="Аватар">
+                <div class="profile-name">${auth.user.username}</div>
+                <div class="profile-role">${roleName}</div>
+            `;
+
+            // Заповнюємо поле аватарки поточною ссилкою
+            avatarInput.value = auth.user.avatar;
+            profileForm.style.display = 'flex';
+
+            // 3. Обробка форми збереження
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                document.getElementById('saveBtn').textContent = 'Збереження...';
+                
+                const fd = new FormData(profileForm);
+                fd.append('action', 'update_profile');
+
+                const updateRes = await fetch('api_auth.php', {
+                    method: 'POST',
+                    body: fd
+                });
+                const result = await updateRes.json();
+
+                if (result.status === 'success') {
+                    profileMessage.style.color = '#72e672';
+                    profileMessage.textContent = result.message;
+                    // Оновлюємо сторінку через секунду, щоб аватарка оновилась скрізь
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    profileMessage.style.color = 'red';
+                    profileMessage.textContent = result.message;
+                }
+                document.getElementById('saveBtn').textContent = 'Зберегти зміни';
+            });
+
+        } catch (error) {
+            console.error('Помилка завантаження профілю:', error);
+            profileInfo.innerHTML = '<p style="color:red;">Помилка зв\'язку з базою даних.</p>';
+        }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стаття - Horror Hub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .single-article {
+      background: var(--surface);
+      border: 1px solid var(--border-red);
+      padding: 3rem 2rem;
+      border-radius: var(--radius);
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-card);
+    }
+    .single-article h1 { font-family: var(--font-headings); color: var(--red-bright); font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.2; }
+    .article-meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    .single-article img { max-width: 100%; height: auto; border-radius: var(--radius); margin: 1.5rem 0; border: 1px solid var(--border); }
+    .single-article p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; color: #ddd; }
+    .single-article h3, .single-article h4 { font-family: var(--font-headings); color: var(--red-main); margin: 2rem 0 1rem; }
+    .single-article a { color: var(--red-bright); text-decoration: underline; }
+    .tg-button { background: #2AABEE; color: #fff !important; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: background 0.3s; }
+    .tg-button:hover { background: #1c88c7; }
+  </style>
+  
+  <!-- Підключаємо auth.js для верхнього меню -->
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>Horror Hub</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Головна</a>
+    <a href="horror_games.html">Ігри Жахів</a>
+    <a href="horror_movies.html">Фільми Жахів</a>
+    <a href="reviews.html">Огляди</a>
+    <a href="articles.html" class="active">Статті</a>
+    <a href="game.html">Ігрова Кімната</a>
+    <a href="contact.html">Контакти</a>
+    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+      Telegram
+    </a>
+    <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+  </nav>
+
+  <div class="ad-zone">
+    <div class="ad-placeholder">Рекламний простір — 728×90</div>
+  </div>
+
+  <main class="container">
+    
+    <!-- БЛОК СТАТТІ -->
+    <article class="single-article" id="article-content">
+      <h1 style="text-align: center; color: var(--text-muted);">Виклик духів... (Завантаження)</h1>
+    </article>
+
+    <!-- БЛОК КОМЕНТАРІВ (ТЕПЕР ВІН ЗОВНІ!) -->
+    <section class="single-article" style="margin-top: 2rem;">
+        <h3>Коментарі</h3>
+        <div id="comment-form-container">
+            <!-- JS підставить форму сюди, якщо юзер увійшов -->
+        </div>
+        <div id="comments-list" style="margin-top: 2rem;">
+            <p style="color: var(--text-muted);">Завантаження коментарів...</p>
+        </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">Horror Hub</a>
+      <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
+    </div>
+  </footer>
+
+  <!-- Магія завантаження тексту та коментарів -->
+  <script src="js/render_article.js"></script>
+</body>
+</html>
