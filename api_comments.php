@@ -22,9 +22,19 @@ elseif ($action == 'post') {
         echo json_encode(['status' => 'error', 'message' => 'Потрібно увійти']); exit;
     }
 
+    $user_id = $_SESSION['user_id'];
+
+    // ПЕРЕВІРКА НА БАН
+    $stmt = $pdo->prepare("SELECT is_banned FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
+    
+    if ($user['is_banned']) {
+        echo json_encode(['status' => 'error', 'message' => 'Ваш акаунт заблоковано за порушення правил.']); exit;
+    }
+
     $article_id = $_POST['article_id'];
     $text = htmlspecialchars(trim($_POST['comment_text']));
-    $user_id = $_SESSION['user_id'];
 
     if (empty($text)) {
         echo json_encode(['status' => 'error', 'message' => 'Коментар порожній']); exit;

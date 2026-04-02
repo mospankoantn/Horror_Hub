@@ -89,13 +89,27 @@
     <p class="page-subtitle">Від перших пікселів 1960-х до сучасних шедеврів хоррору</p>
 
     <!-- ПАНЕЛЬ КЕРУВАННЯ (Пошук, Сортування, Ліміт) -->
+<!-- ПАНЕЛЬ КЕРУВАННЯ (Пошук, Фільтри, Сортування, Ліміт) -->
     <div class="controls-bar">
       <input type="text" id="searchInput" placeholder="Знайти статтю у темряві...">
       
       <div class="filters-group">
+        <!-- Новий фільтр: Жанри -->
+        <select id="genreSelect">
+          <option value="">Всі жанри</option>
+        </select>
+
+        <!-- Новий фільтр: Розробники -->
+        <select id="devSelect">
+          <option value="">Всі розробники</option>
+        </select>
+
         <select id="sortSelect">
-          <option value="newest" selected>Спочатку нові (останні)</option>
-          <option value="oldest">Спочатку старі (перші)</option>
+          <option value="newest" selected>Додано: Спочатку нові</option>
+          <option value="oldest">Додано: Спочатку старі</option>
+          <!-- Нові сортування по релізу -->
+          <option value="release_desc">Реліз: Від нових до старих</option>
+          <option value="release_asc">Реліз: Від старих до нових</option>
         </select>
         
         <select id="limitSelect">
