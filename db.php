@@ -10,9 +10,15 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     // Стартуємо сесію для всього сайту
     if (session_status() == PHP_SESSION_NONE) {
+        session_set_cookie_params([
+            'httponly' => true,
+            'samesite' => 'Lax',
+            'secure' => !empty($_SERVER['HTTPS'])
+        ]);
         session_start();
     }
 } catch(PDOException $e) {
-    die("Помилка підключення до бази даних: " . $e->getMessage());
+    error_log("DB connection error: " . $e->getMessage());
+    die("Помилка підключення до бази даних.");
 }
 ?>

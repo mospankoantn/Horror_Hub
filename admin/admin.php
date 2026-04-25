@@ -5,22 +5,37 @@ set_time_limit(300); // Збільшуємо ліміт часу для бека
 // ==========================================
 // НАЛАШТУВАННЯ
 // ==========================================
-$admin_password = 'admin'; // ПАРОЛЬ!
 $json_file = '../articles_data.json';
+$admin_password = getenv('HORROR_HUB_ADMIN_PASSWORD') ?: '';
+$admin_password_hash = getenv('HORROR_HUB_ADMIN_PASSWORD_HASH') ?: '';
 
 // Підключення до БД
 require_once '../db.php'; 
 
 if (isset($_GET['logout'])) { session_destroy(); header("Location: admin.php"); exit; }
 
-if (isset($_POST['login'])) {
-    if ($_POST['password'] === $admin_password) {
-        $_SESSION['is_admin'] = true; header("Location: admin.php"); exit;
-    } else { $error_msg = "Невірний пароль!"; }
+function hasAdminAccess(): bool {
+    return (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] === true)
+        || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
 }
 
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    echo '<!DOCTYPE html><html lang="uk"><head><title>Вхід</title><style>body{background:#040404;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;} form{background:#111;padding:2rem;border:1px solid #9e0000;} input,button{padding:10px;margin:5px;}</style></head><body><form method="POST"><h2>Horror Admin</h2><input type="password" name="password"><button type="submit" name="login">Вхід</button></form></body></html>';
+function adminPasswordMatches(string $password, string $plainPassword, string $passwordHash): bool {
+    if ($passwordHash !== '') {
+        return password_verify($password, $passwordHash);
+    }
+
+    return $plainPassword !== '' && hash_equals($plainPassword, $password);
+}
+
+if (isset($_POST['login'])) {
+    if (adminPasswordMatches((string)($_POST['password'] ?? ''), $admin_password, $admin_password_hash)) {
+        $_SESSION['is_admin'] = true; header("Location: admin.php"); exit;
+    } else { $error_msg = "Невірний пароль або адмін-пароль не налаштовано."; }
+}
+
+if (!hasAdminAccess()) {
+    $error = isset($error_msg) ? '<p style="color:#f03030;">' . htmlspecialchars($error_msg) . '</p>' : '';
+    echo '<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8"><title>Вхід</title><style>body{background:#040404;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;} form{background:#111;padding:2rem;border:1px solid #9e0000;min-width:280px;} input,button{padding:10px;margin:5px 0;width:100%;box-sizing:border-box;} button{background:#9e0000;color:#fff;border:0;cursor:pointer;}</style></head><body><form method="POST"><h2>Horror Admin</h2>' . $error . '<input type="password" name="password" autocomplete="current-password" required><button type="submit" name="login">Вхід</button></form></body></html>';
     exit;
 }
 
@@ -35,9 +50,21 @@ function syncDbToJson($pdo, $json_file) {
 
 function parseTelegraphNodeToHTML($node) {
     if (is_string($node)) return htmlspecialchars($node);
-    $html = "<{$node['tag']}";
+    $tag = strtolower((string)($node['tag'] ?? ''));
+    $allowed_tags = ['a','aside','b','blockquote','br','code','em','figcaption','figure','h3','h4','hr','i','img','li','ol','p','pre','s','strong','u','ul'];
+    if (!in_array($tag, $allowed_tags, true)) {
+        $html = '';
+        if (isset($node['children'])) {
+            foreach ($node['children'] as $child) $html .= parseTelegraphNodeToHTML($child);
+        }
+        return $html;
+    }
+
+    $html = "<{$tag}";
     if (isset($node['attrs'])) {
         foreach ($node['attrs'] as $key => $value) {
+            if (!preg_match('/^[a-zA-Z_:.-]+$/', $key)) continue;
+            if (!in_array($key, ['href', 'src', 'alt', 'title'], true)) continue;
             if ($key === 'src' && strpos($value, '/') === 0) $value = 'https://telegra.ph' . $value;
             $html .= " {$key}=\"" . htmlspecialchars($value) . "\"";
         }
@@ -46,7 +73,7 @@ function parseTelegraphNodeToHTML($node) {
     if (isset($node['children'])) {
         foreach ($node['children'] as $child) $html .= parseTelegraphNodeToHTML($child);
     }
-    $html .= "</{$node['tag']}>";
+    if (!in_array($tag, ['br', 'hr', 'img'], true)) $html .= "</{$tag}>";
     return $html;
 }
 
@@ -55,9 +82,18 @@ $countDB = $pdo->query("SELECT COUNT(*) FROM articles")->fetchColumn();
 if ($countDB == 0 && file_exists($json_file)) {
     $jsonData = json_decode(file_get_contents($json_file), true);
     if (!empty($jsonData)) {
-        $stmt = $pdo->prepare("INSERT INTO articles (url, image_url, title, preview_text, sort_order) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO articles (url, image_url, title, preview_text, release_date, developer, genre, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         foreach ($jsonData as $index => $item) {
-            $stmt->execute([$item['url'], $item['imageUrl'], $item['title'], $item['previewText'], $index]);
+            $stmt->execute([
+                $item['url'] ?? '',
+                $item['imageUrl'] ?? '',
+                $item['title'] ?? '',
+                $item['previewText'] ?? '',
+                $item['release_date'] ?? '',
+                $item['developer'] ?? '',
+                $item['genre'] ?? '',
+                $index
+            ]);
         }
     }
 }
@@ -430,7 +466,7 @@ if (autofillBtn) {
                 if (firstImg && firstP) break;
             }
             
-            document.getElementById('imageInput').value = firstImg || '../images/article-fallback.jpg';
+            document.getElementById('imageInput').value = firstImg || '../images/placeholder.jpg';
             document.getElementById('previewInput').value = firstP ? (firstP.length>250 ? firstP.substring(0,250)+'...' : firstP) : '';
             
             this.innerHTML = '✨ Ок!'; setTimeout(() => { this.innerHTML = '✨ Автозаповнити'; this.disabled = false; }, 2000);

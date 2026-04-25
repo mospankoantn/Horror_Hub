@@ -1,246 +1,334 @@
-/**
- * load_articles.js
- * ─────────────────────────────────────────────────────────────────
- * Завантажує статті з articles_data.json, генерує фільтри і рендерить сітку
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.getElementById('articlesGrid');
-    if (!grid) return;
-  
-    // DOM Елементи керування
-    const searchInput = document.getElementById('searchInput');
-    const sortSelect = document.getElementById('sortSelect');
-    const limitSelect = document.getElementById('limitSelect');
-    const genreSelect = document.getElementById('genreSelect');
-    const devSelect = document.getElementById('devSelect');
-    const prevBtn = document.getElementById('prevPage');
-    const nextBtn = document.getElementById('nextPage');
-    const pageInfo = document.getElementById('pageInfo');
-  
-    // Змінні стану
-    let allArticles = [];      
-    let filteredArticles = []; 
-    let currentPage = 1;
-    let itemsPerPage = 10;
-    let currentSort = 'newest';
-    let searchQuery = '';
-    let selectedGenre = '';
-    let selectedDev = '';
-  
-    // 1. ЗАВАНТАЖУЄМО ДАНІ
-    fetch('articles_data.json')
-      .then(res => {
-        if (!res.ok) throw new Error('Помилка завантаження файлу JSON');
-        return res.json();
-      })
-      .then(data => {
-        allArticles = data; 
-        populateFilters(); // Генеруємо списки жанрів і розробників
-        updateView();       
-      })
-      .catch(error => {
-        console.error('Помилка load_articles.js:', error);
-        grid.innerHTML = '<p style="color:red; text-align:center; grid-column: 1/-1;">Не вдалося завантажити статті.</p>';
+  const grid = document.getElementById('articlesGrid');
+  if (!grid) return;
+
+  const controls = {
+    search: document.getElementById('searchInput'),
+    sort: document.getElementById('sortSelect'),
+    limit: document.getElementById('limitSelect'),
+    genre: document.getElementById('genreSelect'),
+    developer: document.getElementById('devSelect'),
+    prev: document.getElementById('prevPage'),
+    next: document.getElementById('nextPage'),
+    pageInfo: document.getElementById('pageInfo'),
+    resultsInfo: document.getElementById('resultsInfo')
+  };
+
+  const requiredControls = Object.entries(controls)
+    .filter(([key]) => key !== 'resultsInfo')
+    .filter(([, element]) => !element)
+    .map(([key]) => key);
+
+  if (requiredControls.length > 0) {
+    console.error(`load_articles.js: missing controls: ${requiredControls.join(', ')}`);
+    return;
+  }
+
+  const state = {
+    allArticles: [],
+    filteredArticles: [],
+    currentPage: 1,
+    itemsPerPage: Number.parseInt(controls.limit.value, 10) || 10,
+    currentSort: controls.sort.value || 'newest',
+    searchQuery: '',
+    selectedGenre: '',
+    selectedDeveloper: ''
+  };
+
+  grid.setAttribute('aria-live', 'polite');
+
+  loadArticles();
+  bindEvents();
+
+  async function loadArticles() {
+    setLoading(true);
+
+    try {
+      const response = await fetch(`articles_data.json?t=${Date.now()}`, {
+        headers: { Accept: 'application/json' }
       });
-  
-    // 2. ГЕНЕРАЦІЯ СПИСКІВ ДЛЯ ФІЛЬТРІВ
-    function populateFilters() {
-        const genres = new Set();
-        const devs = new Set();
 
-        allArticles.forEach(article => {
-            if (article.genre) genres.add(article.genre.trim());
-            if (article.developer) devs.add(article.developer.trim());
-        });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
-        // Сортуємо за алфавітом і додаємо в select
-        Array.from(genres).sort().forEach(g => {
-            if(g !== "") genreSelect.innerHTML += `<option value="${g}">${g}</option>`;
-        });
-        
-        Array.from(devs).sort().forEach(d => {
-            if(d !== "") devSelect.innerHTML += `<option value="${d}">${d}</option>`;
-        });
+      const articles = await response.json();
+      if (!Array.isArray(articles)) {
+        throw new Error('articles_data.json має містити масив статей');
+      }
+
+      state.allArticles = articles.filter(isValidArticle);
+      populateFilters();
+      updateView();
+    } catch (error) {
+      console.error('Помилка load_articles.js:', error);
+      showEmptyState('Не вдалося завантажити статті. Перевірте articles_data.json або сервер.');
+      updatePagination(1);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    // 3. СЛУХАЧІ ПОДІЙ
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value.toLowerCase();
-      currentPage = 1; 
-      updateView();
-    });
-  
-    sortSelect.addEventListener('change', (e) => {
-      currentSort = e.target.value;
-      currentPage = 1;
-      updateView();
-    });
+  function bindEvents() {
+    let searchTimer = 0;
 
-    genreSelect.addEventListener('change', (e) => {
-      selectedGenre = e.target.value;
-      currentPage = 1;
-      updateView();
-    });
-
-    devSelect.addEventListener('change', (e) => {
-      selectedDev = e.target.value;
-      currentPage = 1;
-      updateView();
-    });
-  
-    limitSelect.addEventListener('change', (e) => {
-      itemsPerPage = parseInt(e.target.value);
-      currentPage = 1;
-      updateView();
-    });
-  
-    prevBtn.addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
+    controls.search.addEventListener('input', (event) => {
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(() => {
+        state.searchQuery = normalize(event.target.value);
+        state.currentPage = 1;
         updateView();
-        window.scrollTo({ top: grid.offsetTop - 100, behavior: 'smooth' }); 
-      }
+      }, 180);
     });
-  
-    nextBtn.addEventListener('click', () => {
-      const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
-      if (currentPage < totalPages) {
-        currentPage++;
-        updateView();
-        window.scrollTo({ top: grid.offsetTop - 100, behavior: 'smooth' }); 
-      }
+
+    controls.sort.addEventListener('change', (event) => {
+      state.currentSort = event.target.value;
+      state.currentPage = 1;
+      updateView();
     });
-  
-    // ДОПОМІЖНА ФУНКЦІЯ: Витягує рік з рядка (напр. "2003 рік" -> 2003)
-    function extractYear(dateString) {
-        if (!dateString) return 0;
-        const match = dateString.match(/\d{4}/); // Шукаємо 4 цифри підряд (рік)
-        return match ? parseInt(match[0]) : 0;
+
+    controls.genre.addEventListener('change', (event) => {
+      state.selectedGenre = event.target.value;
+      state.currentPage = 1;
+      updateView();
+    });
+
+    controls.developer.addEventListener('change', (event) => {
+      state.selectedDeveloper = event.target.value;
+      state.currentPage = 1;
+      updateView();
+    });
+
+    controls.limit.addEventListener('change', (event) => {
+      state.itemsPerPage = Number.parseInt(event.target.value, 10) || 10;
+      state.currentPage = 1;
+      updateView();
+    });
+
+    controls.prev.addEventListener('click', () => {
+      if (state.currentPage <= 1) return;
+      state.currentPage -= 1;
+      updateView();
+      scrollToGrid();
+    });
+
+    controls.next.addEventListener('click', () => {
+      const totalPages = getTotalPages();
+      if (state.currentPage >= totalPages) return;
+      state.currentPage += 1;
+      updateView();
+      scrollToGrid();
+    });
+  }
+
+  function populateFilters() {
+    const genres = uniqueSortedValues(state.allArticles.map((article) => article.genre));
+    const developers = uniqueSortedValues(state.allArticles.map((article) => article.developer));
+
+    replaceOptions(controls.genre, 'Всі жанри', genres);
+    replaceOptions(controls.developer, 'Всі розробники', developers);
+  }
+
+  function updateView() {
+    const query = state.searchQuery;
+
+    const filtered = state.allArticles.filter((article) => {
+      const searchableText = normalize([
+        article.title,
+        article.previewText,
+        article.genre,
+        article.developer,
+        article.release_date
+      ].join(' '));
+
+      const genre = (article.genre || '').trim();
+      const developer = (article.developer || '').trim();
+
+      return searchableText.includes(query)
+        && (!state.selectedGenre || genre === state.selectedGenre)
+        && (!state.selectedDeveloper || developer === state.selectedDeveloper);
+    });
+
+    state.filteredArticles = sortArticles(filtered);
+
+    const totalPages = getTotalPages();
+    if (state.currentPage > totalPages) state.currentPage = totalPages;
+
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const pageItems = state.filteredArticles.slice(startIndex, startIndex + state.itemsPerPage);
+
+    updatePagination(totalPages);
+    renderGrid(pageItems);
+  }
+
+  function renderGrid(items) {
+    if (items.length === 0) {
+      showEmptyState('За вашим запитом нічого не знайдено.');
+      return;
     }
 
-    // 4. ГОЛОВНА ФУНКЦІЯ ОНОВЛЕННЯ ДАНИХ
-    function updateView() {
-      // Крок А: Фільтрація (Пошук + Жанр + Розробник)
-      let tempArticles = allArticles.filter(article => {
-        // Пошук по тексту (назва, опис, жанр, розробник)
-        const searchStr = `${article.title} ${article.previewText} ${article.genre || ''} ${article.developer || ''}`.toLowerCase();
-        const matchSearch = searchStr.includes(searchQuery);
-        
-        // Фільтри по випадаючих списках (точний збіг)
-        const matchGenre = selectedGenre === '' || (article.genre && article.genre.trim() === selectedGenre);
-        const matchDev = selectedDev === '' || (article.developer && article.developer.trim() === selectedDev);
+    const fragment = document.createDocumentFragment();
 
-        return matchSearch && matchGenre && matchDev;
-      });
-  
-      // Крок Б: Сортування
-      if (currentSort === 'newest') {
-          // Оскільки в JSON найновіші в кінці (якщо ти зберігаєш через адмінку), перевертаємо
-          tempArticles.reverse();
-      } else if (currentSort === 'oldest') {
-          // Залишаємо як є
-      } else if (currentSort === 'release_desc') {
-          // Від найновіших релізів до найстаріших
-          tempArticles.sort((a, b) => extractYear(b.release_date) - extractYear(a.release_date));
-      } else if (currentSort === 'release_asc') {
-          // Від найстаріших релізів до найновіших
-          tempArticles.sort((a, b) => extractYear(a.release_date) - extractYear(b.release_date));
+    items.forEach((article, index) => {
+      if (index > 0 && index % 6 === 0) {
+        fragment.appendChild(createAdCard());
       }
-  
-      filteredArticles = tempArticles;
-  
-      // Крок В: Пагінація
-      const totalPages = Math.ceil(filteredArticles.length / itemsPerPage) || 1;
-      if (currentPage > totalPages) currentPage = totalPages;
-  
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      
-      const pageItems = filteredArticles.slice(startIndex, endIndex);
-  
-      // Оновлюємо UI кнопок
-      pageInfo.textContent = `Сторінка ${currentPage} з ${totalPages}`;
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === totalPages;
-  
-      renderGrid(pageItems);
-    }
-  
-    // 5. ФУНКЦІЯ ВІДМАЛЬОВУВАННЯ СІТКИ
-    function renderGrid(items) {
-      grid.innerHTML = '';
-      
-      if (items.length === 0) {
-        grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 3rem 0;">За вашим запитом монстрів не знайдено.</p>';
-        return;
-      }
-  
-      items.forEach((data, index) => {
-        if (index > 0 && index % 6 === 0) {
-          grid.appendChild(createAdCard());
-        }
-        grid.appendChild(createArticleCard(data));
-      });
-    }
-  
-    // 6. СТВОРЕННЯ КАРТКИ
-    function createArticleCard(data) {
-      const article = document.createElement('article');
-      article.className = 'article';
-  
-      const imgWrap = document.createElement('div');
-      imgWrap.className = 'img-wrap';
-  
-      const img = document.createElement('img');
-      img.src = data.imageUrl || 'images/article-fallback.jpg';
-      img.alt = `Прев'ю: ${data.title}`;
-      img.loading = 'lazy';
-      imgWrap.appendChild(img);
-  
-      const content = document.createElement('div');
-      content.className = 'article-content';
-  
-      const h2 = document.createElement('h2');
-      h2.textContent = data.title;
 
-      // Вивід Мета-даних (Жанр, Рік, Розробник)
-      const meta = document.createElement('small');
-      meta.style.color = 'var(--red-main)';
-      meta.style.display = 'block';
-      meta.style.marginBottom = '10px';
-      meta.style.fontWeight = 'bold';
-      meta.style.fontFamily = 'var(--font-headings)';
-      
-      let metaData = [];
-      if (data.genre) metaData.push(data.genre);
-      if (data.release_date) metaData.push(data.release_date);
-      if (data.developer) metaData.push(data.developer);
-      
-      meta.textContent = metaData.length > 0 ? metaData.join(' | ') : 'Стаття';
-  
-      const p = document.createElement('p');
-      p.textContent = data.previewText;
-  
-      const a = document.createElement('a');
-      const urlObj = new URL(data.url);
-      const path = urlObj.pathname.substring(1); 
-      a.href = `article.html?id=${path}`;
-      a.className = 'read-more';
-      a.textContent = 'Читати Далі →';
-  
-      content.append(h2, meta, p, a);
-      article.append(imgWrap, content);
-  
-      return article;
+      fragment.appendChild(createArticleCard(article));
+    });
+
+    grid.replaceChildren(fragment);
+  }
+
+  function createArticleCard(data) {
+    const article = document.createElement('article');
+    article.className = 'article';
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'img-wrap';
+
+    const img = document.createElement('img');
+    img.src = getImageUrl(data.imageUrl);
+    img.alt = `Прев'ю: ${data.title}`;
+    img.loading = 'lazy';
+    img.referrerPolicy = 'no-referrer';
+    img.addEventListener('error', () => {
+      img.src = 'images/placeholder.jpg';
+    }, { once: true });
+    imgWrap.appendChild(img);
+
+    const content = document.createElement('div');
+    content.className = 'article-content';
+
+    const title = document.createElement('h2');
+    title.textContent = data.title;
+
+    const meta = document.createElement('small');
+    meta.className = 'article-meta-list';
+    meta.textContent = getMetaText(data);
+
+    const preview = document.createElement('p');
+    preview.textContent = data.previewText || "Опис скоро з'явиться.";
+
+    const link = document.createElement('a');
+    link.href = `article.html?id=${encodeURIComponent(getArticleId(data.url))}`;
+    link.className = 'read-more';
+    link.textContent = 'Читати далі';
+
+    content.append(title, meta, preview, link);
+    article.append(imgWrap, content);
+
+    return article;
+  }
+
+  function createAdCard() {
+    const card = document.createElement('aside');
+    card.className = 'ad-card';
+    card.setAttribute('aria-label', 'Рекламний блок');
+
+    const text = document.createElement('p');
+    text.textContent = 'Рекламний простір 300x250';
+    card.appendChild(text);
+
+    return card;
+  }
+
+  function sortArticles(articles) {
+    const sorted = [...articles];
+
+    switch (state.currentSort) {
+      case 'newest':
+        return sorted.reverse();
+      case 'release_desc':
+        return sorted.sort((a, b) => extractYear(b.release_date) - extractYear(a.release_date));
+      case 'release_asc':
+        return sorted.sort((a, b) => extractYear(a.release_date) - extractYear(b.release_date));
+      case 'oldest':
+      default:
+        return sorted;
     }
-  
-    function createAdCard() {
-      const card = document.createElement('div');
-      card.className = 'ad-card';
-      const p = document.createElement('p');
-      p.textContent = 'Рекламний простір 300×250';
-      card.appendChild(p);
-      return card;
+  }
+
+  function updatePagination(totalPages) {
+    const total = state.filteredArticles.length;
+    controls.pageInfo.textContent = `Сторінка ${state.currentPage} з ${totalPages}`;
+    controls.prev.disabled = state.currentPage === 1;
+    controls.next.disabled = state.currentPage === totalPages;
+
+    if (controls.resultsInfo) {
+      controls.resultsInfo.textContent = total === 1
+        ? 'Знайдено 1 матеріал'
+        : `Знайдено ${total} матеріалів`;
     }
+  }
+
+  function getTotalPages() {
+    return Math.max(1, Math.ceil(state.filteredArticles.length / state.itemsPerPage));
+  }
+
+  function showEmptyState(message) {
+    const empty = document.createElement('p');
+    empty.className = 'empty-state';
+    empty.textContent = message;
+    grid.replaceChildren(empty);
+  }
+
+  function setLoading(isLoading) {
+    grid.classList.toggle('is-loading', isLoading);
+  }
+
+  function scrollToGrid() {
+    window.scrollTo({ top: Math.max(grid.offsetTop - 100, 0), behavior: 'smooth' });
+  }
+
+  function replaceOptions(select, firstLabel, values) {
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(new Option(firstLabel, ''));
+
+    values.forEach((value) => {
+      fragment.appendChild(new Option(value, value));
+    });
+
+    select.replaceChildren(fragment);
+  }
+
+  function uniqueSortedValues(values) {
+    return [...new Set(values.map((value) => (value || '').trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' }));
+  }
+
+  function normalize(value) {
+    return String(value || '').toLocaleLowerCase('uk').trim();
+  }
+
+  function extractYear(value) {
+    const match = String(value || '').match(/\d{4}/);
+    return match ? Number.parseInt(match[0], 10) : 0;
+  }
+
+  function isValidArticle(article) {
+    return article && typeof article === 'object' && article.title && article.url && article.previewText;
+  }
+
+  function getMetaText(article) {
+    const parts = [article.genre, article.release_date, article.developer]
+      .map((value) => (value || '').trim())
+      .filter(Boolean);
+
+    return parts.length > 0 ? parts.join(' | ') : 'Стаття';
+  }
+
+  function getImageUrl(value) {
+    const imageUrl = String(value || '').trim();
+    return imageUrl || 'images/placeholder.jpg';
+  }
+
+  function getArticleId(url) {
+    try {
+      const parsedUrl = new URL(url, window.location.href);
+      return parsedUrl.pathname.replace(/^\/+/, '') || String(url);
+    } catch (error) {
+      return String(url || '').replace(/^https?:\/\/telegra\.ph\//i, '').replace(/^\/+/, '');
+    }
+  }
 });

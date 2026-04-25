@@ -24,10 +24,12 @@
   --red-bright:   #c0392b;
   --red-hot:      #f03030;
   --red-glow:     rgba(158, 0, 0, 0.45);
+  --accent-cold:  #5fa8b8;
+  --accent-ash:   #a9a093;
 
   /* Текст */
-  --text:         #c4c4c4;
-  --text-muted:   #666666;
+  --text:         #d4d0c8;
+  --text-muted:   #8a837a;
   --text-dim:     #393939;
 
   /* Межі */
@@ -65,6 +67,7 @@
 html                   { scroll-behavior: smooth; }
 img                    { display: block; max-width: 100%; }
 a                      { text-decoration: none; }
+[hidden]               { display: none !important; }
 
 body {
   font-family:     var(--font-body);
@@ -455,6 +458,119 @@ nav a.active::before {
   margin-bottom: 3rem;
 }
 
+/* --- ПАНЕЛЬ СТАТЕЙ --- */
+.controls-bar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(95, 168, 184, 0.08), transparent 36%),
+    var(--surface);
+  border: 1px solid var(--border-red);
+  border-left: 3px solid var(--red-main);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.filters-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.controls-bar input,
+.controls-bar select {
+  min-height: 44px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--t-mid), box-shadow var(--t-mid), background var(--t-mid);
+}
+
+.controls-bar input {
+  width: 100%;
+}
+
+.controls-bar select {
+  max-width: 240px;
+}
+
+.controls-bar input:focus,
+.controls-bar select:focus {
+  border-color: var(--accent-cold);
+  box-shadow: 0 0 0 3px rgba(95, 168, 184, 0.14), 0 0 12px var(--red-glow);
+}
+
+.results-info {
+  grid-column: 1 / -1;
+  color: var(--accent-ash);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  width: 100%;
+  text-align: center;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-red);
+  border-radius: var(--radius);
+  padding: 3rem 1rem;
+}
+
+.articles-grid.is-loading {
+  opacity: 0.6;
+}
+
+.article-meta-list {
+  display: block;
+  margin-bottom: 0.85rem;
+  color: var(--accent-ash);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 3rem;
+}
+
+.page-info {
+  color: var(--text-muted);
+  font-family: var(--font-headings);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+
 /* --- 12. СІТКИ КОНТЕНТУ --- */
 .articles-grid,
 .games-grid,
@@ -644,7 +760,202 @@ article:hover .feature-content h3 {
   transform: translateY(-2px);
 }
 
-/* --- 17. КОНТАКТНА ФОРМА --- */
+/* --- 17. ОКРЕМА СТАТТЯ ТА КОМЕНТАРІ --- */
+.single-article {
+  background:
+    linear-gradient(180deg, rgba(95, 168, 184, 0.04), transparent 26%),
+    var(--surface);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.comments-section {
+  margin-top: 2rem;
+}
+
+.loading-title {
+  text-align: center;
+  color: var(--text-muted) !important;
+}
+
+.comments-list {
+  margin-top: 2rem;
+}
+
+.single-article h1 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.2;
+  margin-bottom: 0.7rem;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-body img,
+.single-article img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 1.5rem 0;
+}
+
+.article-body p,
+.single-article > p {
+  color: #ddd;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  margin-bottom: 1.35rem;
+}
+
+.article-body h3,
+.article-body h4,
+.comments-section h3 {
+  font-family: var(--font-headings);
+  color: var(--red-main);
+  margin: 2rem 0 1rem;
+}
+
+.article-body a,
+.inline-link {
+  color: var(--red-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tg-button {
+  display: inline-block;
+  background: #2AABEE;
+  color: #fff !important;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: background var(--t-mid), transform var(--t-fast);
+}
+
+.tg-button:hover {
+  background: #1c88c7;
+  transform: translateY(-1px);
+}
+
+.muted-text {
+  color: var(--text-muted);
+}
+
+.error-text {
+  color: var(--red-hot);
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.comment-form textarea {
+  min-height: 110px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  font-family: var(--font-body);
+  resize: vertical;
+}
+
+.comment-form button {
+  align-self: flex-start;
+  background: var(--red-main);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-mid), box-shadow var(--t-mid), transform var(--t-fast);
+}
+
+.comment-form button:hover:not(:disabled) {
+  background: var(--red-bright);
+  box-shadow: 0 0 16px var(--red-glow);
+  transform: translateY(-2px);
+}
+
+.comment-form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.form-note {
+  min-height: 1.2rem;
+  color: var(--red-hot);
+  font-size: 0.86rem;
+}
+
+.comment-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--red-dark);
+  object-fit: cover;
+  margin: 0;
+}
+
+.comment-header strong {
+  color: var(--red-bright);
+}
+
+.comment-header time {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.admin-badge {
+  display: inline-block;
+  margin-left: 0.45rem;
+  color: var(--accent-cold);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.comment-body {
+  color: #ddd;
+  margin: 0;
+  padding-left: 44px;
+}
+
+/* --- 18. КОНТАКТНА ФОРМА --- */
 /* Нова обгортка — додана в contact.html */
 .contact-wrapper {
   max-width: 720px;
@@ -663,6 +974,32 @@ article:hover .feature-content h3 {
   text-align: center;
   margin-bottom: 2rem;
   letter-spacing: 2px;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.auth-panel {
+  background:
+    linear-gradient(135deg, rgba(95, 168, 184, 0.06), transparent 38%),
+    var(--surface);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.auth-panel h3 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.5rem;
+  margin-bottom: 1.3rem;
+  letter-spacing: 1px;
 }
 
 .contact-form {
@@ -685,6 +1022,7 @@ article:hover .feature-content h3 {
 
 .contact-form input[type="text"],
 .contact-form input[type="email"],
+.contact-form input[type="password"],
 .contact-form textarea {
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -765,6 +1103,59 @@ article:hover .feature-content h3 {
   background: rgba(140, 0, 0, 0.18);
   color: var(--red-hot);
   border: 1px solid var(--red-dark);
+}
+
+.form-note.is-success,
+.is-success {
+  color: #72e672;
+}
+
+.form-note.is-error,
+.is-error {
+  color: var(--red-hot);
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--red-main);
+  object-fit: cover;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 15px var(--red-glow);
+}
+
+.profile-name {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.8rem;
+}
+
+.profile-role {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.help-text {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.profile-message {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 700;
 }
 
 /* --- 18. СЕКЦІЯ "FEATURES" (Головна) --- */
@@ -852,6 +1243,345 @@ footer hr {
 
 .footer-copy a:hover { color: var(--red-bright); }
 
+.user-menu {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-left: 0.8rem;
+}
+
+.user-menu a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.user-menu img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--red-main);
+  object-fit: cover;
+}
+
+.user-menu__admin,
+.user-menu__login {
+  color: var(--red-bright) !important;
+}
+
+.user-menu__logout {
+  color: var(--text-muted) !important;
+}
+
+/* --- 20. ІГРОВА КІМНАТА --- */
+.game-page {
+  background-color: #030303;
+}
+
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(95, 168, 184, 0.025), rgba(0, 0, 255, 0.045));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.36;
+}
+
+.game-selection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.game-mode-card,
+.game-shell {
+  background:
+    linear-gradient(145deg, rgba(95, 168, 184, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(158, 0, 0, 0.1), transparent 44%),
+    var(--surface);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card), inset 0 0 50px rgba(0, 0, 0, 0.45);
+}
+
+.game-mode-card {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 1.1rem;
+  min-height: 320px;
+  padding: 1.6rem;
+}
+
+.mode-kicker {
+  display: block;
+  color: var(--accent-cold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.game-mode-card h3 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.65rem;
+  line-height: 1.25;
+  margin-bottom: 0.85rem;
+}
+
+.game-mode-card p,
+.maze-instructions {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.difficulty-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.difficulty-btn,
+.icon-text-btn,
+.game-choice-btn,
+.game-choices button {
+  min-height: 44px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--t-mid), color var(--t-mid), border-color var(--t-mid), box-shadow var(--t-mid), transform var(--t-fast);
+}
+
+.difficulty-btn,
+.icon-text-btn {
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.8rem;
+}
+
+.difficulty-btn:hover,
+.difficulty-btn.is-active,
+.icon-text-btn:hover {
+  color: #fff;
+  border-color: var(--accent-cold);
+  background: rgba(95, 168, 184, 0.14);
+  box-shadow: 0 0 16px rgba(95, 168, 184, 0.14);
+}
+
+.game-choice-btn {
+  width: 100%;
+  background: linear-gradient(90deg, var(--red-dark), #120707);
+  color: #fff;
+  border: 1px solid var(--red-bright);
+  padding: 0.9rem 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.game-choice-btn:hover,
+.game-choices button:hover:not(:disabled) {
+  background: var(--red-main);
+  color: #fff;
+  border-color: var(--red-bright);
+  box-shadow: 0 0 22px var(--red-glow);
+  transform: translateY(-2px);
+}
+
+.game-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-height: 560px;
+  margin-top: 2rem;
+  padding: 1.3rem;
+}
+
+.game-toolbar,
+.quest-hud,
+.maze-hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.game-toolbar {
+  justify-content: space-between;
+}
+
+.quest-hud,
+.maze-hud {
+  justify-content: flex-start;
+}
+
+.quest-hud span,
+.maze-hud span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent-ash);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.game-story {
+  flex-grow: 1;
+  min-height: 260px;
+  color: #d8d4cc;
+  background: rgba(0, 0, 0, 0.36);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.35rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  text-shadow: 0 0 5px rgba(200, 200, 200, 0.22);
+}
+
+.game-choices {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.game-choices button {
+  width: 100%;
+  background: transparent;
+  color: var(--red-bright);
+  border: 1px solid var(--red-dark);
+  padding: 0.85rem 1rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.08rem;
+  letter-spacing: 1px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.game-choices button:disabled {
+  color: var(--text-dim);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+.quest-ending {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  font-family: var(--font-headings);
+  font-size: 1.35rem;
+  letter-spacing: 1px;
+}
+
+.quest-ending.is-good {
+  color: #8cf29b;
+  border-color: rgba(140, 242, 155, 0.28);
+  background: rgba(30, 120, 48, 0.12);
+}
+
+.quest-ending.is-bad {
+  color: var(--red-hot);
+  border-color: var(--border-red);
+  background: rgba(158, 0, 0, 0.14);
+}
+
+.maze-shell {
+  align-items: stretch;
+}
+
+.maze-stage {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+#mazeCanvas {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  height: auto;
+  background: #000;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  image-rendering: pixelated;
+}
+
+.maze-result {
+  position: absolute;
+  inset: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  backdrop-filter: blur(8px);
+}
+
+.maze-result h3 {
+  font-family: var(--font-headings);
+  color: var(--red-bright);
+  font-size: 1.9rem;
+}
+
+.maze-result p {
+  color: var(--text);
+}
+
+.mobile-controls {
+  display: none;
+  grid-template-columns: 58px 58px 58px;
+  grid-template-rows: 58px 58px;
+  gap: 0.65rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+  touch-action: none;
+}
+
+.d-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(50, 0, 0, 0.52);
+  border: 1px solid var(--red-main);
+  border-radius: var(--radius);
+  font-size: 1.35rem;
+  user-select: none;
+  touch-action: none;
+}
+
+.d-btn:active {
+  background: var(--red-main);
+  box-shadow: 0 0 18px var(--red-glow);
+}
+
+#btn-up { grid-column: 2; grid-row: 1; }
+#btn-left { grid-column: 1; grid-row: 2; }
+#btn-down { grid-column: 2; grid-row: 2; }
+#btn-right { grid-column: 3; grid-row: 2; }
+
+.maze-instructions {
+  text-align: center;
+}
+
 /* --- 20. АДАПТИВНІСТЬ ---
    Mobile-first підхід:
    > 1024px — повний десктоп
@@ -874,6 +1604,16 @@ footer hr {
   nav a             { font-size: 0.72rem; padding: 0.35rem 0.65rem; letter-spacing: 0.8px; }
 
   .container        { padding: 2rem 1rem; }
+
+  .controls-bar     { grid-template-columns: 1fr; }
+  .filters-group    { justify-content: stretch; }
+  .filters-group select { flex: 1 1 190px; max-width: none; }
+  .article-meta     { align-items: flex-start; flex-direction: column; }
+  .auth-grid        { grid-template-columns: 1fr; }
+  .game-selection   { grid-template-columns: 1fr; }
+  .game-mode-card   { min-height: 260px; }
+  .game-toolbar     { justify-content: flex-start; }
+  .mobile-controls  { display: grid; }
 
   .hero             { min-height: 56vh; }
   .hero h1          { font-size: 2.5rem; }
@@ -909,6 +1649,16 @@ footer hr {
   }
 
   article.movie img { height: 240px; }
+
+  .pagination       { flex-wrap: wrap; }
+  .page-info        { order: -1; width: 100%; text-align: center; }
+  .single-article   { padding: 2rem 1rem; }
+  .comment-body     { padding-left: 0; }
+  .game-shell       { padding: 1rem; min-height: 0; }
+  .game-story       { min-height: 220px; font-size: 1.18rem; }
+  .difficulty-panel { grid-template-columns: 1fr; }
+  .mobile-controls  { grid-template-columns: 54px 54px 54px; grid-template-rows: 54px 54px; }
+  .maze-result      { inset: 0.6rem; }
 
   .contact-wrapper  { padding: 1.5rem 1rem; }
   .contact-wrapper h1 { font-size: 1.7rem; }

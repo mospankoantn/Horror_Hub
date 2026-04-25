@@ -14,40 +14,6 @@
   <!-- Підключаємо auth.js для верхнього меню -->
   <script src="js/auth.js"></script>
 
-  <style>
-    .profile-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    .profile-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 2px solid var(--red-main);
-      object-fit: cover;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 15px var(--red-glow);
-    }
-    .profile-name {
-      font-family: var(--font-headings);
-      color: var(--red-bright);
-      font-size: 1.8rem;
-    }
-    .profile-role {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    .help-text {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: -10px;
-      margin-bottom: 15px;
-    }
-  </style>
 </head>
 <body>
 
@@ -63,18 +29,18 @@
     <a href="articles.html">Статті</a>
     <a href="game.html">Ігрова Кімната</a>
     <a href="contact.html">Контакти</a>
-    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link">Telegram</a>
-    <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer">Telegram</a>
+    <div id="user-menu"></div>
   </nav>
 
   <main class="container">
     <div class="contact-wrapper">
       <div class="profile-header" id="profile-info">
         <!-- Аватар та ім'я підвантажаться через JS -->
-        <p style="color: var(--text-muted);">Завантаження душі...</p>
+        <p class="muted-text">Завантаження душі...</p>
       </div>
 
-      <form id="profileForm" class="contact-form" style="display: none;">
+      <form id="profileForm" class="contact-form" hidden>
         
         <div class="form-group">
           <label>URL нової аватарки:</label>
@@ -89,7 +55,7 @@
         </div>
 
         <button type="submit" id="saveBtn">Зберегти зміни</button>
-        <div id="profileMessage" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
+        <div id="profileMessage" class="profile-message"></div>
       </form>
     </div>
   </main>
@@ -101,68 +67,6 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const profileInfo = document.getElementById('profile-info');
-        const profileForm = document.getElementById('profileForm');
-        const avatarInput = document.getElementById('avatarInput');
-        const profileMessage = document.getElementById('profileMessage');
-
-        try {
-            // 1. Перевіряємо, чи юзер увійшов
-            const res = await fetch('api_auth.php?action=status');
-            const auth = await res.json();
-
-            if (!auth.logged_in) {
-                // Якщо не увійшов — викидаємо на сторінку логіну
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // 2. Виводимо інформацію про користувача
-            let roleName = auth.user.role === 'admin' ? '<span style="color:red;">Адміністратор</span>' : 'Жертва (Користувач)';
-            
-            profileInfo.innerHTML = `
-                <img src="${auth.user.avatar}" class="profile-avatar" alt="Аватар">
-                <div class="profile-name">${auth.user.username}</div>
-                <div class="profile-role">${roleName}</div>
-            `;
-
-            // Заповнюємо поле аватарки поточною ссилкою
-            avatarInput.value = auth.user.avatar;
-            profileForm.style.display = 'flex';
-
-            // 3. Обробка форми збереження
-            profileForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                document.getElementById('saveBtn').textContent = 'Збереження...';
-                
-                const fd = new FormData(profileForm);
-                fd.append('action', 'update_profile');
-
-                const updateRes = await fetch('api_auth.php', {
-                    method: 'POST',
-                    body: fd
-                });
-                const result = await updateRes.json();
-
-                if (result.status === 'success') {
-                    profileMessage.style.color = '#72e672';
-                    profileMessage.textContent = result.message;
-                    // Оновлюємо сторінку через секунду, щоб аватарка оновилась скрізь
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    profileMessage.style.color = 'red';
-                    profileMessage.textContent = result.message;
-                }
-                document.getElementById('saveBtn').textContent = 'Зберегти зміни';
-            });
-
-        } catch (error) {
-            console.error('Помилка завантаження профілю:', error);
-            profileInfo.innerHTML = '<p style="color:red;">Помилка зв\'язку з базою даних.</p>';
-        }
-    });
-  </script>
+  <script src="js/profile.js"></script>
 </body>
 </html>

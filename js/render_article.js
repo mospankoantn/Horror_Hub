@@ -1,150 +1,335 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const container = document.getElementById('article-content');
-    
-    // 1. Отримуємо ID статті з URL (ВІН СТВОРЮЄТЬСЯ ТУТ)
-    const urlParams = new URLSearchParams(window.location.search);
-    const articleId = urlParams.get('id');
+  const container = document.getElementById('article-content');
+  if (!container) return;
 
-    if (!articleId) {
-        container.innerHTML = '<h1>Помилка 404</h1><p>Статтю не знайдено або її поглинула темрява.</p>';
-        return;
+  const articleId = getArticleId();
+  if (!articleId) {
+    renderArticleError('Помилка 404', 'Статтю не знайдено або її поглинула темрява.');
+    return;
+  }
+
+  const commentsList = document.getElementById('comments-list');
+  const commentFormContainer = document.getElementById('comment-form-container');
+
+  try {
+    const response = await fetch(`https://api.telegra.ph/getPage/${articleId}?return_content=true`, {
+      headers: { Accept: 'application/json' }
+    });
+    const data = await response.json();
+
+    if (!data.ok) {
+      throw new Error(data.error || 'Telegraph API error');
     }
 
-    // ==========================================
-    // ЛОГІКА КОМЕНТАРІВ (Тепер вона бачить articleId!)
-    // ==========================================
-    const commentsList = document.getElementById('comments-list');
-    const commentFormContainer = document.getElementById('comment-form-container');
+    renderArticle(data.result);
+    loadComments();
+    checkAuthAndShowForm();
+  } catch (error) {
+    console.error('Помилка завантаження статті:', error);
+    renderArticleError(
+      'Щось пішло не так...',
+      "Не вдалося зв'язатися з Telegraph. Можливо, стаття була видалена."
+    );
+  }
 
-    // Функція завантаження коментарів
-    async function loadComments() {
-        try {
-            // Ось тут використовується articleId (рядок 89 у твоїй помилці)
-            const res = await fetch(`api_comments.php?action=get&article_id=${articleId}`);
-            const comments = await res.json();
-            
-            if (!commentsList) return;
+  function getArticleId() {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('id') || '').trim().replace(/^\/+/, '');
+  }
 
-            commentsList.innerHTML = '';
-            if(comments.length === 0) {
-                commentsList.innerHTML = '<p>Поки немає коментарів. Будь першим, хто порушить тишу...</p>';
-                return;
-            }
+  function renderArticle(page) {
+    const title = document.createElement('h1');
+    title.textContent = page.title || 'Без назви';
 
-            comments.forEach(c => {
-                let adminBadge = c.role === 'admin' ? '<span style="color: red; font-size: 0.7em; margin-left: 5px;">[АДМІН]</span>' : '';
-                commentsList.innerHTML += `
-                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
-                        <div style="display:flex; align-items:center; gap: 10px; margin-bottom: 5px;">
-                            <img src="${c.avatar}" style="width:30px; height:30px; border-radius:50%; border:1px solid var(--red-dark); object-fit: cover;">
-                            <strong style="color:var(--red-bright)">${c.username} ${adminBadge}</strong>
-                            <span style="color:var(--text-muted); font-size: 0.8rem;">${c.created_at}</span>
-                        </div>
-                        <p style="color: #ddd; margin:0; padding-left: 40px;">${c.comment_text}</p>
-                    </div>
-                `;
-            });
-        } catch (error) {
-            console.error("Помилка завантаження коментарів:", error);
-            if (commentsList) commentsList.innerHTML = '<p style="color:red;">Помилка завантаження коментарів.</p>';
-        }
+    const meta = document.createElement('div');
+    meta.className = 'article-meta';
+
+    const author = document.createElement('span');
+    author.textContent = `Автор: ${page.author_name || 'Невідомий'}`;
+
+    const sourceLink = document.createElement('a');
+    sourceLink.href = `https://telegra.ph/${articleId}`;
+    sourceLink.target = '_blank';
+    sourceLink.rel = 'noopener noreferrer';
+    sourceLink.className = 'tg-button';
+    sourceLink.textContent = 'Відкрити в Telegraph';
+
+    meta.append(author, sourceLink);
+
+    const body = document.createElement('div');
+    body.className = 'article-body';
+
+    (page.content || []).forEach((node) => {
+      body.appendChild(renderTelegraphNode(node));
+    });
+
+    container.replaceChildren(title, meta, body);
+    document.title = `${title.textContent} - Horror Hub`;
+  }
+
+  function renderTelegraphNode(node) {
+    if (typeof node === 'string') {
+      return document.createTextNode(node);
     }
 
-    // Перевірка авторизації та показ форми
-    async function checkAuthAndShowForm() {
-        if (!commentFormContainer) return;
-
-        try {
-            const res = await fetch('api_auth.php?action=status');
-            const auth = await res.json();
-            
-            if (auth.logged_in) {
-                commentFormContainer.innerHTML = `
-                    <form id="addCommentForm" style="display: flex; flex-direction: column; gap: 10px;">
-                        <textarea id="commentText" rows="3" placeholder="Напишіть свій моторошний коментар..." required style="background: var(--surface-2); color: white; border: 1px solid var(--border-red); padding: 10px; border-radius: 4px; font-family: var(--font-body); resize: vertical;"></textarea>
-                        <button type="submit" style="background: var(--red-main); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; align-self: flex-start; font-weight: bold; text-transform: uppercase;">Відправити</button>
-                    </form>
-                `;
-                
-                document.getElementById('addCommentForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const text = document.getElementById('commentText').value;
-                    const fd = new FormData();
-                    fd.append('action', 'post');
-                    // Ось тут використовується articleId (рядок 131 у твоїй помилці)
-                    fd.append('article_id', articleId);
-                    fd.append('comment_text', text);
-                    
-                    await fetch('api_comments.php', { method: 'POST', body: fd });
-                    document.getElementById('commentText').value = '';
-                    loadComments(); // Оновлюємо список після додавання
-                });
-            } else {
-                commentFormContainer.innerHTML = '<p style="color: var(--text-muted);">Щоб залишити коментар, <a href="login.html" style="color: var(--red-bright); text-decoration:underline;">увійдіть</a> або зареєструйтесь.</p>';
-            }
-        } catch (error) {
-            console.error("Помилка перевірки авторизації:", error);
-        }
+    if (!node || typeof node !== 'object') {
+      return document.createTextNode('');
     }
 
-    // ==========================================
-    // ЗАВАНТАЖЕННЯ СТАТТІ З TELEGRAPH
-    // ==========================================
+    const tag = String(node.tag || '').toLowerCase();
+    const allowedTags = new Set([
+      'a', 'aside', 'b', 'blockquote', 'br', 'code', 'em', 'figcaption',
+      'figure', 'h3', 'h4', 'hr', 'i', 'img', 'li', 'ol', 'p', 'pre',
+      's', 'strong', 'u', 'ul'
+    ]);
+
+    if (!allowedTags.has(tag)) {
+      return renderChildrenAsFragment(node.children);
+    }
+
+    const element = document.createElement(tag);
+
+    if (tag === 'a' && node.attrs?.href) {
+      setSafeLink(element, node.attrs.href);
+    }
+
+    if (tag === 'img') {
+      const hasSafeImage = setSafeImage(element, node.attrs?.src, node.attrs?.alt);
+      if (!hasSafeImage) return document.createDocumentFragment();
+    }
+
+    if (!['br', 'hr', 'img'].includes(tag)) {
+      (node.children || []).forEach((child) => {
+        element.appendChild(renderTelegraphNode(child));
+      });
+    }
+
+    return element;
+  }
+
+  function renderChildrenAsFragment(children = []) {
+    const fragment = document.createDocumentFragment();
+    children.forEach((child) => fragment.appendChild(renderTelegraphNode(child)));
+    return fragment;
+  }
+
+  function setSafeLink(link, rawHref) {
     try {
-        const response = await fetch(`https://api.telegra.ph/getPage/${articleId}?return_content=true`);
-        const data = await response.json();
+      const url = new URL(rawHref, 'https://telegra.ph');
+      if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) return;
 
-        if (!data.ok) throw new Error(data.error);
-
-        const page = data.result;
-        
-        let html = `
-            <h1>${page.title}</h1>
-            <div class="article-meta">
-                <span>Автор: ${page.author_name || 'Невідомий'}</span>
-                <a href="https://telegra.ph/${articleId}" target="_blank" class="tg-button">Відкрити в Telegraph</a>
-            </div>
-            <div class="article-body">
-        `;
-
-        function renderNode(node) {
-            if (typeof node === 'string') return node;
-            
-            let nodeHtml = `<${node.tag}`;
-            if (node.attrs) {
-                for (let key in node.attrs) {
-                    let value = node.attrs[key];
-                    if (key === 'src' && value.startsWith('/')) {
-                        value = 'https://telegra.ph' + value;
-                    }
-                    nodeHtml += ` ${key}="${value}"`;
-                }
-            }
-            nodeHtml += '>';
-
-            if (node.children) {
-                for (let child of node.children) {
-                    nodeHtml += renderNode(child);
-                }
-            }
-            nodeHtml += `</${node.tag}>`;
-            return nodeHtml;
-        }
-
-        for (let node of page.content) {
-            html += renderNode(node);
-        }
-
-        html += `</div>`;
-        container.innerHTML = html;
-        document.title = `${page.title} - Horror Hub`;
-
-        // ВИКЛИКАЄМО ФУНКЦІЇ КОМЕНТАРІВ ТІЛЬКИ ПІСЛЯ ТОГО, ЯК СТАТТЯ ЗАВАНТАЖИЛАСЬ
-        loadComments();
-        checkAuthAndShowForm();
-
+      link.href = url.href;
+      if (url.protocol !== 'mailto:') {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
     } catch (error) {
-        console.error('Помилка завантаження статті:', error);
-        container.innerHTML = `<h1>Щось пішло не так...</h1><p>Не вдалося зв'язатися з потойбіччям (Telegraph). Можливо, стаття була видалена.</p>`;
+      link.removeAttribute('href');
     }
-}); // <-- Ось ця дужка закриває весь код! Вона дуже важлива.
+  }
+
+  function setSafeImage(image, rawSrc, alt = '') {
+    if (!rawSrc) return false;
+
+    try {
+      const url = new URL(rawSrc, 'https://telegra.ph');
+      if (!['http:', 'https:'].includes(url.protocol)) return false;
+
+      image.src = url.href;
+      image.alt = alt || '';
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+      image.addEventListener('error', () => {
+        image.src = 'images/placeholder.jpg';
+      }, { once: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function renderArticleError(titleText, messageText) {
+    const title = document.createElement('h1');
+    title.textContent = titleText;
+
+    const message = document.createElement('p');
+    message.textContent = messageText;
+
+    container.replaceChildren(title, message);
+  }
+
+  async function loadComments() {
+    if (!commentsList) return;
+
+    try {
+      const response = await fetch(`api_comments.php?action=get&article_id=${encodeURIComponent(articleId)}`, {
+        headers: { Accept: 'application/json' }
+      });
+      const comments = await response.json();
+
+      if (!response.ok || !Array.isArray(comments)) {
+        throw new Error('Невірна відповідь сервера коментарів');
+      }
+
+      if (comments.length === 0) {
+        commentsList.replaceChildren(createMutedText('Поки немає коментарів. Будьте першим, хто порушить тишу...'));
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      comments.forEach((comment) => fragment.appendChild(createComment(comment)));
+      commentsList.replaceChildren(fragment);
+    } catch (error) {
+      console.error('Помилка завантаження коментарів:', error);
+      const message = createMutedText('Помилка завантаження коментарів.');
+      message.classList.add('error-text');
+      commentsList.replaceChildren(message);
+    }
+  }
+
+  async function checkAuthAndShowForm() {
+    if (!commentFormContainer) return;
+
+    try {
+      const response = await fetch('api_auth.php?action=status', {
+        headers: { Accept: 'application/json' }
+      });
+      const auth = await response.json();
+
+      if (auth.logged_in) {
+        commentFormContainer.replaceChildren(createCommentForm());
+      } else {
+        commentFormContainer.replaceChildren(createLoginPrompt());
+      }
+    } catch (error) {
+      console.error('Помилка перевірки авторизації:', error);
+      commentFormContainer.replaceChildren(createLoginPrompt());
+    }
+  }
+
+  function createComment(comment) {
+    const item = document.createElement('article');
+    item.className = 'comment-item';
+
+    const header = document.createElement('div');
+    header.className = 'comment-header';
+
+    const avatar = document.createElement('img');
+    avatar.className = 'comment-avatar';
+    avatar.src = getSafeLocalOrRemoteUrl(comment.avatar, 'images/default_avatar.png');
+    avatar.alt = '';
+    avatar.loading = 'lazy';
+    avatar.addEventListener('error', () => {
+      avatar.src = 'images/default_avatar.png';
+    }, { once: true });
+
+    const username = document.createElement('strong');
+    username.textContent = comment.username || 'Гість';
+
+    if (comment.role === 'admin') {
+      const badge = document.createElement('span');
+      badge.className = 'admin-badge';
+      badge.textContent = 'Адмін';
+      username.appendChild(badge);
+    }
+
+    const date = document.createElement('time');
+    date.textContent = comment.created_at || '';
+
+    header.append(avatar, username, date);
+
+    const body = document.createElement('p');
+    body.className = 'comment-body';
+    body.textContent = decodeEntities(comment.comment_text || '');
+
+    item.append(header, body);
+    return item;
+  }
+
+  function createCommentForm() {
+    const form = document.createElement('form');
+    form.className = 'comment-form';
+
+    const textarea = document.createElement('textarea');
+    textarea.id = 'commentText';
+    textarea.rows = 3;
+    textarea.placeholder = 'Напишіть свій моторошний коментар...';
+    textarea.required = true;
+    textarea.maxLength = 2000;
+
+    const button = document.createElement('button');
+    button.type = 'submit';
+    button.textContent = 'Відправити';
+
+    const note = document.createElement('p');
+    note.className = 'form-note';
+
+    form.append(textarea, button, note);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      button.disabled = true;
+      button.textContent = 'Надсилання...';
+      note.textContent = '';
+
+      try {
+        const formData = new FormData();
+        formData.append('action', 'post');
+        formData.append('article_id', articleId);
+        formData.append('comment_text', text);
+
+        const response = await fetch('api_comments.php', { method: 'POST', body: formData });
+        const result = await response.json();
+
+        if (!response.ok || result.status !== 'success') {
+          throw new Error(result.message || 'Не вдалося додати коментар');
+        }
+
+        textarea.value = '';
+        await loadComments();
+      } catch (error) {
+        note.textContent = error.message;
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Відправити';
+      }
+    });
+
+    return form;
+  }
+
+  function createLoginPrompt() {
+    const prompt = createMutedText('Щоб залишити коментар, ');
+    const link = document.createElement('a');
+    link.href = 'login.html';
+    link.className = 'inline-link';
+    link.textContent = 'увійдіть або зареєструйтесь';
+    prompt.append(link, document.createTextNode('.'));
+    return prompt;
+  }
+
+  function createMutedText(text) {
+    const paragraph = document.createElement('p');
+    paragraph.className = 'muted-text';
+    paragraph.textContent = text;
+    return paragraph;
+  }
+
+  function decodeEntities(value) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = String(value);
+    return textarea.value;
+  }
+
+  function getSafeLocalOrRemoteUrl(rawUrl, fallback) {
+    try {
+      const url = new URL(rawUrl || fallback, window.location.href);
+      return ['http:', 'https:'].includes(url.protocol) ? url.href : fallback;
+    } catch (error) {
+      return fallback;
+    }
+  }
+});

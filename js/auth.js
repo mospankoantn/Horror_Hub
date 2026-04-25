@@ -1,29 +1,85 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const userMenu = document.getElementById('user-menu');
-    if(!userMenu) return;
+  const userMenu = document.getElementById('user-menu');
+  if (!userMenu) return;
 
+  userMenu.classList.add('user-menu');
+
+  try {
+    const response = await fetch('api_auth.php?action=status', {
+      headers: { Accept: 'application/json' }
+    });
+    const data = await response.json();
+
+    if (data.logged_in && data.user) {
+      renderUserMenu(data.user);
+    } else {
+      renderGuestMenu();
+    }
+  } catch (error) {
+    console.error('Auth error:', error);
+    renderGuestMenu();
+  }
+
+  function renderUserMenu(user) {
+    const profileLink = document.createElement('a');
+    profileLink.href = 'profile.html';
+    profileLink.className = 'user-menu__profile';
+
+    const avatar = document.createElement('img');
+    avatar.src = getSafeImageUrl(user.avatar);
+    avatar.alt = '';
+    avatar.loading = 'lazy';
+    avatar.addEventListener('error', () => {
+      avatar.src = 'images/default_avatar.png';
+    }, { once: true });
+
+    const name = document.createElement('span');
+    name.textContent = user.username || 'Профіль';
+
+    profileLink.append(avatar, name);
+
+    const items = [profileLink];
+
+    if (user.role === 'admin') {
+      const adminLink = document.createElement('a');
+      adminLink.href = 'admin/admin.php';
+      adminLink.className = 'user-menu__admin';
+      adminLink.textContent = 'Адмінка';
+      items.push(adminLink);
+    }
+
+    const logoutLink = document.createElement('a');
+    logoutLink.href = '#';
+    logoutLink.className = 'user-menu__logout';
+    logoutLink.textContent = 'Вийти';
+    logoutLink.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await fetch('api_auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=logout'
+      });
+      window.location.reload();
+    });
+    items.push(logoutLink);
+
+    userMenu.replaceChildren(...items);
+  }
+
+  function renderGuestMenu() {
+    const loginLink = document.createElement('a');
+    loginLink.href = 'login.html';
+    loginLink.className = 'user-menu__login';
+    loginLink.textContent = 'Увійти / Реєстрація';
+    userMenu.replaceChildren(loginLink);
+  }
+
+  function getSafeImageUrl(rawUrl) {
     try {
-        const res = await fetch('api_auth.php?action=status');
-        const data = await res.json();
-
-        if (data.logged_in) {
-            let adminLink = data.user.role === 'admin' ? `<a href="admin/admin.php" style="color:var(--red-bright)">Адмінка</a>` : '';
-            userMenu.innerHTML = `
-                <a href="profile.html" style="color:var(--text); font-family:var(--font-body); font-size:0.8rem; margin-right:10px; text-decoration: none; display: inline-flex; align-items: center;">
-                <img src="${data.user.avatar}" style="width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:5px; border: 1px solid var(--red-main); object-fit: cover;">
-                <span style="transition: color 0.3s;" onmouseover="this.style.color='var(--red-bright)'" onmouseout="this.style.color='var(--text)'">${data.user.username}</span>
-                </a>
-                ${adminLink}
-                <a href="#" id="logout-btn" style="color:var(--text-muted)">Вийти</a>
-            `;
-            
-            document.getElementById('logout-btn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await fetch('api_auth.php', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: 'action=logout' });
-                location.reload();
-            });
-        } else {
-            userMenu.innerHTML = `<a href="login.html" style="color:var(--red-main)">Увійти / Реєстрація</a>`;
-        }
-    } catch(e) { console.error('Auth error', e); }
+      const url = new URL(rawUrl || 'images/default_avatar.png', window.location.href);
+      return ['http:', 'https:'].includes(url.protocol) ? url.href : 'images/default_avatar.png';
+    } catch (error) {
+      return 'images/default_avatar.png';
+    }
+  }
 });

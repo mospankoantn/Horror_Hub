@@ -5,184 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ігрова Кімната - Horror Hub</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
+    <meta name="description" content="Міні-ігри Horror Hub: текстовий квест і темний лабіринт у браузері.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* CRT Ефект старого монітора для атмосфери */
-        .crt-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0.4;
-        }
-
-        .game-container {
-            background-color: #050505;
-            padding: 2.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-red);
-            box-shadow: inset 0 0 50px rgba(158, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.8);
-            margin-top: 2rem;
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Стиль тексту для квесту (як на старому терміналі) */
-        #game-story {
-            color: #d1d1d1;
-            font-family: 'VT323', monospace; /* Ретро шрифт */
-            font-size: 1.4rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            flex-grow: 1;
-            white-space: pre-wrap;
-            text-shadow: 0 0 5px rgba(200, 200, 200, 0.3);
-        }
-
-        #game-choices {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            align-items: flex-start;
-        }
-
-        #game-choices button {
-            background-color: transparent;
-            color: var(--red-main);
-            border: 1px solid var(--red-dark);
-            padding: 0.8rem 1.5rem;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-family: 'VT323', monospace;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            width: 100%;
-            text-align: left;
-        }
-
-        #game-choices button:hover:not(:disabled) {
-            background-color: var(--red-main);
-            color: #000;
-            box-shadow: 0 0 15px var(--red-glow);
-            transform: translateX(10px);
-        }
-
-        #game-choices button:disabled {
-             border-color: #333;
-             color: #555;
-             cursor: not-allowed;
-        }
-
-        #game-selection {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .game-choice-btn {
-            background: linear-gradient(45deg, var(--red-dark), #000);
-            color: #fff;
-            border: 1px solid var(--red-bright);
-            padding: 1rem 2rem;
-            margin: 1rem;
-            border-radius: 4px;
-            font-size: 1.2rem;
-            font-family: var(--font-headings);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(158, 0, 0, 0.5);
-        }
-
-        .game-choice-btn:hover {
-             transform: scale(1.05);
-             box-shadow: 0 0 30px var(--red-glow);
-        }
-
-        #maze-game-container {
-            background-color: #000;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #222;
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            position: relative;
-        }
-
-        #mazeCanvas {
-            background-color: #000;
-            max-width: 100%; /* Для мобілок */
-            height: auto;
-            border: 2px solid #333;
-        }
-
-        #maze-instructions {
-             color: var(--text-muted);
-             font-size: 0.9rem;
-             margin-top: 1rem;
-             text-align: center;
-        }
-
-        /* Мобільні кнопки керування */
-        #mobile-controls {
-            display: none;
-            grid-template-columns: 60px 60px 60px;
-            grid-template-rows: 60px 60px;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        .d-btn {
-            background: rgba(50, 0, 0, 0.5);
-            border: 1px solid var(--red-main);
-            color: white;
-            font-size: 1.5rem;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-        .d-btn:active { background: var(--red-main); }
-        #btn-up { grid-column: 2; grid-row: 1; }
-        #btn-left { grid-column: 1; grid-row: 2; }
-        #btn-down { grid-column: 2; grid-row: 2; }
-        #btn-right { grid-column: 3; grid-row: 2; }
-
-        .back-to-selection-btn {
-             margin-bottom: 1rem;
-             align-self: flex-start;
-             background: transparent;
-             color: var(--text-muted);
-             border: none;
-             text-decoration: underline;
-             cursor: pointer;
-             font-family: var(--font-body);
-        }
-        .back-to-selection-btn:hover { color: var(--red-bright); }
-
-        .game-container, #maze-game-container { display: none; }
-
-        @media (max-width: 768px) {
-            #mobile-controls { display: grid; } /* Показуємо кнопки на телефонах */
-        }
-    </style>
     <script src="js/auth.js"></script>
 </head>
-<body>
-    <div class="crt-overlay"></div> <!-- CRT ефект -->
+<body class="game-page">
+    <div class="crt-overlay" aria-hidden="true"></div>
 
     <header>
         <h1>Horror Hub</h1>
@@ -194,58 +25,100 @@
         <a href="horror_movies.html">Фільми Жахів</a>
         <a href="reviews.html">Огляди</a>
         <a href="articles.html">Статті</a>
-        <a href="game.html">Ігрова Кімната</a>
+        <a href="game.html" class="active">Ігрова Кімната</a>
         <a href="contact.html">Контакти</a>
-        
-         <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК -->
-        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" title="Підписатися на наш Telegram">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-        Telegram
+        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer" title="Підписатися на наш Telegram">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+            Telegram
         </a>
-        <div id="user-menu" style="display:inline-block; margin-left:15px;"></div>
+        <div id="user-menu"></div>
     </nav>
 
     <div class="ad-zone">
-        <div class="ad-placeholder">Рекламний простір — 728×90</div>
+        <div class="ad-placeholder">Рекламний простір - 728x90</div>
     </div>
 
     <main class="container">
         <h2 class="page-title">Ігрова Кімната</h2>
-        <p class="page-subtitle">Одягніть навушники. Вимкніть світло. Виберіть свій кошмар.</p>
+        <p class="page-subtitle">Оберіть сценарій і тримайте світло ближче.</p>
 
-        <div id="game-selection">
-            <button id="select-text-quest" class="game-choice-btn">Страшний Квест</button>
-            <button id="select-maze-game" class="game-choice-btn">Темний Лабіринт</button>
-        </div>
+        <section id="game-selection" class="game-selection" aria-label="Вибір гри">
+            <article class="game-mode-card">
+                <div>
+                    <span class="mode-kicker">Текстовий режим</span>
+                    <h3>Підвал під сценою</h3>
+                    <p>Короткий інтерактивний квест з інвентарем, страхом і кількома фіналами.</p>
+                </div>
+                <button id="select-text-quest" class="game-choice-btn" type="button">Почати квест</button>
+            </article>
 
-        <!-- Контейнер для текстової гри -->
-        <div class="game-container" id="text-quest-container">
-            <button class="back-to-selection-btn" onclick="showGameSelection()">&larr; Втекти в меню</button>
-            <div id="game-story"></div>
-            <div id="game-choices"></div>
-        </div>
+            <article class="game-mode-card">
+                <div>
+                    <span class="mode-kicker">Canvas режим</span>
+                    <h3>Темний лабіринт</h3>
+                    <p>Знайдіть вихід, доки ліхтар не згас, а переслідувач не підійшов надто близько.</p>
+                </div>
+                <div class="difficulty-panel" aria-label="Складність лабіринту">
+                    <button class="difficulty-btn is-active" type="button" data-difficulty="normal">Нормально</button>
+                    <button class="difficulty-btn" type="button" data-difficulty="hard">Важко</button>
+                </div>
+                <button id="select-maze-game" class="game-choice-btn" type="button">Увійти в лабіринт</button>
+            </article>
+        </section>
 
-        <!-- Контейнер для 2D гри -->
-        <div id="maze-game-container">
-             <button class="back-to-selection-btn" onclick="showGameSelection()">&larr; Втекти в меню</button>
-             <canvas id="mazeCanvas" width="600" height="400">Ваш браузер не підтримує Canvas.</canvas>
-             
-             <!-- Мобільні кнопки -->
-             <div id="mobile-controls">
-                 <div class="d-btn" id="btn-up">▲</div>
-                 <div class="d-btn" id="btn-left">◀</div>
-                 <div class="d-btn" id="btn-down">▼</div>
-                 <div class="d-btn" id="btn-right">▶</div>
-             </div>
+        <section class="game-shell text-quest-shell" id="text-quest-container" hidden>
+            <div class="game-toolbar">
+                <button class="icon-text-btn" type="button" data-action="menu">← Меню</button>
+                <button class="icon-text-btn" type="button" data-action="restart-quest">↻ Заново</button>
+                <button class="icon-text-btn" type="button" data-action="sound">Звук: увімк.</button>
+            </div>
 
-             <div id="maze-instructions">Керування: стрілки або екранні кнопки. Знайдіть зелений вихід. <b>Не дайте ЇЙ вас наздогнати.</b></div>
-        </div>
+            <div class="quest-hud" aria-label="Стан квесту">
+                <span id="questFear">Страх: 0</span>
+                <span id="questInventory">Інвентар: порожньо</span>
+            </div>
+
+            <div id="game-story" class="game-story" aria-live="polite"></div>
+            <div id="game-choices" class="game-choices"></div>
+        </section>
+
+        <section id="maze-game-container" class="game-shell maze-shell" hidden>
+            <div class="game-toolbar">
+                <button class="icon-text-btn" type="button" data-action="menu">← Меню</button>
+                <button class="icon-text-btn" type="button" data-action="restart-maze">↻ Новий лабіринт</button>
+                <button class="icon-text-btn" type="button" data-action="sound">Звук: увімк.</button>
+            </div>
+
+            <div class="maze-hud" aria-label="Стан лабіринту">
+                <span id="mazeTimer">00:00</span>
+                <span id="mazeBattery">Ліхтар: 100%</span>
+                <span id="mazeDistance">Відстань: --</span>
+            </div>
+
+            <div class="maze-stage">
+                <canvas id="mazeCanvas" width="600" height="400">Ваш браузер не підтримує Canvas.</canvas>
+                <div id="maze-result" class="maze-result" hidden>
+                    <h3 id="maze-result-title"></h3>
+                    <p id="maze-result-text"></p>
+                    <button class="game-choice-btn" type="button" data-action="restart-maze">Спробувати ще</button>
+                </div>
+            </div>
+
+            <div id="mobile-controls" class="mobile-controls" aria-label="Керування лабіринтом">
+                <button class="d-btn" id="btn-up" type="button" data-key="ArrowUp">▲</button>
+                <button class="d-btn" id="btn-left" type="button" data-key="ArrowLeft">◀</button>
+                <button class="d-btn" id="btn-down" type="button" data-key="ArrowDown">▼</button>
+                <button class="d-btn" id="btn-right" type="button" data-key="ArrowRight">▶</button>
+            </div>
+
+            <p id="maze-instructions" class="maze-instructions">WASD або стрілки. Зелений знак - вихід.</p>
+        </section>
     </main>
 
     <footer>
         <div class="footer-inner">
-          <a href="index.html" class="footer-logo">Horror Hub</a>
-          <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
+            <a href="index.html" class="footer-logo">Horror Hub</a>
+            <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
         </div>
     </footer>
 
