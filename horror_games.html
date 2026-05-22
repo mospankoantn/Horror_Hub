@@ -1,141 +1,86 @@
 <!DOCTYPE html>
-<html lang="uk"> <!-- Змінено мову -->
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ігри Жахів - Horror Hub</title> <!-- Оновлено title -->
-    <link rel="icon" type="image/png" href="images/favicon.png">
-    <!-- Підключення шрифтів (як у попередніх файлах) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Підключення зовнішнього CSS -->
-    <link rel="stylesheet" href="style.css">
-    <script src="js/auth.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ігри Жахів — Horror Hub</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <meta name="description" content="Добірка статей Horror Hub про ігри жахів: survival horror, психологічний хоррор, ретро-класика та культові серії.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="js/auth.js?v=20260430-nav"></script>
 </head>
 <body>
-    <header>
-        <!-- Заголовок може бути просто "Horror Hub", а назва сторінки в <title> і h2 -->
-        <h1>Horror Hub</h1>
-    </header>
+  <header>
+    <h1>Horror Hub</h1>
+  </header>
 
     <nav>
-        <a href="index.html">Головна</a>
-        <a href="horror_games.html">Ігри Жахів</a>
-        <a href="horror_movies.html">Фільми Жахів</a>
-        <a href="reviews.html">Огляди</a>
-        <a href="articles.html">Статті</a>
-        <a href="game.html">Ігрова Кімната</a>
-        <a href="contact.html">Контакти</a>
-        
-         <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК -->
-        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer" title="Підписатися на наш Telegram">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-        Telegram
-        </a>
-        <div id="user-menu"></div>
-    </nav>
-      <!--
-    РЕКЛАМНИЙ БЛОК #1 — Під навігацією (Leaderboard 728×90)
-    Замініть .ad-placeholder на код Google AdSense:
+    <a href="index.html">Головна</a>
+    <a href="horror_games.html" class="active">Ігри Жахів</a>
+    <a href="horror_movies.html">Фільми Жахів</a>
+    <a href="reviews.html">Огляди</a>
+    <a href="articles.html">Статті</a>
+    <a href="internet_horror.html">Інтернет Хоррор</a>
+    <a href="horror_art.html">Мистецтво</a>
+    <a href="horror_literature.html">Література</a>
+    <a href="game.html">Ігрова Кімната</a>
+    <a href="contact.html">Контакти</a>
+    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer" title="Підписатися на наш Telegram">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
+      Telegram
+    </a>
+    <div id="user-menu"></div>
+  </nav>
 
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-  -->
   <div class="ad-zone">
-    <div class="ad-placeholder">Рекламний простір — 728×90 (підключіть Google AdSense)</div>
+    <div class="ad-placeholder">Рекламний простір — 728×90</div>
   </div>
 
-    <!-- Використання <main> замість <div> -->
-    <main class="container">
-        <!-- Додано клас для легшого стилювання -->
-        <h2 class="page-title">Найкращі Ігри Жахів</h2>
-        <div class="games-grid">
-            <!-- Game 1: Використання <article> замість <div> -->
-            <article class="game">
-                 <!-- Замініть на реальні зображення! -->
-                <img src="images/re4_cover.jpg" alt="Обкладинка Resident Evil 4"> <!-- Приклад релевантного зображення -->
-                <div class="game-content">
-                    <h2>Resident Evil 4</h2>
-                    <p>Відчуйте культову гру в жанрі survival horror, яка переосмислила жанр.</p>
-                    <!-- Додано клас для стилізації кнопки -->
-                    <a href="articles.html" class="learn-more">Дізнатися більше</a>
-                </div>
-            </article>
+  <main class="container">
+    <h2 class="page-title">Ігри Жахів</h2>
+    <p class="page-subtitle">Survival horror, психологічні кошмари, ретро-легенди й забуті темні перлини</p>
 
-            <!-- Game 2 -->
-            <article class="game">
-                <img src="images/sh2_cover.jpg" alt="Обкладинка Silent Hill 2">
-                <div class="game-content">
-                    <h2>Silent Hill 2</h2>
-                    <p>Пориньте в шедевр психологічного хоррору, який переслідує гравців і донині.</p>
-                    <a href="article.html?id=Silent-Hill-2-Klasichnij-zhah-shcho-zaglyadaye-v-dushu-11-25" class="learn-more">Дізнатися більше</a>
-                </div>
-            </article>
+    <div class="controls-bar" aria-label="Фільтри статей про ігри">
+      <input type="search" id="searchInput" placeholder="Знайти гру у темряві..." aria-label="Пошук статей про ігри" autocomplete="off">
+      <div class="filters-group">
+        <select id="genreSelect" aria-label="Фільтр за жанром"><option value="">Всі жанри</option></select>
+        <select id="devSelect" aria-label="Фільтр за автором"><option value="">Всі автори</option></select>
+        <select id="sortSelect" aria-label="Сортування">
+          <option value="newest" selected>Додано: Спочатку нові</option>
+          <option value="oldest">Додано: Спочатку старі</option>
+          <option value="release_desc">Реліз: Від нових до старих</option>
+          <option value="release_asc">Реліз: Від старих до нових</option>
+        </select>
+        <select id="limitSelect" aria-label="Кількість на сторінці">
+          <option value="5">5 на сторінці</option>
+          <option value="10" selected>10 на сторінці</option>
+          <option value="25">25 на сторінці</option>
+        </select>
+      </div>
+      <span id="resultsInfo" class="results-info">Завантаження матеріалів...</span>
+    </div>
 
-            <!-- Game 3 -->
-            <article class="game">
-                <img src="images/amnesia_cover.jpg" alt="Обкладинка Amnesia: The Dark Descent">
-                <div class="game-content">
-                    <h2>Amnesia: The Dark Descent</h2>
-                    <p>Моторошна подорож крізь божевілля в одній із найстрашніших ігор, коли-небудь створених.</p>
-                    <a href="articles.html" class="learn-more">Дізнатися більше</a>
-                </div>
-            </article>
+    <div class="articles-grid" id="articlesGrid" data-source="data/horror_games/articles_data.json" data-section="horror_games">
+      <p class="empty-state">Завантаження ігор жахів...</p>
+    </div>
 
-            <!-- Game 4 (Додатковий приклад) -->
-            <article class="game">
-                <img src="images/outlast_cover.jpg" alt="Обкладинка Outlast">
-                <div class="game-content">
-                    <h2>Outlast</h2>
-                    <p>Виживайте в покинутій психіатричній лікарні, озброївшись лише відеокамерою.</p>
-                    <a href="articles.html" class="learn-more">Дізнатися більше</a>
-                </div>
-            </article>
+    <div class="pagination" aria-label="Пагінація">
+      <button id="prevPage" class="read-more">← Попередня</button>
+      <span id="pageInfo" class="page-info">Сторінка 1 з 1</span>
+      <button id="nextPage" class="read-more">Наступна →</button>
+    </div>
+  </main>
 
-             <!-- Додайте більше ігор за аналогією -->
-
-        </div>
-    </main>
-  <!--
-    РЕКЛАМНИЙ БЛОК #2 — Між секціями (Rectangle 300×250 або великий банер)
-  -->
-  <div class="ad-zone">
-    <div class="ad-placeholder">Рекламний простір — 300×250 (підключіть Google AdSense)</div>
-  </div>
-
-<footer>
+  <footer>
     <div class="footer-inner">
       <a href="index.html" class="footer-logo">Horror Hub</a>
-      
-      <nav>
-        <a href="index.html">Головна</a>
-        <a href="horror_games.html">Ігри Жахів</a>
-        <a href="horror_movies.html">Фільми Жахів</a>
-        <a href="reviews.html">Огляди</a>
-        <a href="articles.html">Статті</a>
-        <a href="game.html">Ігрова Кімната</a>
-        <a href="contact.html">Контакти</a>
-        
-        <!-- ДОДАТИ ОСЬ ЦЕЙ БЛОК У ФУТЕР -->
-        <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-          Telegram
-        </a>
-      </nav>
-
-      <hr>
-
-      <p class="footer-copy">
-        &copy; 2026 Horror Hub. Всі права захищено.
-        &nbsp;|&nbsp; <a href="privacy.html">Конфіденційність</a>
-      </p>
+      <p class="footer-copy">&copy; 2026 Horror Hub. Всі права захищено.</p>
     </div>
   </footer>
+
+  <script src="js/load_articles.js"></script>
 </body>
 </html>

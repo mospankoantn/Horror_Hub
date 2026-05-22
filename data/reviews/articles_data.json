@@ -1,0 +1,42 @@
+[
+    {
+        "url": "local://reviews/silent-hill-2-remake-review",
+        "imageUrl": "images/sh2_remake.jpg",
+        "title": "Огляд ремейку Silent Hill 2: що важливо перевірити",
+        "previewText": "Короткий оглядовий каркас: атмосфера, темп, символи й те, чи не губиться біль оригіналу.",
+        "release_date": "2024",
+        "developer": "Bloober Team / Konami",
+        "genre": "Огляд гри",
+        "section": "reviews",
+        "sectionLabel": "Огляди",
+        "id": 1,
+        "localId": "reviews:silent-hill-2-remake-review",
+        "contentPath": "content/reviews/silent-hill-2-remake-review.html"
+    },
+    {
+        "url": "local://reviews/hereditary-review",
+        "imageUrl": "images/hereditary_poster.jpg",
+        "title": "Огляд фільму \"Спадковість\"",
+        "previewText": "Сімейна трагедія, окультна пастка й повільний розпад довіри в одному з найсильніших сучасних хоррорів.",
+        "release_date": "2018",
+        "developer": "Ari Aster",
+        "genre": "Огляд фільму",
+        "section": "reviews",
+        "sectionLabel": "Огляди",
+        "id": 2,
+        "localId": "reviews:hereditary-review",
+        "contentPath": "content/reviews/hereditary-review.html"
+    },
+    {
+        "url": "https://telegra.ph/Gra-pochalasya-Oglyad-Saw-The-Video-Game--%D0%86nzhenernij-sadizm-u-cifr%D1%96-01-23",
+        "imageUrl": "https://m.media-amazon.com/images/M/MV5BNGFjMTM2OGMtMTQ1Ni00ZGNjLWExOTMtNjQyNGZhOGY3OGVkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+        "title": "Гра почалася: огляд Saw: The Video Game",
+        "previewText": "Інженерний садизм у цифрі: як Пила перетворюється на survival horror із пастками й головоломками.",
+        "release_date": "2009",
+        "developer": "Zombie Studios",
+        "genre": "Огляд гри",
+        "section": "reviews",
+        "sectionLabel": "Огляди",
+        "id": 3
+    }
+]

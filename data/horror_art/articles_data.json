@@ -1,0 +1,30 @@
+[
+    {
+        "url": "local://horror_art/horror-in-art",
+        "imageUrl": "images/horror_background.jpg",
+        "title": "Жах у мистецтві: від Ґої до Ґігера",
+        "previewText": "Як живопис, гравюра, сюрреалізм і біомеханіка сформували візуальну мову хоррору.",
+        "release_date": "XVIII-XX століття",
+        "developer": "Ґоя, Беклін, Ґігер та інші",
+        "genre": "Horror art",
+        "section": "horror_art",
+        "sectionLabel": "Жах у мистецтві",
+        "id": 1,
+        "localId": "horror_art:horror-in-art",
+        "contentPath": "content/horror_art/horror-in-art.html"
+    },
+    {
+        "url": "local://horror_art/interactive-horror-art",
+        "imageUrl": "images/article1-preview.png",
+        "title": "Коли картина стає кімнатою: інтерактивний жах",
+        "previewText": "Про композицію, світло, камеру й те, як хоррор-ігри перетворюють глядача на учасника образу.",
+        "release_date": "1990-ті - 2020-ті",
+        "developer": "Різні автори",
+        "genre": "Interactive horror",
+        "section": "horror_art",
+        "sectionLabel": "Жах у мистецтві",
+        "id": 2,
+        "localId": "horror_art:interactive-horror-art",
+        "contentPath": "content/horror_art/interactive-horror-art.html"
+    }
+]

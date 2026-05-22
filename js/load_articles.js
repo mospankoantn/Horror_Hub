@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('articlesGrid');
   if (!grid) return;
 
+  const dataSource = grid.dataset.source || 'articles_data.json';
+  const sectionFilter = grid.dataset.section || '';
+
   const controls = {
     search: document.getElementById('searchInput'),
     sort: document.getElementById('sortSelect'),
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`articles_data.json?t=${Date.now()}`, {
+      const response = await fetch(`${dataSource}?t=${Date.now()}`, {
         headers: { Accept: 'application/json' }
       });
 
@@ -54,15 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const articles = await response.json();
       if (!Array.isArray(articles)) {
-        throw new Error('articles_data.json має містити масив статей');
+        throw new Error(`${dataSource} має містити масив статей`);
       }
 
-      state.allArticles = articles.filter(isValidArticle);
+      state.allArticles = articles
+        .filter(isValidArticle)
+        .filter((article) => !sectionFilter || article.section === sectionFilter);
       populateFilters();
       updateView();
     } catch (error) {
       console.error('Помилка load_articles.js:', error);
-      showEmptyState('Не вдалося завантажити статті. Перевірте articles_data.json або сервер.');
+      showEmptyState(`Не вдалося завантажити статті. Перевірте ${dataSource} або сервер.`);
       updatePagination(1);
     } finally {
       setLoading(false);
@@ -211,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     preview.textContent = data.previewText || "Опис скоро з'явиться.";
 
     const link = document.createElement('a');
-    link.href = `article.html?id=${encodeURIComponent(getArticleId(data.url))}`;
+    link.href = `article.html?id=${encodeURIComponent(getArticleId(data))}`;
     link.className = 'read-more';
     link.textContent = 'Читати далі';
 
@@ -307,11 +312,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function isValidArticle(article) {
-    return article && typeof article === 'object' && article.title && article.url && article.previewText;
+    return article
+      && typeof article === 'object'
+      && article.title
+      && (article.url || article.localId || article.contentHtml || article.contentPath)
+      && article.previewText;
   }
 
   function getMetaText(article) {
-    const parts = [article.genre, article.release_date, article.developer]
+    const parts = [article.sectionLabel, article.genre, article.release_date, article.developer]
       .map((value) => (value || '').trim())
       .filter(Boolean);
 
@@ -323,7 +332,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return imageUrl || 'images/placeholder.jpg';
   }
 
-  function getArticleId(url) {
+  function getArticleId(article) {
+    if (article.localId) {
+      return article.localId;
+    }
+
+    const url = article.url;
     try {
       const parsedUrl = new URL(url, window.location.href);
       return parsedUrl.pathname.replace(/^\/+/, '') || String(url);

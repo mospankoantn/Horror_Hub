@@ -1,0 +1,30 @@
+[
+    {
+        "url": "local://horror_movies/cult-horror-films",
+        "imageUrl": "images/the_shining_poster.jpg",
+        "title": "Культові фільми жахів: короткий путівник",
+        "previewText": "Від Психо й Екзорциста до Сяйва, Пастки та Спадковості: чому ці фільми стали мовою жанру.",
+        "release_date": "1960-ті - 2010-ті",
+        "developer": "Гічкок, Фрідкін, Кубрик, Піл, Астер",
+        "genre": "Horror cinema",
+        "section": "horror_movies",
+        "sectionLabel": "Фільми Жахів",
+        "id": 1,
+        "localId": "horror_movies:cult-horror-films",
+        "contentPath": "content/horror_movies/cult-horror-films.html"
+    },
+    {
+        "url": "local://horror_movies/psychological-horror-cinema",
+        "imageUrl": "images/hereditary_poster.jpg",
+        "title": "Психологічний хоррор у кіно",
+        "previewText": "Страх без простого монстра: провина, родина, ізоляція й недовіра до власного сприйняття.",
+        "release_date": "XX-XXI століття",
+        "developer": "Різні режисери",
+        "genre": "Psychological horror",
+        "section": "horror_movies",
+        "sectionLabel": "Фільми Жахів",
+        "id": 2,
+        "localId": "horror_movies:psychological-horror-cinema",
+        "contentPath": "content/horror_movies/psychological-horror-cinema.html"
+    }
+]

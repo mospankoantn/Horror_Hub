@@ -1,0 +1,30 @@
+[
+    {
+        "url": "local://horror_literature/gothic-to-lovecraft",
+        "imageUrl": "images/horror_background.jpg",
+        "title": "Жах у літературі: від готики до Лавкрафта",
+        "previewText": "Готичні замки, психологія По, наукова тривога Шеллі й космічний страх Лавкрафта.",
+        "release_date": "XVIII-XX століття",
+        "developer": "По, Шеллі, Лавкрафт та інші",
+        "genre": "Horror literature",
+        "section": "horror_literature",
+        "sectionLabel": "Жах у літературі",
+        "id": 1,
+        "localId": "horror_literature:gothic-to-lovecraft",
+        "contentPath": "content/horror_literature/gothic-to-lovecraft.html"
+    },
+    {
+        "url": "local://horror_literature/urban-legends",
+        "imageUrl": "images/placeholder.jpg",
+        "title": "Міські легенди: література, що прикидається чуткою",
+        "previewText": "Як короткі страшні історії стали містком між фольклором, крипіпастами та інтернет-хоррором.",
+        "release_date": "XX-XXI століття",
+        "developer": "Фольклор і мережеві спільноти",
+        "genre": "Urban legends",
+        "section": "horror_literature",
+        "sectionLabel": "Жах у літературі",
+        "id": 2,
+        "localId": "horror_literature:urban-legends",
+        "contentPath": "content/horror_literature/urban-legends.html"
+    }
+]
