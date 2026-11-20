@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Horror Hub — варіант B «Архівна справа»</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nosifer&amp;family=PT+Serif:wght@400;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="background: {{t.bg}}; color: {{t.text}}; font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100%;">
+
+  <header style="position: sticky; top: 0; z-index: 5; background: {{t.bg}}; border-bottom: 1px solid {{t.line}};">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 12px clamp(16px, 3vw, 28px); display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap;">
+      <a href="#top" style="display: flex; align-items: baseline; gap: 10px; text-decoration: none; white-space: nowrap;">
+        <span style="font-family: 'Nosifer', Impact, sans-serif; font-size: 20px; color: {{t.stamp}};">HORROR HUB</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.muted}};">АРХІВ ЖАХУ</span>
+      </a>
+      <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}">
+        <label style="flex: 1 1 360px; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 4px; border: 1px solid {{t.field}}; background: {{t.surface}};">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: {{t.muted}}; flex-shrink: 0;"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);">Пошук по архіву</span>
+          <input type="search" placeholder="Назва, рік або студія — напр. «Capcom 1996»" style="flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; color: {{t.text}}; font: inherit; font-size: 15px;">
+          <kbd style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 2px 6px; border-radius: 3px; border: 1px solid {{t.line}}; color: {{t.muted}};">/</kbd>
+        </label>
+      </sc-if>
+      <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+        <button type="button" onClick="{{toggleTheme}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="height: 44px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; border: 1px solid {{t.line}}; background: transparent; color: {{t.text}}; font: inherit; font-size: 14px; cursor: pointer;">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"></path></svg>
+          </sc-if>
+          <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}"><span>{{themeShort}}</span></sc-if>
+        </button>
+        <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}">
+          <a href="#top" style="height: 44px; padding: 0 18px; display: inline-flex; align-items: center; border-radius: 4px; background: {{t.button}}; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none;">Увійти</a>
+        </sc-if>
+        <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{toggleMenu}}" aria-label="Меню" aria-expanded="{{menuExpanded}}" style="width: 44px; height: 44px; display: grid; place-items: center; border-radius: 4px; border: 1px solid {{t.line}}; background: transparent; color: {{t.text}}; cursor: pointer;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 0 16px 12px;">
+        <label style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 4px; border: 1px solid {{t.field}}; background: {{t.surface}};">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: {{t.muted}};"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);">Пошук по архіву</span>
+          <input type="search" placeholder="Назва, рік або студія" style="flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; color: {{t.text}}; font: inherit; font-size: 15px;">
+        </label>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showTabs}}" hint-placeholder-val="{{ true }}">
+      <nav aria-label="Розділи" style="max-width: 1280px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 28px); display: flex; gap: 4px; overflow-x: auto;">
+        <sc-for list="{{tabs}}" as="tab" hint-placeholder-count="7">
+          <a href="#top" style="{{tab.style}}">{{tab.label}}</a>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main id="top" style="max-width: 1280px; margin: 0 auto; padding: 28px clamp(16px, 3vw, 28px) 64px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start;">
+
+    <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{toggleFilters}}" aria-expanded="{{filtersExpanded}}" style="flex: 1 1 100%; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-radius: 4px; border: 1px solid {{t.field}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 600; cursor: pointer;">Фільтри й десятиліття<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{t.muted}};">{{found}}</span></button>
+    </sc-if>
+    <sc-if value="{{showSidebar}}" hint-placeholder-val="{{ true }}">
+    <aside aria-label="Фільтри" style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 24px;">
+      <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 4px;">
+        <legend style="margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.muted}};">ДЕСЯТИЛІТТЯ</legend>
+        <sc-for list="{{eras}}" as="era" hint-placeholder-count="5">
+          <label style="display: flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer;">
+            <input type="checkbox" checked="{{era.on}}" onChange="{{era.toggle}}" style="width: 18px; height: 18px; accent-color: {{t.accent}};">
+            <span style="flex: 1;">{{era.label}}</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{t.muted}};">{{era.count}}</span>
+          </label>
+        </sc-for>
+      </fieldset>
+      <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px;">
+        <legend style="margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.muted}};">ПІДЖАНР</legend>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-for list="{{genres}}" as="g" hint-placeholder-count="5">
+            <span style="padding: 6px 10px; border-radius: 3px; border: 1px solid {{t.line}}; font-size: 13px;">{{g}}</span>
+          </sc-for>
+        </div>
+      </fieldset>
+      <a href="#top" style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 4px; border: 1px dashed {{t.field}}; color: {{t.text}}; text-decoration: none;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.accent}};">ІГРОВА КІМНАТА</span>
+        <span style="font-family: 'PT Serif', Georgia, serif; font-size: 19px; font-weight: 700;">Квест «Підвал під сценою» і Темний лабіринт</span>
+        <span style="font-size: 14px; color: {{t.muted}};">Грати в браузері →</span>
+      </a>
+    </aside>
+    </sc-if>
+
+    <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 28px;">
+
+      <article style="position: relative; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px; border-radius: 4px; border: 1px solid {{t.line}}; background: {{t.surface}};">
+        <img src="/_blob/1ae692c0f8715468898de360d10cb995" alt="Обкладинка Resident Evil 1996" style="flex: 0 1 220px; width: 220px; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 2px; filter: {{t.imgFilter}};">
+        <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+          <span style="align-self: flex-start; padding: 4px 10px; border: 2px solid {{t.stamp}}; color: {{t.stamp}}; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 3px; transform: rotate(-2deg);">РОЗСЕКРЕЧЕНО</span>
+          <h1 style="margin: 0; font-family: 'PT Serif', Georgia, serif; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; text-wrap: balance;">Resident Evil (1996): гра, що дала життя survival horror</h1>
+          <p style="margin: 0; color: {{t.muted}}; text-wrap: pretty;">Якщо ви коли-небудь замислювалися, яка гра стоїть біля витоків жанру «хоррор на виживання», згадки про Resident Evil неминучі…</p>
+          <dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; padding-top: 14px; border-top: 1px solid {{t.line}}; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+            <div><dt style="color: {{t.muted}};">РІК</dt><dd style="margin: 0; font-weight: 600;">1996</dd></div>
+            <div><dt style="color: {{t.muted}};">СТУДІЯ</dt><dd style="margin: 0; font-weight: 600;">Capcom</dd></div>
+            <div><dt style="color: {{t.muted}};">ЖАНР</dt><dd style="margin: 0; font-weight: 600;">Survival horror</dd></div>
+            <div><dt style="color: {{t.muted}};">ЧИТАННЯ</dt><dd style="margin: 0; font-weight: 600;">4 хв</dd></div>
+          </dl>
+          <a href="#top" style="align-self: flex-start; height: 48px; padding: 0 22px; display: inline-flex; align-items: center; gap: 10px; border-radius: 4px; background: {{t.button}}; color: #ffffff; font-weight: 600; text-decoration: none;">Відкрити справу
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+        </div>
+      </article>
+
+      <section aria-labelledby="results-b" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid {{t.line}};">
+          <h2 id="results-b" style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; letter-spacing: 1px;">{{found}}</h2>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: {{t.muted}};">Сортувати
+              <select style="height: 40px; padding: 0 10px; border-radius: 4px; border: 1px solid {{t.field}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-size: 14px;">
+                <option>Рік: старіші спершу</option>
+                <option>Рік: новіші спершу</option>
+                <option>Спочатку нові</option>
+              </select>
+            </label>
+            <div role="group" aria-label="Вигляд списку" style="display: flex; border: 1px solid {{t.field}}; border-radius: 4px; overflow: hidden;">
+              <button type="button" onClick="{{showList}}" aria-pressed="{{listPressed}}" style="{{listBtn}}">Список</button>
+              <button type="button" onClick="{{showCards}}" aria-pressed="{{cardsPressed}}" style="{{cardsBtn}}">Картки</button>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column;">
+            <sc-for list="{{articles}}" as="a" hint-placeholder-count="8">
+              <li style="border-bottom: 1px solid {{t.line}};">
+                <a href="#top" style="display: flex; gap: 18px; align-items: center; padding: 14px 4px; color: {{t.text}}; text-decoration: none;">
+                  <img src="{{a.img}}" alt="" style="width: 112px; height: 76px; flex-shrink: 0; object-fit: cover; border-radius: 2px; filter: {{t.imgFilter}};">
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{t.accent}};">{{a.year}} · {{a.studio}} · {{a.genre}}</span>
+                    <span style="font-family: 'PT Serif', Georgia, serif; font-size: 19px; font-weight: 700; line-height: 1.25;">{{a.title}}</span>
+                    <span style="font-size: 14px; color: {{t.muted}}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{a.preview}}</span>
+                  </span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{t.muted}}; white-space: nowrap;">{{a.minutes}} хв</span>
+                </a>
+              </li>
+            </sc-for>
+          </ol>
+        </sc-if>
+
+        <sc-if value="{{isCards}}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 18px;">
+            <sc-for list="{{articles}}" as="a" hint-placeholder-count="8">
+              <a href="#top" style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 4px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.text}}; text-decoration: none;">
+                <img src="{{a.img}}" alt="" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; filter: {{t.imgFilter}};">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{t.accent}};">{{a.year}} · {{a.studio}}</span>
+                <span style="font-family: 'PT Serif', Georgia, serif; font-size: 17px; font-weight: 700; line-height: 1.25;">{{a.title}}</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <nav aria-label="Сторінки" style="display: flex; justify-content: center; gap: 6px; padding-top: 12px; font-family: 'IBM Plex Mono', monospace;">
+          <sc-for list="{{pages}}" as="p" hint-placeholder-count="5">
+            <a href="#top" aria-current="{{p.current}}" style="{{p.style}}">{{p.label}}</a>
+          </sc-for>
+        </nav>
+      </section>
+
+      <a href="#top" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; padding: 20px; border-radius: 4px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.text}}; text-decoration: none;">
+        <img src="/_blob/1e54a17b0223e18a9c6a4b0311d28b71" alt="" style="flex: 0 1 220px; width: 220px; max-width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 2px;">
+        <span style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.stamp}};">ІНТЕРНЕТ-ХОРРОР · ІНТЕРАКТИВНЕ ДОСЬЄ</span>
+          <span style="font-family: 'PT Serif', Georgia, serif; font-size: 24px; font-weight: 700;">SCP: хоррор у формі секретного архіву</span>
+          <span style="color: {{t.muted}};">Тести D-класу, знакові об’єкти, лор Фонду й реальна історія появи SCP. Об’єкт <span style="background: {{t.text}}; color: {{t.text}}; border-radius: 1px;">██████</span> чекає на вас.</span>
+        </span>
+      </a>
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid {{t.line}};">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 28px clamp(16px, 3vw, 28px); display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; font-size: 14px; color: {{t.muted}};">
+      <span style="font-family: 'IBM Plex Mono', monospace;">© 2026 HORROR HUB · 153 МАТЕРІАЛИ В АРХІВІ</span>
+      <a href="#top" style="color: {{t.muted}};">Контакти</a>
+      <a href="#top" style="color: {{t.muted}};">Конфіденційність</a>
+      <a href="https://t.me/moyi_statti" style="color: {{t.muted}};">Telegram</a>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"compact":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: null, menuOpen: false, view: 'list', eras: { '1980-ті': true, '1990-ті': true, '2000-ні': true } };
+  }
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'dark';
+    const dark = theme === 'dark';
+    const compact = Boolean(this.props.compact);
+    const t = dark ? {
+      bg: '#0f1113', surface: '#16191c', line: '#2a3034', field: '#4a5358',
+      text: '#e7e3db', muted: '#a0a6a9', accent: '#7cc0cf', stamp: '#ec6a5f',
+      button: '#2c6a78', imgFilter: 'grayscale(0.35) contrast(1.05)'
+    } : {
+      bg: '#efe7d6', surface: '#f8f3e8', line: '#d6c9ae', field: '#9c8f76',
+      text: '#1e1b16', muted: '#5a5145', accent: '#1d5a68', stamp: '#a3221f',
+      button: '#1d5a68', imgFilter: 'sepia(0.25) contrast(1.02)'
+    };
+    const tabNames = ['Усе', 'Ігри жахів', 'Кіно', 'Огляди', 'Інтернет-хоррор', 'Культура', 'Ігрова кімната'];
+    const tabs = tabNames.map((label, i) => ({
+      label,
+      style: 'display: inline-flex; align-items: center; height: 44px; padding: 0 14px; white-space: nowrap; font-size: 14px; font-weight: 600; text-decoration: none; '
+        + (i === 0 ? `color: ${t.text}; box-shadow: inset 0 -3px 0 ${t.stamp};` : `color: ${t.muted};`)
+    }));
+    const eraDefs = [['до 1980', 6], ['1980-ті', 10], ['1990-ті', 48], ['2000-ні', 76], ['2010+', 8]];
+    const eras = eraDefs.map(([label, count]) => ({
+      label, count, on: Boolean(this.state.eras[label]),
+      toggle: () => this.setState({ eras: { ...this.state.eras, [label]: !this.state.eras[label] } })
+    }));
+    const selected = eras.filter((e) => e.on);
+    const total = (selected.length ? selected : eras).reduce((sum, e) => sum + e.count, 0);
+    const all = [
+      { title: 'Alone in the Dark: перший справжній жах у трьох вимірах', img: '/_blob/0b5eae591cf31bd766362e87ae783d54', year: '1992', studio: 'Infogrames', genre: 'Survival horror', minutes: 4, preview: 'Коли хтось згадує першу хоррор-гру, ви, напевно, одразу думаєте про «Оселю зла»…' },
+      { title: 'Clock Tower (1995): класика хоррор-ігор, натхненна Ардженто', img: '/_blob/667789810392b4662f672d7bf46c165e', year: '1995', studio: 'Human Entertainment', genre: 'Point-and-click', minutes: 3, preview: 'Уявіть: ви — беззахисна сирота в темному маєтку, де за вами полює вбивця з ножицями…' },
+      { title: 'System Shock 2 (1999): космічний кошмар', img: '/_blob/fa832861dc484b44410f28d1e24b7fda', year: '1999', studio: 'Irrational Games', genre: 'Immersive sim', minutes: 4, preview: 'Якщо ви не грали у System Shock 2, то пропустили одну з найвпливовіших ігор свого часу…' },
+      { title: 'Koudelka: темна симфонія хоррору та рольових ігор', img: '/_blob/ad897575e2755701c5821671ce12fa57', year: '1999', studio: 'Sacnoth', genre: 'RPG, survival horror', minutes: 3, preview: 'Уявіть, що ви сидите біля вогнища в стародавньому монастирі, де кожна тінь…' },
+      { title: 'Fatal Frame (Project Zero): класика японського хорору', img: '/_blob/56a66e5aeda05dd0dcce3dea35cfb084', year: '2001', studio: 'Tecmo', genre: 'Survival horror', minutes: 3, preview: 'Якщо ви коли-небудь відчували, як у спину дихає невидима істота…' },
+      { title: 'Eternal Darkness: Sanity’s Requiem — гра, що змусить засумніватися у власному глузді', img: '/_blob/64b3d035533e885927eeabbbbd712be3', year: '2002', studio: 'Silicon Knights', genre: 'Psychological horror', minutes: 5, preview: 'Ігри, які не просто лякають, а змушують перевіряти, чи не зламалася ваша консоль…' },
+      { title: 'Yume Nikki (2004): мандрівка світом снів і таємниць', img: '/_blob/3a8b12c4440cd3595e3486639e649ed6', year: '2004', studio: 'Kikiyama', genre: 'Psychological horror', minutes: 7, preview: 'У 2004 році розробник під псевдонімом Kikiyama подарував геймерам справжню інді-легенду…' },
+      { title: 'Haunting Ground (2005): дівчина, пес і найдорожчий замок жахів', img: '/_blob/d396291ebf90a07672b7ce175c3fc5e7', year: '2005', studio: 'Capcom', genre: 'Survival horror', minutes: 4, preview: 'Гра, що вийшла в тіні Resident Evil 4 і була несправедливо проігнорована масами…' },
+      { title: 'Penumbra: Overture (2007) — фізика страху та початок нової ери хорору', img: '/_blob/9aee2c792cd4abd9a18155e0604f40d8', year: '2007', studio: 'Frictional Games', genre: 'Survival horror', minutes: 6, preview: 'Гра, що народилася з технологічної демки 2006 року й назавжди змінила ДНК жанру…' }
+    ];
+    const decadeOf = (year) => { const y = Number(year); return y < 1980 ? 'до 1980' : y < 1990 ? '1980-ті' : y < 2000 ? '1990-ті' : y < 2010 ? '2000-ні' : '2010+'; };
+    const articles = selected.length ? all.filter((a) => this.state.eras[decadeOf(a.year)]) : all;
+    const last = total % 10, teen = total % 100 >= 11 && total % 100 <= 14;
+    const noun = !teen && last === 1 ? 'матеріал' : !teen && last >= 2 && last <= 4 ? 'матеріали' : 'матеріалів';
+    const isList = this.state.view === 'list';
+    const toggleStyle = (on) => `height: 40px; padding: 0 14px; border: 0; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: ${on ? t.text : 'transparent'}; color: ${on ? t.bg : t.text};`;
+    const pages = ['1', '2', '3', '…', '16'].map((label, i) => ({
+      label, current: i === 0 ? 'page' : 'false',
+      style: `min-width: 40px; height: 40px; display: grid; place-items: center; border-radius: 4px; text-decoration: none; border: 1px solid ${i === 0 ? t.text : t.line}; background: ${i === 0 ? t.text : 'transparent'}; color: ${i === 0 ? t.bg : t.text};`
+    }));
+    return {
+      t, tabs, eras, articles, pages, compact,
+      genres: ['Survival horror', 'Психологічний', 'Point-and-click', 'Immersive sim', 'Liminal'],
+      found: `ЗНАЙДЕНО ${total} ${noun.toUpperCase()}`,
+      isList, isCards: !isList, listPressed: String(isList), cardsPressed: String(!isList),
+      listBtn: toggleStyle(isList), cardsBtn: toggleStyle(!isList),
+      showList: () => this.setState({ view: 'list' }), showCards: () => this.setState({ view: 'cards' }),
+      isDark: dark, isLight: !dark,
+      themeLabel: dark ? 'Увімкнути світлу тему' : 'Увімкнути темну тему',
+      themeShort: dark ? 'Світла' : 'Темна',
+      toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' }),
+      showFullNav: !compact,
+      showTabs: !compact || this.state.menuOpen,
+      showSidebar: !compact || this.state.filtersOpen,
+      filtersExpanded: String(Boolean(this.state.filtersOpen)),
+      toggleFilters: () => this.setState({ filtersOpen: !this.state.filtersOpen }),
+      menuExpanded: String(this.state.menuOpen),
+      toggleMenu: () => this.setState({ menuOpen: !this.state.menuOpen })
+    };
+  }
+}
+</script>
+</body>
+</html>

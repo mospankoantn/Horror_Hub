@@ -15,7 +15,7 @@
     },
     {
         "url": "local://horror_literature/urban-legends",
-        "imageUrl": "images/placeholder.jpg",
+        "imageUrl": "images/covers/local-aefcb0b7091a0f.webp",
         "title": "Міські легенди: література, що прикидається чуткою",
         "previewText": "Як короткі страшні історії стали містком між фольклором, крипіпастами та інтернет-хоррором.",
         "release_date": "XX-XXI століття",
@@ -25,6 +25,7 @@
         "sectionLabel": "Жах у літературі",
         "id": 2,
         "localId": "horror_literature:urban-legends",
-        "contentPath": "content/horror_literature/urban-legends.html"
+        "contentPath": "content/horror_literature/urban-legends.html",
+        "imageSource": "images/placeholder.jpg"
     }
 ]

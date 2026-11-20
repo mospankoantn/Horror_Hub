@@ -1,7 +1,7 @@
 [
     {
         "url": "local://reviews/silent-hill-2-remake-review",
-        "imageUrl": "images/sh2_remake.jpg",
+        "imageUrl": "images/covers/local-7e559e738aa58f.webp",
         "title": "Огляд ремейку Silent Hill 2: що важливо перевірити",
         "previewText": "Короткий оглядовий каркас: атмосфера, темп, символи й те, чи не губиться біль оригіналу.",
         "release_date": "2024",
@@ -11,7 +11,8 @@
         "sectionLabel": "Огляди",
         "id": 1,
         "localId": "reviews:silent-hill-2-remake-review",
-        "contentPath": "content/reviews/silent-hill-2-remake-review.html"
+        "contentPath": "content/reviews/silent-hill-2-remake-review.html",
+        "imageSource": "images/sh2_remake.jpg"
     },
     {
         "url": "local://reviews/hereditary-review",
@@ -29,7 +30,7 @@
     },
     {
         "url": "https://telegra.ph/Gra-pochalasya-Oglyad-Saw-The-Video-Game--%D0%86nzhenernij-sadizm-u-cifr%D1%96-01-23",
-        "imageUrl": "https://m.media-amazon.com/images/M/MV5BNGFjMTM2OGMtMTQ1Ni00ZGNjLWExOTMtNjQyNGZhOGY3OGVkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+        "imageUrl": "images/covers/fdee9277b99b8a2eda78.webp",
         "title": "Гра почалася: огляд Saw: The Video Game",
         "previewText": "Інженерний садизм у цифрі: як Пила перетворюється на survival horror із пастками й головоломками.",
         "release_date": "2009",
@@ -37,6 +38,7 @@
         "genre": "Огляд гри",
         "section": "reviews",
         "sectionLabel": "Огляди",
-        "id": 3
+        "id": 3,
+        "imageSource": "https://m.media-amazon.com/images/M/MV5BNGFjMTM2OGMtMTQ1Ni00ZGNjLWExOTMtNjQyNGZhOGY3OGVkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
     }
 ]

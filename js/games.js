@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const COLS = 15;
   const ROWS = 10;
   const DIFFICULTY = {
-    normal: { enemySpeed: 1.05, batteryDrain: 0.018, torchRadius: 3.25, label: 'Нормально' },
-    hard: { enemySpeed: 1.35, batteryDrain: 0.03, torchRadius: 2.75, label: 'Важко' }
+    normal: { enemySpeed: 1.05, batteryDrain: 0.0008, torchRadius: 3.25, label: 'Нормально' },
+    hard: { enemySpeed: 1.35, batteryDrain: 0.00125, torchRadius: 2.75, label: 'Важко' }
   };
 
   let selectedDifficulty = 'normal';
@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let droneOscillator = null;
   let droneGain = null;
   let heartbeatTimer = 0;
+  let heartbeatSpeed = 700;
+  let finishTyping = null;
 
   let typingTimer = 0;
   let isTyping = false;
@@ -187,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedDifficulty = button.dataset.difficulty || 'normal';
       document.querySelectorAll('.difficulty-btn').forEach((item) => {
         item.classList.toggle('is-active', item === button);
+        item.setAttribute('aria-pressed', String(item === button));
       });
     });
   });
@@ -200,10 +203,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'restart-quest') startTextQuest();
     if (action === 'restart-maze') startMazeGame();
     if (action === 'sound') toggleSound();
+    if (action === 'skip-text') finishTyping?.();
+    if (action === 'pause-maze') setMazePaused(!mazeState?.paused);
   });
 
   bindMobileControls();
   updateSoundButtons();
+  drawMazePreview();
+  window.addEventListener('blur', () => {
+    keys = {};
+    if (mazeState && !mazeState.won && !mazeState.lost) setMazePaused(true);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      keys = {};
+      if (mazeState && !mazeState.won && !mazeState.lost) setMazePaused(true);
+      stopDrone();
+    }
+  });
 
   window.showGameSelection = showGameSelection;
 
@@ -215,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stopMazeGame();
     stopDrone();
     stopHeartbeat();
+    document.getElementById('select-text-quest')?.focus({ preventScroll: true });
   }
 
   function showTextQuest() {
@@ -240,6 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startTextQuest() {
+    stopTextTyping();
+    startDrone();
     questState = createQuestState();
     renderQuestHud();
     displayScene('start');
@@ -301,6 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function displayFearEnding() {
+    renderQuestHud();
     nodes.choices.replaceChildren();
     nodes.story.textContent = '';
     typeText('Страх стає густим, як вода. Ліхтар у руці більше не світить назовні. Він світить у тебе.', () => {
@@ -328,6 +349,17 @@ document.addEventListener('DOMContentLoaded', () => {
     stopTextTyping();
     isTyping = true;
     let index = 0;
+    const skipButton = document.querySelector('[data-action="skip-text"]');
+    if (skipButton) skipButton.disabled = false;
+    finishTyping = () => {
+      stopTextTyping();
+      nodes.story.textContent = text;
+      if (typeof done === 'function') done();
+    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finishTyping();
+      return;
+    }
 
     const tick = () => {
       nodes.story.textContent = text.slice(0, index);
@@ -338,8 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      isTyping = false;
-      if (typeof done === 'function') done();
+      finishTyping?.();
     };
 
     tick();
@@ -349,11 +380,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.clearTimeout(typingTimer);
     typingTimer = 0;
     isTyping = false;
+    finishTyping = null;
+    const skipButton = document.querySelector('[data-action="skip-text"]');
+    if (skipButton) skipButton.disabled = true;
   }
 
   function startMazeGame() {
     const settings = DIFFICULTY[selectedDifficulty] || DIFFICULTY.normal;
     stopMazeGame();
+    startDrone();
     hideMazeResult();
     keys = {};
 
@@ -365,7 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
     mazeState = {
       maze,
       settings,
-      startTime: performance.now(),
+      activeMs: 0,
+      paused: false,
       elapsed: 0,
       battery: 100,
       won: false,
@@ -374,11 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
       enemy: cellCenter(enemyCell.col, enemyCell.row, 12),
       exit: cellCenter(exitCell.col, exitCell.row, 12),
       path: [],
-      pathCooldown: 0
+      waypoint: null
     };
 
     bindKeyboard();
-    updateMazeHud(0);
+    updatePauseButton();
+    updateMazeHud();
     drawMaze();
     lastFrameTime = performance.now();
     animationFrame = requestAnimationFrame(loopMaze);
@@ -397,11 +434,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const deltaMs = Math.min(timestamp - lastFrameTime, 40);
     lastFrameTime = timestamp;
+    if (mazeState.paused) {
+      animationFrame = requestAnimationFrame(loopMaze);
+      return;
+    }
+    mazeState.activeMs += deltaMs;
 
     updatePlayer(deltaMs);
     updateEnemy(deltaMs);
     updateBattery(deltaMs);
-    updateMazeHud(timestamp);
+    updateMazeHud();
     drawMaze();
     checkMazeOutcome();
 
@@ -425,7 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = randomOdd(1, ROWS - 3);
       const neighbors = [[1, 0], [-1, 0], [0, 1], [0, -1]];
       const [dx, dy] = neighbors[Math.floor(Math.random() * neighbors.length)];
-      if (maze[row + dy] && maze[row + dy][col + dx] === 1) {
+      const nextCol = col + dx * 2;
+      const nextRow = row + dy * 2;
+      if (nextCol > 0 && nextCol < COLS - 1 && nextRow > 0 && nextRow < ROWS - 2 && maze[nextRow][nextCol] === 0) {
         maze[row + dy][col + dx] = 0;
       }
     }
@@ -476,20 +520,17 @@ document.addEventListener('DOMContentLoaded', () => {
       stopHeartbeat();
     }
 
-    mazeState.pathCooldown -= 1;
-    if (mazeState.pathCooldown <= 0) {
-      mazeState.path = findPath(pointToCell(enemy), pointToCell(player));
-      mazeState.pathCooldown = 10;
+    // Finish each corridor segment before choosing the next turn.
+    if (!mazeState.waypoint || getDistance(enemy, mazeState.waypoint) < 0.1) {
+      const path = findPath(pointToCell(enemy), pointToCell(player));
+      const nextCell = path[1];
+      mazeState.waypoint = nextCell ? cellCenter(nextCell.col, nextCell.row, enemy.radius) : null;
     }
-
-    const nextCell = mazeState.path[1] || mazeState.path[0];
-    if (!nextCell) return;
-
-    const target = cellCenter(nextCell.col, nextCell.row, enemy.radius);
+    const target = mazeState.waypoint || player;
     const dx = target.x - enemy.x;
     const dy = target.y - enemy.y;
     const length = Math.hypot(dx, dy) || 1;
-    const speed = mazeState.settings.enemySpeed * (deltaMs / 16.67);
+    const speed = Math.min(length, mazeState.settings.enemySpeed * (deltaMs / 16.67));
 
     moveCircle(enemy, (dx / length) * speed, (dy / length) * speed, enemy.radius);
   }
@@ -498,10 +539,10 @@ document.addEventListener('DOMContentLoaded', () => {
     mazeState.battery = Math.max(0, mazeState.battery - mazeState.settings.batteryDrain * deltaMs);
   }
 
-  function updateMazeHud(timestamp) {
+  function updateMazeHud() {
     if (!mazeState) return;
 
-    mazeState.elapsed = timestamp ? Math.floor((timestamp - mazeState.startTime) / 1000) : 0;
+    mazeState.elapsed = Math.floor(mazeState.activeMs / 1000);
     const minutes = String(Math.floor(mazeState.elapsed / 60)).padStart(2, '0');
     const seconds = String(mazeState.elapsed % 60).padStart(2, '0');
     const distance = Math.max(0, Math.round(getDistance(mazeState.player, mazeState.enemy) / TILE));
@@ -539,10 +580,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (animationFrame) cancelAnimationFrame(animationFrame);
     animationFrame = 0;
     stopHeartbeat();
+    stopDrone();
     unbindKeyboard();
     nodes.resultTitle.textContent = title;
     nodes.resultText.textContent = text;
     nodes.result.hidden = false;
+    nodes.result.querySelector('button')?.focus({ preventScroll: true });
   }
 
   function hideMazeResult() {
@@ -633,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, nodes.canvas.width, nodes.canvas.height);
+    ctx.moveTo(x + Math.max(radius, TILE * 1.15), y);
     ctx.arc(x, y, Math.max(radius, TILE * 1.15), 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.965)';
     ctx.fill('evenodd');
@@ -731,10 +775,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleKeyDown(event) {
+    if (event.code === 'Escape') {
+      event.preventDefault();
+      setMazePaused(!mazeState?.paused);
+      return;
+    }
+    if (event.target.closest('input, textarea, select, [contenteditable="true"]') || mazeState?.paused) return;
     keys[event.code] = true;
     keys[event.key] = true;
 
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyS', 'KeyA', 'KeyD'].includes(event.code)) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyS', 'KeyA', 'KeyD'].includes(event.code)) {
       event.preventDefault();
     }
   }
@@ -766,16 +816,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initAudio() {
     if (!soundEnabled) return;
-
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.55, audioCtx.currentTime);
-      masterGain.connect(audioCtx.destination);
-    }
-
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) { soundEnabled = false; updateSoundButtons(); return; }
+    try {
+      if (!audioCtx) {
+        audioCtx = new Audio();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.55, audioCtx.currentTime);
+        masterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    } catch {
+      soundEnabled = false;
+      updateSoundButtons();
     }
   }
 
@@ -813,10 +866,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function playHeartbeat(speed = 700) {
+    heartbeatSpeed = speed;
     if (!soundEnabled || !audioCtx || !masterGain || heartbeatTimer) return;
 
     const pulse = () => {
-      if (!soundEnabled || !mazeState || mazeState.won || mazeState.lost) {
+      if (!soundEnabled || !mazeState || mazeState.paused || mazeState.won || mazeState.lost) {
         stopHeartbeat();
         return;
       }
@@ -833,7 +887,8 @@ document.addEventListener('DOMContentLoaded', () => {
       gain.connect(masterGain);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.2);
-      heartbeatTimer = window.setTimeout(pulse, speed);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+      heartbeatTimer = window.setTimeout(pulse, heartbeatSpeed);
     };
 
     pulse();
@@ -865,6 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noise.connect(gain);
     gain.connect(masterGain);
     noise.start();
+    noise.onended = () => { noise.disconnect(); gain.disconnect(); };
   }
 
   function playChime() {
@@ -885,6 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gain.connect(masterGain);
       osc.start(start);
       osc.stop(start + 0.45);
+      osc.onended = () => { osc.disconnect(); gain.disconnect(); };
     });
   }
 
@@ -895,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stopHeartbeat();
     } else {
       initAudio();
-      if (!nodes.selection.hidden) {
+      if (!nodes.selection.hidden || mazeState?.paused || mazeState?.won || mazeState?.lost) {
         stopDrone();
       } else {
         startDrone();
@@ -907,7 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateSoundButtons() {
     document.querySelectorAll('[data-action="sound"]').forEach((button) => {
-      button.textContent = soundEnabled ? 'Звук: увімк.' : 'Звук: вимк.';
+      button.checked = soundEnabled;
     });
   }
 
@@ -935,7 +992,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function shuffle(items) {
-    return [...items].sort(() => Math.random() - 0.5);
+    const shuffled = [...items];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  function setMazePaused(paused) {
+    if (!mazeState || mazeState.won || mazeState.lost) return;
+    mazeState.paused = paused;
+    keys = {};
+    lastFrameTime = performance.now();
+    if (paused) {
+      stopHeartbeat();
+      stopDrone();
+    } else {
+      initAudio();
+      startDrone();
+    }
+    nodes.maze.classList.toggle('is-paused', paused);
+    updatePauseButton();
+  }
+
+  function updatePauseButton() {
+    const button = document.querySelector('[data-action="pause-maze"]');
+    if (!button) return;
+    const paused = Boolean(mazeState?.paused);
+    button.textContent = paused ? '▶' : 'Ⅱ';
+    button.title = paused ? 'Продовжити' : 'Пауза';
+    button.setAttribute('aria-label', button.title);
+    button.setAttribute('aria-pressed', String(paused));
+    nodes.maze.classList.toggle('is-paused', paused);
   }
 
   function randomOdd(min, max) {
@@ -944,5 +1033,27 @@ document.addEventListener('DOMContentLoaded', () => {
       if (value % 2 === 1) values.push(value);
     }
     return values[Math.floor(Math.random() * values.length)];
+  }
+
+  function drawMazePreview() {
+    const canvas = document.getElementById('mazePreview');
+    const preview = canvas?.getContext('2d');
+    if (!preview) return;
+    const maze = generateMaze();
+    const tileWidth = canvas.width / COLS;
+    const tileHeight = canvas.height / ROWS;
+    preview.fillStyle = '#080a0c';
+    preview.fillRect(0, 0, canvas.width, canvas.height);
+    maze.forEach((row, y) => row.forEach((wall, x) => {
+      if (!wall) return;
+      preview.fillStyle = (x + y) % 2 ? '#354044' : '#263135';
+      preview.fillRect(x * tileWidth + 1, y * tileHeight + 1, tileWidth - 2, tileHeight - 2);
+    }));
+    preview.fillStyle = '#f16f6c';
+    preview.beginPath();
+    preview.arc(tileWidth * 1.5, tileHeight * 1.5, 7, 0, Math.PI * 2);
+    preview.fill();
+    preview.fillStyle = '#79cba4';
+    preview.fillRect(tileWidth * 13.5 - 7, tileHeight * 7.5 - 7, 14, 14);
   }
 });

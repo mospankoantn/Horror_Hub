@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('article-content');
   if (!container) return;
 
-  const articleId = getArticleId();
+  // Static pages (statti/*.html) already contain the article; only comments and widgets are added here.
+  const isStaticPage = container.hasAttribute('data-static-article');
+  const articleId = isStaticPage ? (container.dataset.articleId || '') : getArticleId();
   if (!articleId) {
     renderArticleError('Помилка 404', 'Статтю не знайдено або її поглинула темрява.');
     return;
@@ -10,6 +12,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const commentsList = document.getElementById('comments-list');
   const commentFormContainer = document.getElementById('comment-form-container');
+
+  if (isStaticPage) {
+    // Images in article texts are hosted elsewhere and some of them disappear over time.
+    document.querySelectorAll('.article-body img, .related-card img').forEach((image) => {
+      const usePlaceholder = () => { image.src = 'images/placeholder.jpg'; };
+      if (image.complete && image.naturalWidth === 0 && image.currentSrc) usePlaceholder();
+      else image.addEventListener('error', usePlaceholder, { once: true });
+    });
+    if (container.hasAttribute('data-scp-simulator')) {
+      container.querySelector('.article-body')?.appendChild(createScpInteractiveDossier());
+    }
+    loadComments();
+    checkAuthAndShowForm();
+    return;
+  }
+
+  const staticPage = await findStaticPage(articleId);
+  if (staticPage) {
+    window.location.replace(staticPage);
+    return;
+  }
 
   try {
     const catalogArticle = await findArticleInCatalogs(articleId);
@@ -26,16 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       throw new Error('Article source is not available');
     }
 
-    const response = await fetch(`https://api.telegra.ph/getPage/${telegraphId}?return_content=true`, {
-      headers: { Accept: 'application/json' }
-    });
-    const data = await response.json();
-
-    if (!data.ok) {
-      throw new Error(data.error || 'Telegraph API error');
+    try {
+      const response = await fetch('https://api.telegra.ph/getPage/' + telegraphId + '?return_content=true', {
+        headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(8000)
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Telegraph API error');
+      renderArticle(data.result, catalogArticle);
+    } catch (error) {
+      const backup = await findLocalBackup(telegraphId, catalogArticle?.section);
+      if (!backup) throw error;
+      await renderLocalArticle({ ...catalogArticle, title: catalogArticle?.title || 'Локальна копія', url: 'https://telegra.ph/' + telegraphId, contentHtml: backup });
     }
-
-    renderArticle(data.result, catalogArticle);
     loadComments();
     checkAuthAndShowForm();
   } catch (error) {
@@ -46,9 +71,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
+  async function findStaticPage(id) {
+    try {
+      const response = await fetch('data/pages.json', { headers: { Accept: 'application/json' } });
+      if (!response.ok) return '';
+      const path = (await response.json())?.pages?.[id]?.path;
+      return typeof path === 'string' && /^statti\/[a-z0-9-]+\.html$/.test(path) ? path : '';
+    } catch (error) {
+      return '';
+    }
+  }
+
   function getArticleId() {
     const params = new URLSearchParams(window.location.search);
     return (params.get('id') || '').trim().replace(/^\/+/, '');
+  }
+
+  async function findLocalBackup(id, section) {
+    const filename = encodeURIComponent(id) + '.html';
+    const folders = ['articles/'];
+    if (typeof section === 'string' && /^[a-z_]+$/.test(section)) folders.unshift('articles/' + (section === 'articles' ? 'general' : section) + '/');
+    for (const folder of folders) {
+      const response = await fetch(folder + filename);
+      if (response.ok) return response.text();
+    }
+    return '';
   }
 
   async function findArticleInCatalogs(id) {
@@ -65,8 +112,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const catalogs = await Promise.all(sources.map(async (source) => {
       try {
-        const response = await fetch(`${source}?t=${Date.now()}`, {
-          headers: { Accept: 'application/json' }
+        const response = await fetch(source, {
+          cache: 'no-cache', headers: { Accept: 'application/json' }
         });
         if (!response.ok) return [];
         const data = await response.json();
@@ -91,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const parsedUrl = new URL(url, window.location.href);
       if (parsedUrl.protocol === 'local:') {
-        return parsedUrl.pathname.replace(/^\/+/, '').replace('/', ':');
+        return parsedUrl.hostname + ':' + parsedUrl.pathname.replace(/^\/+/, '');
       }
       return parsedUrl.pathname.replace(/^\/+/, '') || String(url);
     } catch (error) {
@@ -105,10 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const url = new URL(raw, 'https://telegra.ph');
-      if (!/telegra\.ph$/i.test(url.hostname)) return '';
-      return url.pathname.replace(/^\/+/, '');
+      if (!['telegra.ph', 'www.telegra.ph'].includes(url.hostname) || !['http:', 'https:'].includes(url.protocol) || url.username || url.password) return '';
+      const path = url.pathname.replace(/^\/+/, '');
+      return path && !path.includes('/') && !decodeURIComponent(path).includes('/') ? path : '';
     } catch (error) {
-      return raw.replace(/^https?:\/\/telegra\.ph\//i, '').replace(/^\/+/, '');
+      return '';
     }
   }
 
@@ -129,13 +177,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       article.genre,
       article.release_date,
       article.developer
-    ].map((value) => (value || '').trim()).filter(Boolean).join(' | ') || 'Horror Hub';
+    ].map((value) => typeof value === 'string' ? value.trim() : '').filter(Boolean).join(' | ') || 'Horror Hub';
 
     meta.appendChild(info);
 
     if (article.url && !String(article.url).startsWith('local://')) {
       const sourceLink = document.createElement('a');
-      sourceLink.href = article.url;
+      setSafeLink(sourceLink, article.url);
       sourceLink.target = '_blank';
       sourceLink.rel = 'noopener noreferrer';
       sourceLink.className = 'tg-button';
@@ -152,6 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (inlineHtml) {
       body.appendChild(renderSafeHtml(inlineHtml));
     } else if (contentPath) {
+      if (!isLocalContentPath(contentPath)) throw new Error('Unsafe local content path');
       const response = await fetch(contentPath, { headers: { Accept: 'text/html' } });
       if (!response.ok) throw new Error(`Local content HTTP ${response.status}`);
       body.appendChild(renderSafeHtml(await response.text()));
@@ -907,11 +956,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function renderSafeHtml(html) {
-    const template = document.createElement('template');
-    template.innerHTML = String(html || '');
+    const documentContent = new DOMParser().parseFromString(String(html || ''), 'text/html');
+    const source = documentContent.querySelector('.article-content') || documentContent.body;
 
     const fragment = document.createDocumentFragment();
-    template.content.childNodes.forEach((node) => {
+    source.childNodes.forEach((node) => {
       fragment.appendChild(sanitizeHtmlNode(node));
     });
     return fragment;
@@ -927,6 +976,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const tag = node.tagName.toLowerCase();
+    if (['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'meta', 'link'].includes(tag)) return document.createDocumentFragment();
     const allowedTags = new Set([
       'a', 'aside', 'b', 'blockquote', 'br', 'code', 'em', 'figcaption',
       'figure', 'h3', 'h4', 'hr', 'i', 'img', 'li', 'ol', 'p', 'pre',
@@ -972,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       : `Автор: ${page.author_name || 'Невідомий'}`;
 
     const sourceLink = document.createElement('a');
-    sourceLink.href = `https://telegra.ph/${articleId}`;
+    sourceLink.href = 'https://telegra.ph/' + getTelegraphId(catalogArticle?.url || articleId);
     sourceLink.target = '_blank';
     sourceLink.rel = 'noopener noreferrer';
     sourceLink.className = 'tg-button';
@@ -1104,10 +1154,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       comments.forEach((comment) => fragment.appendChild(createComment(comment)));
       commentsList.replaceChildren(fragment);
     } catch (error) {
-      console.error('Помилка завантаження коментарів:', error);
-      const message = createMutedText('Помилка завантаження коментарів.');
-      message.classList.add('error-text');
-      commentsList.replaceChildren(message);
+      console.warn('Коментарі недоступні:', error);
+      commentsList.replaceChildren(createMutedText('Коментарі тимчасово недоступні. Спробуйте пізніше.'));
     }
   }
 
@@ -1115,10 +1163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!commentFormContainer) return;
 
     try {
-      const response = await fetch('api_auth.php?action=status', {
-        headers: { Accept: 'application/json' }
-      });
-      const auth = await response.json();
+      const auth = await HorrorHub.status();
 
       if (auth.logged_in) {
         commentFormContainer.replaceChildren(createCommentForm());
@@ -1164,7 +1209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const body = document.createElement('p');
     body.className = 'comment-body';
-    body.textContent = decodeEntities(comment.comment_text || '');
+    body.textContent = comment.comment_text || '';
 
     item.append(header, body);
     return item;
@@ -1180,6 +1225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     textarea.placeholder = 'Напишіть свій моторошний коментар...';
     textarea.required = true;
     textarea.maxLength = 2000;
+    textarea.setAttribute('aria-label', 'Ваш коментар');
 
     const button = document.createElement('button');
     button.type = 'submit';
@@ -1187,6 +1233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const note = document.createElement('p');
     note.className = 'form-note';
+    note.setAttribute('role', 'status');
 
     form.append(textarea, button, note);
 
@@ -1205,12 +1252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('article_id', articleId);
         formData.append('comment_text', text);
 
-        const response = await fetch('api_comments.php', { method: 'POST', body: formData });
-        const result = await response.json();
-
-        if (!response.ok || result.status !== 'success') {
-          throw new Error(result.message || 'Не вдалося додати коментар');
-        }
+        await HorrorHub.post('api_comments.php', formData);
 
         textarea.value = '';
         await loadComments();
@@ -1242,10 +1284,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     return paragraph;
   }
 
-  function decodeEntities(value) {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = String(value);
-    return textarea.value;
+  function isLocalContentPath(value) {
+    if (typeof value !== 'string') return false;
+    try {
+      const decoded = decodeURIComponent(value);
+      return /^(content|articles)\/.+\.html$/i.test(decoded)
+        && !/[\\?#:\x00-\x20]/.test(decoded)
+        && decoded.split('/').every((part) => part && part !== '.' && part !== '..');
+    } catch { return false; }
   }
 
   function getSafeLocalOrRemoteUrl(rawUrl, fallback) {

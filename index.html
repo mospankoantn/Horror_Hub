@@ -3,253 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO: title та description — найважливіші для Google -->
-  <title>Horror Hub — Ігри Жахів, Фільми, Крипіпасти та Огляди</title>
+  <title>Horror Hub — фільми жахів, ігри, крипіпасти й культура жаху</title>
+  <meta name="description" content="Horror Hub — україномовний провідник у темряву: культові фільми жахів, ігри, крипіпасти, огляди й історія жанру.">
+  <script src="js/theme.js?v=20261120-d"></script>
+  <link rel="icon" href="favicon.ico" sizes="32x32">
   <link rel="icon" type="image/png" href="images/favicon.png">
-  <meta name="description" content="Horror Hub — найбільший україномовний ресурс про хоррор: огляди ігор жахів, культові фільми, крипіпасти, статті та новини. Зануртеся у темряву разом з нами.">
-  <meta name="keywords" content="ігри жахів, хоррор ігри, фільми жахів, крипіпасти, огляди хоррор, horror hub, survival horror">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph (для красивих превью у Facebook, Telegram, Discord) -->
-  <meta property="og:type"        content="website">
-  <meta property="og:title"       content="Horror Hub — Ігри Жахів, Фільми та Крипіпасти">
-  <meta property="og:description" content="Найбільший україномовний ресурс про хоррор. Огляди, статті, крипіпасти.">
-  <meta property="og:image"       content="images/horror_background.jpg">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="Horror Hub — Ігри Жахів, Фільми та Крипіпасти">
-  <meta name="twitter:description" content="Найбільший україномовний ресурс про хоррор.">
-  <meta name="twitter:image"       content="images/horror_background.jpg">
-
-  <!-- Шрифти (оновлені) -->
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Special+Elite&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
-
-  <!-- Стилі -->
-  <link rel="stylesheet" href="style.css">
-
-  <!--
-    GOOGLE ADSENSE — замінити на ваш реальний код:
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
-  -->
-
-  <!-- Структуровані дані (JSON-LD) — допомагають Google розуміти сайт -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Horror Hub",
-    "description": "Найбільший україномовний ресурс про хоррор: ігри жахів, фільми, крипіпасти та огляди.",
-    "inLanguage": "uk"
-  }
-  </script>
-  <script src="js/auth.js?v=20260430-nav"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261120-d">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Horror Hub — фільми жахів, ігри, крипіпасти й культура жаху">
+  <meta property="og:description" content="Horror Hub — україномовний провідник у темряву: культові фільми жахів, ігри, крипіпасти, огляди й історія жанру.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Horror Hub","inLanguage":"uk","description":"Horror Hub — україномовний провідник у темряву: культові фільми жахів, ігри, крипіпасти, огляди й історія жанру."}</script>
+  <script src="js/auth.js?v=20261120-d"></script>
 </head>
-<body>
-
-  <!-- ХЕДЕР -->
-  <header>
-    <h1>Horror Hub</h1>
-  </header>
-
-  <!-- НАВІГАЦІЯ (sticky — прилипає до верху при скролі) -->
-  <nav>
-    <a href="index.html" class="active">Головна</a>
-    <a href="horror_games.html">Ігри Жахів</a>
-    <a href="horror_movies.html">Фільми Жахів</a>
-    <a href="reviews.html">Огляди</a>
-    <a href="articles.html">Статті</a>
-    <a href="internet_horror.html">Інтернет Хоррор</a>
-    <a href="horror_art.html">Мистецтво</a>
-    <a href="horror_literature.html">Література</a>
-    <a href="game.html">Ігрова Кімната</a>
-    <a href="contact.html">Контакти</a>
-    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer" title="Підписатися на наш Telegram">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-      Telegram
+<body data-section="home">
+<header class="site-header">
+  <div class="site-header__bar">
+    <a class="brand" href="index.html">
+      <span class="brand__logo">Horror Hub</span>
+      <span class="brand__badge">Усе про жах</span>
     </a>
-    <div id="user-menu"></div>
-  </nav>
-
-  <!--
-    РЕКЛАМНИЙ БЛОК #1 — Під навігацією (Leaderboard 728×90)
-    Замініть .ad-placeholder на код Google AdSense:
-
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-  -->
-  <div class="ad-zone">
-    <div class="ad-placeholder">Рекламний простір — 728×90 (підключіть Google AdSense)</div>
+    <form class="site-search" action="index.html" method="get" role="search">
+      <label class="visually-hidden" for="searchInput">Пошук по сайту</label>
+      <svg class="site-search__icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="searchInput" name="q" placeholder="Фільм, гра, крипіпаста або рік…" autocomplete="off">
+      <kbd aria-hidden="true">/</kbd>
+    </form>
+    <div class="site-header__actions">
+      <button type="button" class="icon-btn theme-toggle" aria-label="Перемкнути тему">
+        <svg class="theme-toggle__sun" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="theme-toggle__moon" aria-hidden="true" viewBox="0 0 24 24"><path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/></svg>
+      </button>
+      <div id="user-menu" class="user-menu"></div>
+      <button type="button" class="icon-btn nav-toggle" aria-expanded="false" aria-controls="siteNav" aria-label="Розділи сайту">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
   </div>
+  <nav id="siteNav" class="site-nav" aria-label="Розділи">
+      <a href="index.html" data-tab="home" aria-current="page">Усе</a>
+      <a href="horror_movies.html" data-tab="movies">Кіно</a>
+      <a href="horror_games.html" data-tab="games">Ігри</a>
+      <a href="internet_horror.html" data-tab="internet">Інтернет-хоррор</a>
+      <a href="culture.html" data-tab="culture">Культура</a>
+      <a href="reviews.html" data-tab="reviews">Огляди</a>
+      <a href="game.html" data-tab="room">Ігрова кімната</a>
+  </nav>
+</header>
 
-  <!-- HERO (головний банер) -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Horror Hub</h1>
-      <p>
-        Ваш провідник у темряву — огляди ігор жахів, культові фільми,
-        крипіпасти та статті про хоррор-культуру.
-      </p>
-      <a href="articles.html" class="hero-cta">Читати Статті</a>
+<main id="main">
+  <section class="hero hero--home" aria-labelledby="pageTitle">
+    <div class="hero__inner">
+      <div class="hero__text">
+        <span class="hero__kicker">Кіно · ігри · мережеві легенди · культура</span>
+        <h1 class="hero__title" id="pageTitle">Провідник у темряву</h1>
+        <p class="hero__lead">Культові фільми жахів, ігри, крипіпасти, огляди й історія жанру — українською.</p>
+        <div class="hero__quick">
+          <a href="horror_movies.html">Що подивитися вночі</a>
+          <a href="horror_games.html?decade=1990-ті">Класика 90-х</a>
+          <a href="internet_horror.html?q=аналогов">Аналоговий хоррор</a>
+          <a href="culture.html?q=Лавкрафт">Готика й Лавкрафт</a>
+        </div>
+      </div>
+      <div class="mosaic" aria-label="Розділи">
+        <a class="mosaic__tile" href="horror_movies.html" style="--tile: #e3ad57"><img src="images/posters/shining.webp" alt="" loading="lazy"><span class="mosaic__label">Кіно</span><span class="mosaic__title">Культові фільми жахів</span></a>
+        <a class="mosaic__tile" href="horror_games.html" style="--tile: #7cc0cf"><img src="images/covers/f2e102e84454df43f6fc.webp" alt="" loading="lazy"><span class="mosaic__label">Ігри</span><span class="mosaic__title">Silent Hill 2 і класика жанру</span></a>
+        <a class="mosaic__tile" href="internet_horror.html" style="--tile: #e2d65c"><img src="images/covers/3123a4bbe3be8ef2ee49.webp" alt="" loading="lazy"><span class="mosaic__label">Інтернет-хоррор</span><span class="mosaic__title">Аналоговий хоррор і крипіпасти</span></a>
+        <a class="mosaic__tile mosaic__tile--culture" href="culture.html" style="--tile: #d2b07a"><span class="mosaic__label">Культура</span><span class="mosaic__title">Від готики до Лавкрафта</span></a>
+      </div>
     </div>
   </section>
 
-  <!-- ОСНОВНИЙ КОНТЕНТ -->
-  <section class="container features-section">
-    <h2 class="page-title">Що тебе чекає</h2>
-    <p class="page-subtitle">Зануртеся в найтемніші куточки ігрового та кіношного хоррору</p>
-
-    <div class="features-grid">
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Ігри Жахів</h3>
-          <p>
-            Resident Evil, Silent Hill, Amnesia, Outlast — найстрашніші ігри
-            від класики до сучасних шедеврів. Обери свій наступний кошмар.
-          </p>
-          <a href="horror_games.html" class="read-more">Дивитись ігри</a>
+  <div class="catalog" id="catalog">
+    <button type="button" class="filters-toggle" aria-expanded="false" aria-controls="facets">Фільтри <span id="filtersSummary"></span></button>
+    <aside class="facets" id="facets" aria-label="Фільтри">
+      <div id="facetGroups" class="facet-groups"></div>
+      <a class="promo" href="game.html"><span class="promo__kicker">ІГРОВА КІМНАТА</span><span class="promo__title">Квест «Підвал під сценою» і Темний лабіринт</span><span class="promo__more">Грати в браузері →</span></a>
+    </aside>
+    <section class="results" aria-labelledby="resultsInfo">
+      <div class="results__bar">
+        <h2 class="results__count" id="resultsInfo" aria-live="polite">Завантаження матеріалів…</h2>
+        <div class="results__tools">
+          <label>Сортувати
+            <select id="sortSelect">
+              <option value="newest" selected>Спочатку нові</option>
+              <option value="oldest">Спочатку старі</option>
+              <option value="release_desc">Рік: новіші спершу</option>
+              <option value="release_asc">Рік: старіші спершу</option>
+            </select>
+          </label>
+          <div class="view-toggle" role="group" aria-label="Вигляд списку">
+            <button type="button" data-view="list" aria-pressed="true">Список</button>
+            <button type="button" data-view="cards" aria-pressed="false">Картки</button>
+          </div>
         </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Фільми Жахів</h3>
-          <p>
-            Культові жахи від Хічкока до А24: "Спадковість", "Відьма",
-            "Пастка". Що переглянути у темну ніч?
-          </p>
-          <a href="horror_movies.html" class="read-more">Дивитись фільми</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Огляди</h3>
-          <p>
-            Глибокий аналіз без спойлерів. Чи варта нова гра ваших нервів?
-            Чи виправдовує фільм очікування?
-          </p>
-          <a href="reviews.html" class="read-more">Читати огляди</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Статті</h3>
-          <p>
-            Від зародження хоррор-ігор у 60-х до сучасних інді-перлин.
-            Глибокі тексти для справжніх шанувальників жанру.
-          </p>
-          <a href="articles.html" class="read-more">Читати статті</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Інтернет Хоррор</h3>
-          <p>
-            Класичні крипіпасти, Backrooms, аналоговий хоррор і SCP:
-            страхи, які виросли з форумів, відео й мережевого фольклору.
-          </p>
-          <a href="internet_horror.html" class="read-more">Читати розділ</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Жах у Мистецтві</h3>
-          <p>
-            Від Ґої до Ґігера: темні образи, біомеханіка, готика
-            й те, як візуальна культура навчила нас боятися.
-          </p>
-          <a href="horror_art.html" class="read-more">Дивитись мистецтво</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Жах у Літературі</h3>
-          <p>
-            Готичні романи, По, Лавкрафт, міські легенди й тексти,
-            з яких виросли сучасні хоррор-історії.
-          </p>
-          <a href="horror_literature.html" class="read-more">Читати літературу</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Ігрова Кімната</h3>
-          <p>
-            Зіграй прямо зараз: текстовий квест і темний лабіринт.
-            Хватить духу?
-          </p>
-          <a href="game.html" class="read-more">Грати</a>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-content">
-          <h3>Написати нам</h3>
-          <p>
-            Маєш матеріал для публікації, пропозицію чи просто хочеш
-            поговорити про улюблений хоррор?
-          </p>
-          <a href="contact.html" class="read-more">Контакти</a>
-        </div>
-      </article>
-
-    </div>
-  </section>
-
-  <!--
-    РЕКЛАМНИЙ БЛОК #2 — Між секціями (Rectangle 300×250 або великий банер)
-  -->
-  <div class="ad-zone">
-    <div class="ad-placeholder">Рекламний простір — 300×250 (підключіть Google AdSense)</div>
+      </div>
+      <div class="entries is-list" id="articlesGrid" data-sources="articles_data.json" data-dev-title="Автори й студії" data-kind-facet="1">
+        <p class="empty-state">Завантаження матеріалів…</p>
+      </div>
+      <nav class="pagination" aria-label="Сторінки">
+        <button type="button" id="prevPage" class="btn">← Попередня</button>
+        <span id="pageInfo" class="page-info">Сторінка 1 з 1</span>
+        <button type="button" id="nextPage" class="btn">Наступна →</button>
+      </nav>
+    </section>
   </div>
+</main>
 
-  <!-- ФУТЕР -->
-  <footer>
-    <div class="footer-inner">
-      <a href="index.html" class="footer-logo">Horror Hub</a>
-
-        <nav>
-    <a href="index.html" class="active">Головна</a>
-    <a href="horror_games.html">Ігри Жахів</a>
-    <a href="horror_movies.html">Фільми Жахів</a>
-    <a href="reviews.html">Огляди</a>
-    <a href="articles.html">Статті</a>
-    <a href="internet_horror.html">Інтернет Хоррор</a>
-    <a href="horror_art.html">Мистецтво</a>
-    <a href="horror_literature.html">Література</a>
-    <a href="game.html">Ігрова Кімната</a>
-    <a href="contact.html">Контакти</a>
-    <a href="https://t.me/moyi_statti" target="_blank" class="tg-link" rel="noopener noreferrer" title="Підписатися на наш Telegram">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.2 3.45-.49.33-.94.5-1.34.49-.45-.01-1.3-.25-1.94-.46-.78-.26-1.4-.4-1.35-.85.03-.23.36-.47.99-.71 3.86-1.68 6.43-2.79 7.72-3.33 3.67-1.53 4.43-1.8 4.91-1.81.11 0 .36.03.49.13.11.08.14.2.16.31.02.04.02.13.01.21z"/></svg>
-      Telegram
-    </a>
-
-  </nav>
-
-      <hr>
-
-      <p class="footer-copy">
-        &copy; 2026 Horror Hub. Всі права захищено.
-        <!-- Посилання на політику конфіденційності важливе для AdSense -->
-        &nbsp;|&nbsp; <a href="privacy.html">Конфіденційність</a>
-      </p>
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="brand__logo" href="index.html">Horror Hub</a>
+      <p>Україномовний провідник у темряву: кіно, ігри, мережеві легенди й культура жаху.</p>
     </div>
-  </footer>
+    <nav class="site-footer__col" aria-label="Розділи сайту">
+      <span class="site-footer__title">Розділи</span>
+        <a href="index.html">Усе</a>
+        <a href="horror_movies.html">Кіно</a>
+        <a href="horror_games.html">Ігри</a>
+        <a href="internet_horror.html">Інтернет-хоррор</a>
+        <a href="culture.html">Культура</a>
+        <a href="reviews.html">Огляди</a>
+        <a href="game.html">Ігрова кімната</a>
+    </nav>
+    <div class="site-footer__col">
+      <span class="site-footer__title">Сайт</span>
+      <a href="contact.html">Контакти</a>
+      <a href="privacy.html">Конфіденційність</a>
+      <a href="https://t.me/moyi_statti" target="_blank" rel="noopener noreferrer">Telegram-канал</a>
+    </div>
+  </div>
+  <p class="site-footer__copy">&copy; 2026 Horror Hub</p>
+</footer>
 
+<script src="js/load_articles.js?v=20261120-d"></script>
 </body>
 </html>

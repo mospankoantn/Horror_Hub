@@ -1,12 +1,12 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/bootstrap.php';
+chdir(__DIR__);
 set_time_limit(300);
 
 $aggregate_json_file = '../articles_data.json';
 $admin_password = getenv('HORROR_HUB_ADMIN_PASSWORD') ?: '';
 $admin_password_hash = getenv('HORROR_HUB_ADMIN_PASSWORD_HASH') ?: '';
 
-require_once '../db.php';
 
 $article_sections = [
     'articles' => [
@@ -68,8 +68,9 @@ $article_sections = [
     ],
 ];
 
-if (isset($_GET['logout'])) {
-    session_destroy();
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') hh_check_csrf();
+if (isset($_POST['logout'])) {
+    hh_destroy_session();
     header('Location: admin.php');
     exit;
 }
@@ -79,8 +80,15 @@ function e($value): string {
 }
 
 function hasAdminAccess(): bool {
-    return (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] === true)
-        || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
+    $credential = (getenv('HORROR_HUB_ADMIN_PASSWORD_HASH') ?: '') . '|' . (getenv('HORROR_HUB_ADMIN_PASSWORD') ?: '');
+    if (!empty($_SESSION['is_admin']) && ($_SESSION['admin_expires'] ?? 0) > time()
+        && hash_equals(hash('sha256', $credential), $_SESSION['admin_credential'] ?? '')) return true;
+    $user = hh_current_user();
+    return $user !== null && $user['role'] === 'admin';
+}
+
+function csrfField(): string {
+    return '<input type="hidden" name="csrf_token" value="' . e(hh_csrf_token()) . '">';
 }
 
 function adminPasswordMatches(string $password, string $plainPassword, string $passwordHash): bool {
@@ -91,8 +99,9 @@ function adminPasswordMatches(string $password, string $plainPassword, string $p
     return $plainPassword !== '' && hash_equals($plainPassword, $password);
 }
 
-function validSectionKey(array $sections, ?string $key): string {
-    return isset($sections[$key ?? '']) ? (string)$key : 'articles';
+function validSectionKey(array $sections, $key): string {
+    if (!is_string($key)) hh_json(['status' => 'error', 'message' => 'Некоректний розділ.'], 422);
+    return isset($sections[$key]) ? $key : 'articles';
 }
 
 function sectionTable(array $sections, string $key): string {
@@ -100,9 +109,7 @@ function sectionTable(array $sections, string $key): string {
 }
 
 function ensureDirectory(string $path): void {
-    if (!is_dir($path)) {
-        mkdir($path, 0777, true);
-    }
+    if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) throw new RuntimeException('Cannot create directory');
 }
 
 function columnExists(PDO $pdo, string $table, string $column): bool {
@@ -186,7 +193,13 @@ function normalizeArticleRow(array $row, string $sectionKey, array $section): ar
 
 function writeJsonFile(string $path, array $data): void {
     ensureDirectory(dirname($path));
-    file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+    $temporary = tempnam(dirname($path), '.catalog-');
+    try {
+        if ($temporary === false || file_put_contents($temporary, $json, LOCK_EX) !== strlen($json) || !rename($temporary, $path)) throw new RuntimeException('Cannot publish article catalog');
+    } finally {
+        if ($temporary !== false && is_file($temporary)) unlink($temporary);
+    }
 }
 
 function fetchSectionArticles(PDO $pdo, array $sections, string $sectionKey): array {
@@ -226,6 +239,14 @@ function syncAllSectionsToJson(PDO $pdo, array $sections, string $aggregatePath)
     }
 
     writeJsonFile($aggregatePath, $aggregate);
+
+    // Static article pages, local covers and data/pages.json follow every catalog change.
+    try {
+        require_once __DIR__ . '/../includes/site_builder.php';
+        hh_build_site();
+    } catch (Throwable $error) {
+        error_log('Horror Hub: static site build failed: ' . $error->getMessage());
+    }
 }
 
 function slugifyTitle(string $title): string {
@@ -244,14 +265,28 @@ function slugifyTitle(string $title): string {
 
 function buildArticlePayload(array $sections, string $fallbackSection): array {
     $sectionKey = validSectionKey($sections, $_POST['section'] ?? $fallbackSection);
-    $title = trim((string)($_POST['title'] ?? ''));
-    $url = trim((string)($_POST['url'] ?? ''));
-    $contentHtml = trim((string)($_POST['contentHtml'] ?? ''));
-    $contentPath = trim((string)($_POST['contentPath'] ?? ''));
-    $localId = trim((string)($_POST['localId'] ?? ''));
+    $title = hh_input($_POST, 'title');
+    $url = hh_input($_POST, 'url');
+    $contentHtml = hh_input($_POST, 'contentHtml');
+    $contentPath = hh_input($_POST, 'contentPath');
+    $localId = hh_input($_POST, 'localId');
+    $image = hh_input($_POST, 'imageUrl') ?: 'images/placeholder.jpg';
+    $preview = hh_input($_POST, 'previewText');
+    $release = hh_input($_POST, 'release_date');
+    $developer = hh_input($_POST, 'developer');
+    $genre = hh_input($_POST, 'genre');
+    if ($title === '' || hh_length($title) > 255 || strlen($contentHtml) > 500000
+        || strlen($url) > 2048 || strlen($image) > 2048 || hh_length($contentPath) > 255
+        || hh_length($preview) > 10000 || hh_length($release) > 100 || hh_length($developer) > 255 || hh_length($genre) > 255
+        || ($url !== '' && !hh_safe_url($url) && !preg_match('~^local://[a-z0-9_]+/[a-z0-9_-]+$~i', $url))
+        || ($localId !== '' && !preg_match('/^[a-z0-9_]+:[a-z0-9_-]{1,150}$/i', $localId))
+        || (!hh_safe_url($image) && !hh_local_path($image, 'images', ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+        || ($contentPath !== '' && !hh_local_path($contentPath, 'content', ['html']) && !hh_local_path($contentPath, 'articles', ['html']))) {
+        hh_json(['status' => 'error', 'message' => 'Перевірте назву, URL, зображення та локальні шляхи статті.'], 422);
+    }
 
     if ($localId === '' && ($contentHtml !== '' || $contentPath !== '' || $url === '')) {
-        $localId = $sectionKey . ':' . slugifyTitle($title);
+        $localId = $sectionKey . ':' . substr(slugifyTitle($title), 0, 150);
     }
 
     if ($url === '' && $localId !== '') {
@@ -261,12 +296,12 @@ function buildArticlePayload(array $sections, string $fallbackSection): array {
     return [
         'section' => $sectionKey,
         'url' => $url,
-        'image_url' => trim((string)($_POST['imageUrl'] ?? '')) ?: 'images/placeholder.jpg',
+        'image_url' => $image,
         'title' => $title,
-        'preview_text' => trim((string)($_POST['previewText'] ?? '')),
-        'release_date' => trim((string)($_POST['release_date'] ?? '')),
-        'developer' => trim((string)($_POST['developer'] ?? '')),
-        'genre' => trim((string)($_POST['genre'] ?? '')),
+        'preview_text' => $preview,
+        'release_date' => $release,
+        'developer' => $developer,
+        'genre' => $genre,
         'content_html' => $contentHtml,
         'content_path' => $contentPath,
         'local_id' => $localId,
@@ -376,6 +411,7 @@ function parseTelegraphNodeToHTML($node): string {
         return htmlspecialchars($node, ENT_QUOTES, 'UTF-8');
     }
 
+    if (!is_array($node)) return '';
     $tag = strtolower((string)($node['tag'] ?? ''));
     $allowed_tags = ['a','aside','b','blockquote','br','code','em','figcaption','figure','h3','h4','hr','i','img','li','ol','p','pre','s','strong','u','ul'];
     if (!in_array($tag, $allowed_tags, true)) {
@@ -397,6 +433,7 @@ function parseTelegraphNodeToHTML($node): string {
         if ($key === 'src' && strpos((string)$value, '/') === 0) {
             $value = 'https://telegra.ph' . $value;
         }
+        if (($key === 'href' || $key === 'src') && (!is_string($value) || !hh_safe_url($value, $key === 'href'))) continue;
         $html .= " {$key}=\"" . htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8') . "\"";
     }
     $html .= '>';
@@ -418,8 +455,12 @@ function redirectAdmin(array $params): void {
 }
 
 if (isset($_POST['login'])) {
-    if (adminPasswordMatches((string)($_POST['password'] ?? ''), $admin_password, $admin_password_hash)) {
+    hh_rate_limit('admin_login', 10, 900);
+    if (adminPasswordMatches(hh_input($_POST, 'password', false), $admin_password, $admin_password_hash)) {
+        session_regenerate_id(true);
         $_SESSION['is_admin'] = true;
+        $_SESSION['admin_expires'] = time() + 3600;
+        $_SESSION['admin_credential'] = hash('sha256', $admin_password_hash . '|' . $admin_password);
         header('Location: admin.php');
         exit;
     }
@@ -429,10 +470,11 @@ if (isset($_POST['login'])) {
 
 if (!hasAdminAccess()) {
     $error = isset($error_msg) ? '<p style="color:#f03030;">' . e($error_msg) . '</p>' : '';
-    echo '<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8"><title>Вхід</title><style>body{background:#040404;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif;} form{background:#111;padding:2rem;border:1px solid #9e0000;min-width:280px;} input,button{padding:10px;margin:5px 0;width:100%;box-sizing:border-box;} button{background:#9e0000;color:#fff;border:0;cursor:pointer;}</style></head><body><form method="POST"><h2>Horror Admin</h2>' . $error . '<input type="password" name="password" autocomplete="current-password" required><button type="submit" name="login">Вхід</button></form></body></html>';
+    echo '<!DOCTYPE html><html lang="uk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вхід - Horror Hub</title><link rel="stylesheet" href="../style.css"></head><body><main class="container"><form method="POST" class="contact-wrapper contact-form"><h2>Horror Admin</h2>' . $error . csrfField() . '<label for="admin-password">Пароль адміністратора</label><input id="admin-password" type="password" name="password" autocomplete="current-password" required><button type="submit" name="login">Вхід</button><a href="../index.html">На сайт</a></form></main></body></html>';
     exit;
 }
 
+$pdo = hh_db();
 foreach ($article_sections as $sectionKey => $section) {
     ensureArticleTable($pdo, $section['table']);
     ensureDirectory(dirname($section['json']));
@@ -440,19 +482,29 @@ foreach ($article_sections as $sectionKey => $section) {
     importJsonSeed($pdo, $article_sections, $sectionKey, $aggregate_json_file);
 }
 
-syncAllSectionsToJson($pdo, $article_sections, $aggregate_json_file);
+if (!is_file($aggregate_json_file)) syncAllSectionsToJson($pdo, $article_sections, $aggregate_json_file);
 
 if (isset($_POST['action']) && $_POST['action'] === 'reorder') {
     header('Content-Type: application/json; charset=utf-8');
     $sectionKey = validSectionKey($article_sections, $_POST['section'] ?? '');
     $table = sectionTable($article_sections, $sectionKey);
-    $newOrder = json_decode((string)($_POST['new_order'] ?? '[]'), true);
+    $newOrder = json_decode(hh_input($_POST, 'new_order'), true);
+    $existing = array_map('intval', $pdo->query('SELECT id FROM ' . $table)->fetchAll(PDO::FETCH_COLUMN));
+    if (!is_array($newOrder) || !array_is_list($newOrder) || array_filter($newOrder, fn($id) => !is_int($id) && !(is_string($id) && ctype_digit($id)))) {
+        hh_json(['status' => 'error', 'message' => 'Невірний порядок.'], 422);
+    }
+    $requested = array_map('intval', $newOrder);
+    sort($existing);
+    sort($requested);
+    if ($requested !== $existing) hh_json(['status' => 'error', 'message' => 'Оновіть список статей.'], 422);
 
     if (is_array($newOrder)) {
+        $pdo->beginTransaction();
         $stmt = $pdo->prepare("UPDATE `{$table}` SET sort_order = ? WHERE id = ?");
         foreach ($newOrder as $sortIndex => $id) {
             $stmt->execute([(int)$sortIndex, (int)$id]);
         }
+        $pdo->commit();
         syncAllSectionsToJson($pdo, $article_sections, $aggregate_json_file);
         echo json_encode(['status' => 'success']);
         exit;
@@ -495,7 +547,8 @@ if (isset($_POST['backup_articles'])) {
             continue;
         }
 
-        $response = @file_get_contents("https://api.telegra.ph/getPage/{$path}?return_content=true");
+        $context = stream_context_create(['http' => ['timeout' => 8, 'follow_location' => 0]]);
+        $response = @file_get_contents("https://api.telegra.ph/getPage/" . rawurlencode($path) . "?return_content=true", false, $context);
         if (!$response) {
             $errors++;
             continue;
@@ -532,7 +585,9 @@ if (isset($_POST['backup_articles'])) {
 if (isset($_POST['add_article'])) {
     $payload = buildArticlePayload($article_sections, 'articles');
     $table = sectionTable($article_sections, $payload['section']);
+    $pdo->beginTransaction();
     insertArticle($pdo, $table, $payload, isset($_POST['add_to_end']));
+    $pdo->commit();
     syncAllSectionsToJson($pdo, $article_sections, $aggregate_json_file);
     redirectAdmin(['tab' => 'articles', 'section' => $payload['section'], 'msg' => 'Статтю додано']);
 }
@@ -543,6 +598,13 @@ if (isset($_POST['save_edit'])) {
     $sourceTable = sectionTable($article_sections, $sourceSection);
     $targetTable = sectionTable($article_sections, $payload['section']);
     $articleId = (int)($_POST['edit_id'] ?? 0);
+    $pdo->beginTransaction();
+    $source = $pdo->prepare('SELECT id FROM ' . $sourceTable . ' WHERE id = ? FOR UPDATE');
+    $source->execute([$articleId]);
+    if (!$source->fetchColumn()) {
+        $pdo->rollBack();
+        hh_json(['status' => 'error', 'message' => 'Статтю вже видалено.'], 404);
+    }
 
     if ($sourceSection !== $payload['section']) {
         $sortValue = (int)$pdo->query("SELECT COALESCE(MAX(sort_order), -1) FROM `{$targetTable}`")->fetchColumn() + 1;
@@ -588,6 +650,7 @@ if (isset($_POST['save_edit'])) {
         ]);
     }
 
+    $pdo->commit();
     syncAllSectionsToJson($pdo, $article_sections, $aggregate_json_file);
     redirectAdmin(['tab' => 'articles', 'section' => $payload['section'], 'msg' => 'Зміни збережено']);
 }
@@ -608,13 +671,12 @@ if (isset($_POST['delete_comment'])) {
 }
 
 if (isset($_POST['ban_user'])) {
-    $banValue = $_POST['ban_status'] == '1' ? 0 : 1;
-    $stmt = $pdo->prepare('UPDATE users SET is_banned = ? WHERE id = ?');
-    $stmt->execute([$banValue, (int)$_POST['user_id']]);
+    $stmt = $pdo->prepare("UPDATE users SET is_banned = 1 - is_banned WHERE id = ? AND role <> 'admin'");
+    $stmt->execute([(int)hh_input($_POST, 'user_id')]);
     redirectAdmin(['tab' => 'comments', 'msg' => 'Статус користувача змінено']);
 }
 
-$active_tab = $_GET['tab'] ?? 'stats';
+$active_tab = hh_input($_GET, 'tab') ?: 'stats';
 $selected_section = validSectionKey($article_sections, $_GET['section'] ?? 'articles');
 
 $section_counts = [];
@@ -723,12 +785,12 @@ if (isset($_GET['edit'])) {
     <a href="?tab=articles&section=<?= e($selected_section) ?>" class="<?= $active_tab === 'articles' ? 'active' : '' ?>">Статті та розділи</a>
     <a href="?tab=comments" class="<?= $active_tab === 'comments' ? 'active' : '' ?>">Модерація коментарів</a>
     <a href="../index.html" target="_blank" style="color:#2AABEE;margin-top:50px;">На сайт</a>
-    <a href="?logout=1" style="color:#888;">Вийти</a>
+    <form method="POST"><?= csrfField() ?><button type="submit" name="logout" class="btn btn-gray">Вийти</button></form>
 </div>
 
 <div class="main-content">
     <?php if (isset($_GET['msg'])): ?>
-        <div class="alert"><?= e($_GET['msg']) ?></div>
+        <div class="alert"><?= e(hh_input($_GET, 'msg')) ?></div>
     <?php endif; ?>
 
     <?php if ($active_tab === 'stats'): ?>
@@ -772,10 +834,12 @@ if (isset($_GET['edit'])) {
                         <td><small><?= e($comment['article_id']) ?></small></td>
                         <td>
                             <form method="POST" style="display:inline;">
+                                <?= csrfField() ?>
                                 <input type="hidden" name="comment_id" value="<?= (int)$comment['cid'] ?>">
                                 <button type="submit" name="delete_comment" class="btn" onclick="return confirm('Видалити коментар?');">Видалити</button>
                             </form>
                             <form method="POST" style="display:inline;">
+                                <?= csrfField() ?>
                                 <input type="hidden" name="user_id" value="<?= (int)$comment['uid'] ?>">
                                 <input type="hidden" name="ban_status" value="<?= (int)$comment['is_banned'] ?>">
                                 <button type="submit" name="ban_user" class="btn <?= $comment['is_banned'] ? 'btn-blue' : 'btn-gray' ?>">
@@ -802,6 +866,7 @@ if (isset($_GET['edit'])) {
         <div class="card">
             <h2><?= $is_editing ? 'Редагування статті' : 'Додати нову статтю' ?></h2>
             <form method="POST" id="articleForm">
+                <?= csrfField() ?>
                 <?php if ($is_editing): ?>
                     <input type="hidden" name="edit_id" value="<?= (int)$edit_data['id'] ?>">
                     <input type="hidden" name="source_section" value="<?= e($edit_section) ?>">
@@ -886,6 +951,7 @@ if (isset($_GET['edit'])) {
                     <p class="note">JSON: <?= e($article_sections[$selected_section]['json']) ?> · Таблиця: <?= e($article_sections[$selected_section]['table']) ?></p>
                 </div>
                 <form method="POST" action="admin.php" onsubmit="return confirm('Зберегти Telegraph-статті цього розділу локально?');">
+                    <?= csrfField() ?>
                     <input type="hidden" name="backup_section" value="<?= e($selected_section) ?>">
                     <button type="submit" name="backup_articles" class="btn btn-backup">Бекап HTML розділу</button>
                 </form>
@@ -914,6 +980,7 @@ if (isset($_GET['edit'])) {
                                 <div class="inline-actions">
                                     <a href="?tab=articles&section=<?= e($selected_section) ?>&edit_section=<?= e($selected_section) ?>&edit=<?= (int)$article['id'] ?>" class="btn btn-blue" style="padding:5px;">Редаг.</a>
                                     <form method="POST" style="display:inline;" onsubmit="return confirm('Видалити статтю?');">
+                                        <?= csrfField() ?>
                                         <input type="hidden" name="delete_id" value="<?= (int)$article['id'] ?>">
                                         <input type="hidden" name="delete_section" value="<?= e($selected_section) ?>">
                                         <button type="submit" name="delete_article" class="btn" style="padding:5px;">Видалити</button>
@@ -940,7 +1007,7 @@ if (autofillBtn) {
 
         try {
             const parsedUrl = new URL(urlInput);
-            if (!/telegra\.ph$/i.test(parsedUrl.hostname)) {
+            if (!['telegra.ph', 'www.telegra.ph'].includes(parsedUrl.hostname) || !['http:', 'https:'].includes(parsedUrl.protocol)) {
                 alert('Автозаповнення працює тільки з Telegraph.');
                 return;
             }
@@ -992,8 +1059,13 @@ if (autofillBtn) {
 const tbody = document.getElementById('sortable-tbody');
 if (tbody) {
     let draggedRow = null;
+    let originalRows = [];
+    let saving = false;
     tbody.addEventListener('dragstart', (event) => {
+        if (saving) { event.preventDefault(); return; }
         draggedRow = event.target.closest('tr');
+        if (!draggedRow) return;
+        originalRows = Array.from(tbody.children);
         event.dataTransfer.effectAllowed = 'move';
         draggedRow.style.opacity = '0.5';
     });
@@ -1001,7 +1073,7 @@ if (tbody) {
     tbody.addEventListener('dragover', (event) => {
         event.preventDefault();
         const targetRow = event.target.closest('tr.draggable-row');
-        if (targetRow && targetRow !== draggedRow) {
+        if (draggedRow && targetRow && targetRow !== draggedRow) {
             const rect = targetRow.getBoundingClientRect();
             (event.clientY - rect.top > rect.height / 2) ? targetRow.after(draggedRow) : targetRow.before(draggedRow);
         }
@@ -1015,7 +1087,20 @@ if (tbody) {
         formData.append('action', 'reorder');
         formData.append('section', tbody.dataset.section || 'articles');
         formData.append('new_order', JSON.stringify(rows.map(row => row.dataset.id)));
-        await fetch('admin.php', { method: 'POST', body: formData });
+        saving = true;
+        try {
+            const response = await fetch('admin.php', {
+                method: 'POST', body: formData,
+                headers: { 'X-CSRF-Token': <?= json_encode(hh_csrf_token()) ?> }
+            });
+            const data = await response.json();
+            if (!response.ok || data.status !== 'success') throw new Error(data.message || 'Не вдалося зберегти порядок.');
+        } catch (error) {
+            tbody.replaceChildren(...originalRows);
+            alert(error.message);
+        } finally {
+            saving = false;
+        }
         draggedRow = null;
     });
 }

@@ -1,12 +1,7 @@
-# 1. Забороняємо серверу показувати список файлів у цій папці (щоб ніхто не бачив, що там лежить)
 Options -Indexes
-
-# 2. Дозволяємо доступ до файлу admin.php (щоб ви могли ввести пароль)
-<Files "admin.php">
-    Require all granted
-</Files>
-
-# 3. Забороняємо доступ до самого файлу .htaccess хакерам
-<FilesMatch "^\.ht">
+<FilesMatch "(?i)(^\.|\.(txt|log|env|bak)$)">
     Require all denied
 </FilesMatch>
+<IfModule mod_headers.c>
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: http: data:; connect-src 'self' https://api.telegra.ph; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+</IfModule>

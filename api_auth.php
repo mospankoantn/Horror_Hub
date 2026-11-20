@@ -1,154 +1,82 @@
 <?php
-require 'db.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-function respond(array $payload, int $status = 200): void {
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-function post_string(string $key): string {
-    return trim((string)($_POST[$key] ?? ''));
-}
-
-function normalize_avatar(?string $avatar): ?string {
-    $avatar = trim((string)$avatar);
-    if ($avatar === '') {
-        return null;
-    }
-
-    if (preg_match('/^https?:\/\/[^\s]+$/i', $avatar)) {
-        return $avatar;
-    }
-
-    if (preg_match('/^images\/[a-zA-Z0-9._\/-]+$/', $avatar)) {
-        return $avatar;
-    }
-
-    return null;
-}
-
-function text_length(string $value): int {
-    return function_exists('mb_strlen') ? mb_strlen($value) : strlen($value);
-}
-
-function session_user_payload(): array {
-    return [
-        'username' => $_SESSION['username'] ?? '',
-        'avatar' => $_SESSION['avatar'] ?? 'images/default_avatar.png',
-        'role' => $_SESSION['role'] ?? 'user'
-    ];
-}
-
-$action = $_POST['action'] ?? $_GET['action'] ?? '';
-
-if ($action === 'register') {
-    $username = post_string('username');
-    $email = post_string('email');
-    $password = (string)($_POST['password'] ?? '');
-
-    if ($username === '' || $email === '' || $password === '') {
-        respond(['status' => 'error', 'message' => 'Заповніть всі поля'], 422);
-    }
-
-    if (text_length($username) < 3 || text_length($username) > 40) {
-        respond(['status' => 'error', 'message' => 'Нікнейм має містити від 3 до 40 символів'], 422);
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        respond(['status' => 'error', 'message' => 'Введіть дійсний email'], 422);
-    }
-
-    if (strlen($password) < 6) {
-        respond(['status' => 'error', 'message' => 'Пароль має містити щонайменше 6 символів'], 422);
-    }
-
-    try {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$username, $email, $hash]);
-        respond(['status' => 'success', 'message' => 'Реєстрація успішна! Тепер увійдіть.']);
-    } catch (PDOException $e) {
-        respond(['status' => 'error', 'message' => 'Користувач або email вже існує!'], 409);
-    }
-}
-
-if ($action === 'login') {
-    $email = post_string('email');
-    $password = (string)($_POST['password'] ?? '');
-
-    if ($email === '' || $password === '') {
-        respond(['status' => 'error', 'message' => 'Введіть email і пароль'], 422);
-    }
-
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$user || !password_verify($password, $user['password'])) {
-        respond(['status' => 'error', 'message' => 'Невірний email або пароль'], 401);
-    }
-
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['role'] = $user['role'] ?? 'user';
-    $_SESSION['avatar'] = $user['avatar'] ?: 'images/default_avatar.png';
-
-    respond(['status' => 'success', 'message' => 'Успішний вхід']);
-}
-
+$action = hh_input(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? $_POST : $_GET, 'action');
 if ($action === 'status') {
-    if (!isset($_SESSION['user_id'])) {
-        respond(['logged_in' => false]);
-    }
-
-    respond([
-        'logged_in' => true,
-        'user' => session_user_payload()
-    ]);
+    hh_method('GET');
+    $user = hh_current_user();
+    hh_json(['logged_in' => $user !== null, 'csrf_token' => hh_csrf_token()] + ($user ? ['user' => [
+        'username' => $user['username'], 'avatar' => $user['avatar'] ?: 'images/default_avatar.png', 'role' => $user['role']
+    ]] : []));
 }
-
+if (!in_array($action, ['register', 'login', 'logout', 'update_profile'], true)) {
+    hh_json(['status' => 'error', 'message' => 'Невідома дія.'], 400);
+}
+hh_method('POST');
+hh_check_csrf();
 if ($action === 'logout') {
-    session_destroy();
-    respond(['status' => 'success']);
+    hh_destroy_session();
+    hh_json(['status' => 'success']);
 }
 
-if ($action === 'update_profile') {
-    if (!isset($_SESSION['user_id'])) {
-        respond(['status' => 'error', 'message' => 'Ви не авторизовані!'], 401);
+if ($action === 'register' || $action === 'login') {
+    $email = hh_input($_POST, 'email');
+    $password = hh_input($_POST, 'password', false);
+    if (strlen($email) > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '' || strlen($password) > 72) {
+        hh_json(['status' => 'error', 'message' => 'Введіть дійсний email і пароль (до 72 байтів).'], 422);
     }
-
-    $userId = $_SESSION['user_id'];
-    $newAvatar = normalize_avatar($_POST['avatar'] ?? null);
-    $rawAvatar = post_string('avatar');
-    $newPassword = (string)($_POST['new_password'] ?? '');
-    $responseMessage = 'Зміни збережено!';
-
-    if ($rawAvatar !== '' && $newAvatar === null) {
-        respond(['status' => 'error', 'message' => 'Посилання на аватар має бути http(s) URL або шляхом images/...'], 422);
+    if ($action === 'register') {
+        $username = hh_input($_POST, 'username');
+        if (hh_length($username) < 3 || hh_length($username) > 40 || preg_match('/[<>\x00-\x1f\x7f]/', $username)) {
+            hh_json(['status' => 'error', 'message' => 'Нікнейм має містити від 3 до 40 символів.'], 422);
+        }
+        if (hh_length($password) < 8) hh_json(['status' => 'error', 'message' => 'Пароль має містити щонайменше 8 символів.'], 422);
+        hh_rate_limit('register', 5, 900);
+        try {
+            $stmt = hh_db()->prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)');
+            $stmt->execute([$username, $email, password_hash($password, PASSWORD_DEFAULT)]);
+        } catch (PDOException $error) {
+            if ($error->getCode() !== '23000') throw $error;
+            hh_json(['status' => 'error', 'message' => 'Користувач або email вже існує.'], 409);
+        }
+        hh_json(['status' => 'success', 'message' => 'Реєстрація успішна! Тепер увійдіть.']);
     }
-
-    if ($newPassword !== '' && strlen($newPassword) < 6) {
-        respond(['status' => 'error', 'message' => 'Новий пароль має містити щонайменше 6 символів'], 422);
+    hh_rate_limit('login', 15, 900);
+    $stmt = hh_db()->prepare('SELECT id, password, is_banned FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+    if (!$user || !password_verify($password, $user['password']) || !empty($user['is_banned'])) {
+        hh_json(['status' => 'error', 'message' => 'Невірний email або пароль, або доступ обмежений.'], 401);
     }
-
-    if ($newAvatar !== null) {
-        $stmt = $pdo->prepare("UPDATE users SET avatar = ? WHERE id = ?");
-        $stmt->execute([$newAvatar, $userId]);
-        $_SESSION['avatar'] = $newAvatar;
-    }
-
-    if ($newPassword !== '') {
-        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmt->execute([$hash, $userId]);
-        $responseMessage = $newAvatar !== null ? 'Пароль та дані оновлено!' : 'Пароль оновлено!';
-    }
-
-    respond(['status' => 'success', 'message' => $responseMessage]);
+    session_regenerate_id(true);
+    $_SESSION = ['user_id' => $user['id'], 'csrf_token' => bin2hex(random_bytes(32))];
+    hh_json(['status' => 'success', 'message' => 'Успішний вхід']);
 }
 
-respond(['status' => 'error', 'message' => 'Невідома дія'], 400);
-?>
+$user = hh_current_user();
+if (!$user) hh_json(['status' => 'error', 'message' => 'Ви не авторизовані.'], 401);
+hh_rate_limit('profile', 20, 600);
+$avatar = hh_input($_POST, 'avatar');
+$password = hh_input($_POST, 'new_password', false);
+$currentPassword = hh_input($_POST, 'current_password', false);
+if ($avatar !== '' && (strlen($avatar) > 2048 || (!hh_safe_url($avatar) && !hh_local_path($avatar, 'images', ['jpg', 'jpeg', 'png', 'gif', 'webp'])))) {
+    hh_json(['status' => 'error', 'message' => 'Вкажіть http(s) URL або наявне зображення у папці images.'], 422);
+}
+if ($password !== '' && (hh_length($password) < 8 || strlen($password) > 72)) {
+    hh_json(['status' => 'error', 'message' => 'Новий пароль: від 8 символів до 72 байтів.'], 422);
+}
+if ($password !== '' && !password_verify($currentPassword, $user['password'])) {
+    hh_json(['status' => 'error', 'message' => 'Поточний пароль невірний.'], 422);
+}
+$pdo = hh_db();
+$pdo->beginTransaction();
+try {
+    if ($avatar !== '') $pdo->prepare('UPDATE users SET avatar = ? WHERE id = ?')->execute([$avatar, $user['id']]);
+    if ($password !== '') $pdo->prepare('UPDATE users SET password = ? WHERE id = ?')->execute([password_hash($password, PASSWORD_DEFAULT), $user['id']]);
+    $pdo->commit();
+} catch (Throwable $error) {
+    $pdo->rollBack();
+    throw $error;
+}
+if ($password !== '') session_regenerate_id(true);
+hh_json(['status' => 'success', 'message' => 'Зміни збережено!']);
