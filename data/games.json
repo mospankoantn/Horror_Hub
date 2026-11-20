@@ -1,0 +1,46 @@
+{
+  "games": [
+    {
+      "id": "quest-cinema",
+      "engine": "quest",
+      "kind": "Текстовий квест",
+      "title": "Підвал під сценою",
+      "tagline": "Двері кінотеатру зачинилися. Під сценою хтось чекає на останній сеанс.",
+      "cover": "images/horror_background.jpg",
+      "coverAlt": "Покинутий цвинтар у тумані",
+      "duration": "5–10 хв",
+      "controls": [
+        "Обирайте дії кліком або клавішами 1–3",
+        "Пробіл або Enter — показати весь текст одразу",
+        "Предмети з інвентаря відкривають нові шляхи, а страх веде до поганих фіналів"
+      ],
+      "script": "js/game-room/games/quest.js",
+      "data": "data/games/quests/cinema-basement.json",
+      "modes": [],
+      "leaderboard": null,
+      "progress": { "type": "endings" }
+    },
+    {
+      "id": "maze",
+      "engine": "maze",
+      "kind": "Лабіринт",
+      "title": "Темний лабіринт",
+      "tagline": "Знайдіть вихід, доки ліхтар не згас, а переслідувач не підійшов надто близько.",
+      "preview": "maze",
+      "duration": "1–3 хв",
+      "controls": [
+        "Стрілки або WASD — рух, Shift — ривок (швидше, але гучно й ліхтар сідає вдвічі швидше)",
+        "На телефоні — кнопки або проведіть пальцем по полю",
+        "Батарейки на підлозі заряджають ліхтар, Esc або P — пауза"
+      ],
+      "script": "js/game-room/games/maze.js",
+      "modes": [
+        { "id": "normal", "label": "Нормально" },
+        { "id": "hard", "label": "Важко" },
+        { "id": "nightmare", "label": "Кошмар" }
+      ],
+      "leaderboard": { "metric": "time", "order": "asc", "label": "Найшвидші втечі", "minMs": 4000, "maxMs": 1800000 },
+      "progress": null
+    }
+  ]
+}

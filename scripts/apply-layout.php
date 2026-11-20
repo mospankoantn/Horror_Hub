@@ -172,6 +172,75 @@ foreach ($catalogPages as $file => [$section, $active, $title, $description, $ki
     echo "generated $file\n";
 }
 
+/* Game room: the catalog, leaderboard and player are filled by js/game-room/core.js from data/games.json. */
+$schematic = str_repeat('<span></span>', 54);
+$gameRoom = hh_page_head('Ігрова кімната — Horror Hub',
+        'Ігрова кімната Horror Hub: текстові квести й міні-ігри жаху в браузері, колекція фіналів і таблиця лідерів.')
+    . "<body data-section=\"room\">\n" . hh_site_header('room', 'room') . "\n\n"
+    . <<<HTML
+<main id="main">
+  <section class="hero hero--room" aria-labelledby="pageTitle">
+    <div class="hero__inner">
+      <div class="hero__text">
+        <span class="hero__kicker">Ігрова кімната · грається в браузері</span>
+        <h1 class="hero__title" id="pageTitle">Ігрова кімната</h1>
+        <p class="hero__lead">Текстові квести й міні-ігри жаху: проходьте, збирайте фінали та змагайтеся за найшвидшу втечу.</p>
+        <div class="hero__quick">
+          <a href="#games">Усі ігри</a>
+          <a href="#leaderboard">Таблиця лідерів</a>
+        </div>
+      </div>
+      <div class="room-schematic" aria-hidden="true">$schematic</div>
+    </div>
+  </section>
+
+  <div class="room__body">
+    <section class="room-games" id="games" aria-labelledby="gamesTitle">
+      <div class="room__head">
+        <h2 class="room__title" id="gamesTitle">Ігри</h2>
+        <div class="facet__chips" id="gameFilters" role="group" aria-label="Тип гри"></div>
+      </div>
+      <div class="game-grid" id="gameGrid" aria-live="polite">
+        <p class="empty-state">Завантаження ігор…</p>
+      </div>
+    </section>
+
+    <section class="leaderboard" id="leaderboard" aria-labelledby="leaderboardTitle">
+      <h2 id="leaderboardTitle">Таблиця лідерів</h2>
+      <p class="leaderboard__lead">Найкращі результати зареєстрованих гравців — по одному на гравця.</p>
+      <div class="leaderboard__tabs" id="leaderboardTabs" role="group" aria-label="Гра й режим"></div>
+      <ol class="leaderboard__list" id="leaderboardList" aria-live="polite"></ol>
+      <p class="leaderboard__note" id="leaderboardNote"></p>
+    </section>
+  </div>
+
+  <section class="player theme-dark-scope" id="player" tabindex="-1" aria-labelledby="playerTitle" hidden>
+    <div class="player__bar">
+      <button type="button" class="player__btn" data-player="menu" data-icon="back"><span>Ігри</span></button>
+      <h2 class="player__title" id="playerTitle"></h2>
+      <div class="player__tools">
+        <button type="button" class="player__btn" data-player="restart" data-icon="restart"><span>Заново</span></button>
+        <button type="button" class="player__btn" data-player="pause" data-icon="pause" aria-pressed="false"><span>Пауза</span></button>
+        <button type="button" class="player__btn" data-player="sound" aria-pressed="true"><span>Звук</span></button>
+        <button type="button" class="player__btn" data-player="fullscreen" data-icon="fullscreen"><span>На весь екран</span></button>
+        <button type="button" class="player__btn" data-player="help" data-icon="help"><span>Як грати</span></button>
+      </div>
+    </div>
+    <div class="player__hud" id="playerHud"></div>
+    <div class="player__screen">
+      <div class="player__stage" id="playerStage"></div>
+      <div class="player__overlay" id="playerOverlay" hidden></div>
+    </div>
+    <div class="player__touch" id="playerTouch"></div>
+  </section>
+</main>
+
+
+HTML
+    . hh_site_footer() . "\n\n<script src=\"js/game-room/core.js?v=20261120-room\"></script>\n</body>\n</html>\n";
+file_put_contents("$root/game.html", $gameRoom);
+echo "generated game.html\n";
+
 /* Pages with their own content: only head assets, header and footer change. */
 $patchPages = [
     'contact.html' => ['home', ''],
@@ -179,28 +248,27 @@ $patchPages = [
     'profile.html' => ['home', ''],
     'privacy.html' => ['home', ''],
     'article.html' => ['home', ''],
-    'game.html' => ['room', 'room'],
     '404.html' => ['home', ''],
 ];
 foreach ($patchPages as $file => [$section, $active]) {
     $path = "$root/$file";
-    $html = (string)file_get_contents($path);
+    $html = str_replace(["\r\n", "\r"], "\n", (string)file_get_contents($path));
     // Head: drop old icons, fonts, stylesheet and auth script; AdSense leftovers too.
     $html = preg_replace('#\s*<!--\s*(Шрифти|Стилі|Підключаємо auth|Підключення|GOOGLE ADSENSE|SEO|Served)[\s\S]*?-->#u', '', $html);
     $html = preg_replace('#\n\s*<link rel="(icon|apple-touch-icon|preconnect)"[^>]*>#', '', $html);
     $html = preg_replace('#\n\s*<link href="https://fonts\.googleapis\.com/[^"]*" rel="stylesheet">#', '', $html);
     $html = preg_replace('#\n\s*<link rel="stylesheet" href="style\.css[^"]*">#', '', $html);
     $html = preg_replace('#\n\s*<script src="js/(auth|theme)\.js[^"]*"></script>#', '', $html);
-    $extra = $file === 'game.html'
-        ? "\n  <link href=\"https://fonts.googleapis.com/css2?family=VT323&amp;display=swap\" rel=\"stylesheet\">"
-        : '';
     $anchor = str_contains($html, '<base href=') ? '#(<base href="[^"]*">)#' : '#(<meta name="viewport"[^>]*>)#';
-    $html = preg_replace($anchor, "$1\n  " . str_replace('$', '\$', hh_site_head_assets()) . $extra . "\n  " . HH_AUTH_SCRIPT, $html, 1);
+    $html = preg_replace($anchor, "$1\n  " . str_replace('$', '\$', hh_site_head_assets()) . "\n  " . HH_AUTH_SCRIPT, $html, 1);
     // Body: header before <main>, footer after </main>.
     $html = preg_replace('#<body([^>]*)>[\s\S]*?(<main\b)#', "<body$1>\n" . str_replace('$', '\$', hh_site_header($section, $active)) . "\n\n$2", $html, 1);
     $html = preg_replace('#<body(?![^>]*data-section)([^>]*)>#', "<body data-section=\"$section\"$1>", $html, 1);
     $html = preg_replace('#(</main>)[\s\S]*?(\s*<script\b|\s*</body>)#', "$1\n\n" . str_replace('$', '\$', hh_site_footer()) . "\n$2", $html, 1);
-    if ($file === 'game.html') $html = preg_replace('#<main class="container">#', '<main class="container theme-dark-scope">', $html, 1);
+    // Tidy up so that running the script again changes nothing: no blank lines in <head>, at most one elsewhere.
+    [$head, $rest] = explode('</head>', $html, 2);
+    $head = preg_replace("/\n[ \t]*(?=\n)/", '', $head);
+    $html = $head . '</head>' . preg_replace("/\n{3,}/", "\n\n", $rest);
     file_put_contents($path, $html);
     echo "patched $file\n";
 }

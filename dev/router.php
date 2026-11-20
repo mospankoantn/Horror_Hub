@@ -40,7 +40,7 @@ if ($blocked || !$file || !is_file($file) || !str_starts_with(strtolower($file),
     return true;
 }
 if ($extension === 'php') {
-    if (!in_array($path, ['/api_auth.php', '/api_comments.php', '/save_contact.php', '/admin/admin.php'], true)) {
+    if (!in_array($path, ['/api_auth.php', '/api_comments.php', '/api_games.php', '/save_contact.php', '/admin/admin.php'], true)) {
         http_response_code(403);
         return true;
     }

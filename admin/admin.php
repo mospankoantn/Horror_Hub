@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/games.php';
 chdir(__DIR__);
 set_time_limit(300);
 
@@ -670,6 +671,12 @@ if (isset($_POST['delete_comment'])) {
     redirectAdmin(['tab' => 'comments', 'msg' => 'Коментар видалено']);
 }
 
+if (isset($_POST['remove_game_run'])) {
+    hh_ensure_game_tables($pdo);
+    $pdo->prepare("UPDATE game_runs SET status = 'removed' WHERE id = ? AND status = 'finished'")->execute([(int)hh_input($_POST, 'run_id')]);
+    redirectAdmin(['tab' => 'games', 'msg' => 'Результат прибрано з таблиці лідерів']);
+}
+
 if (isset($_POST['ban_user'])) {
     $stmt = $pdo->prepare("UPDATE users SET is_banned = 1 - is_banned WHERE id = ? AND role <> 'admin'");
     $stmt->execute([(int)hh_input($_POST, 'user_id')]);
@@ -677,6 +684,23 @@ if (isset($_POST['ban_user'])) {
 }
 
 $active_tab = hh_input($_GET, 'tab') ?: 'stats';
+
+$game_boards = [];
+if ($active_tab === 'games') {
+    hh_ensure_game_tables($pdo);
+    foreach (hh_games() as $game) {
+        if (empty($game['leaderboard'])) continue;
+        $modes = array_column((array)($game['modes'] ?? []), 'id') ?: ['default'];
+        foreach ($modes as $mode) {
+            $game_boards[] = ['title' => $game['title'] . ($mode === 'default' ? '' : ' · ' . hh_game_mode_label($game, $mode)), 'rows' => hh_game_board($pdo, $game, $mode, 20)];
+        }
+    }
+}
+
+function adminFormatMs(int $ms): string {
+    $tenths = intdiv($ms + 50, 100);
+    return sprintf('%02d:%02d.%d', intdiv($tenths, 600), intdiv($tenths % 600, 10), $tenths % 10);
+}
 $selected_section = validSectionKey($article_sections, $_GET['section'] ?? 'articles');
 
 $section_counts = [];
@@ -784,6 +808,7 @@ if (isset($_GET['edit'])) {
     <a href="?tab=stats" class="<?= $active_tab === 'stats' ? 'active' : '' ?>">Статистика</a>
     <a href="?tab=articles&section=<?= e($selected_section) ?>" class="<?= $active_tab === 'articles' ? 'active' : '' ?>">Статті та розділи</a>
     <a href="?tab=comments" class="<?= $active_tab === 'comments' ? 'active' : '' ?>">Модерація коментарів</a>
+    <a href="?tab=games" class="<?= $active_tab === 'games' ? 'active' : '' ?>">Ігри й рекорди</a>
     <a href="../index.html" target="_blank" style="color:#2AABEE;margin-top:50px;">На сайт</a>
     <form method="POST"><?= csrfField() ?><button type="submit" name="logout" class="btn btn-gray">Вийти</button></form>
 </div>
@@ -851,6 +876,46 @@ if (isset($_GET['edit'])) {
                 <?php endforeach; ?>
             </table>
         </div>
+    <?php endif; ?>
+
+    <?php if ($active_tab === 'games'): ?>
+        <h2>Таблиці лідерів Ігрової кімнати</h2>
+        <p style="color:#aaa;">Прибраний результат не видаляється з бази (статус <code>removed</code>), а гравець опускається до свого наступного результату. Забанені гравці в таблиці не потрапляють.</p>
+        <?php if (!$game_boards): ?>
+            <div class="card">Немає ігор із таблицею лідерів у data/games.json.</div>
+        <?php endif; ?>
+        <?php foreach ($game_boards as $board): ?>
+            <h3><?= e($board['title']) ?></h3>
+            <div class="card">
+                <?php if (!$board['rows']): ?>
+                    <p style="color:#aaa;">Поки немає результатів.</p>
+                <?php else: ?>
+                <table>
+                    <tr><th>#</th><th>Гравець</th><th>Час</th><th>Забіг</th><th>Дії</th></tr>
+                    <?php foreach ($board['rows'] as $index => $row): ?>
+                        <tr>
+                            <td><?= $index + 1 ?></td>
+                            <td><b><?= e($row['username']) ?></b></td>
+                            <td><?= e(adminFormatMs($row['score_ms'])) ?></td>
+                            <td><small>#<?= (int)$row['run_id'] ?></small></td>
+                            <td>
+                                <form method="POST" style="display:inline;">
+                                    <?= csrfField() ?>
+                                    <input type="hidden" name="run_id" value="<?= (int)$row['run_id'] ?>">
+                                    <button type="submit" name="remove_game_run" class="btn" onclick="return confirm('Прибрати цей результат із таблиці?');">Прибрати результат</button>
+                                </form>
+                                <form method="POST" style="display:inline;">
+                                    <?= csrfField() ?>
+                                    <input type="hidden" name="user_id" value="<?= (int)$row['user_id'] ?>">
+                                    <button type="submit" name="ban_user" class="btn btn-gray">Забанити</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <?php if ($active_tab === 'articles'): ?>

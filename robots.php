@@ -13,7 +13,7 @@ header('Cache-Control: public, max-age=3600');
 $lines = ['User-agent: *'];
 // Service pages and raw article sources: the full text lives in /statti/. The old article.html stays crawlable
 // so search engines can see its noindex tag and the redirect to the static page.
-foreach (['/admin/', '/api_auth.php', '/api_comments.php', '/save_contact.php', '/login.html', '/profile.html',
+foreach (['/admin/', '/api_auth.php', '/api_comments.php', '/api_games.php', '/save_contact.php', '/login.html', '/profile.html',
     '/articles/', '/content/'] as $path) {
     $lines[] = 'Disallow: ' . $prefix . $path;
 }

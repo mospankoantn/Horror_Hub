@@ -41,6 +41,7 @@
   --tone-internet: #e2d65c;
   --tone-culture: #d2b07a;
   --tone-reviews: #f07a70;
+  --tone-room: #8fd18c;
 
   /* Сумісність зі старими блоками (ігрова кімната, SCP) */
   --surface-legacy: #0c0c0c;
@@ -99,6 +100,7 @@
   --tone-internet: #625b0c;
   --tone-culture: #74531c;
   --tone-reviews: #9c1c24;
+  --tone-room: #2f6b2c;
 
   --text-dim: #6e655d;
   --border-red: #d9b9b3;
@@ -116,6 +118,7 @@ body[data-section="games"] { --sa: var(--tone-games); }
 body[data-section="internet"] { --sa: var(--tone-internet); }
 body[data-section="culture"] { --sa: var(--tone-culture); }
 body[data-section="reviews"] { --sa: var(--tone-reviews); }
+body[data-section="room"] { --sa: var(--tone-room); }
 
 /* --- 2. БАЗА --- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -284,6 +287,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .site-nav a[data-tab="games"] { --tab-tone: var(--tone-games); }
 .site-nav a[data-tab="internet"] { --tab-tone: var(--tone-internet); }
 .site-nav a[data-tab="culture"] { --tab-tone: var(--tone-culture); }
+.site-nav a[data-tab="room"] { --tab-tone: var(--tone-room); }
 .site-nav a:hover { color: var(--ink); box-shadow: inset 0 -2px 0 var(--line); }
 .site-nav a[aria-current="page"] { color: var(--ink); box-shadow: inset 0 -3px 0 var(--tab-tone); }
 
@@ -630,9 +634,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .not-found__links a:hover { color: var(--ink); }
 
 /* Ігрова кімната: темна смуга у будь-якій темі */
-main.theme-dark-scope { background: var(--bg); color: var(--ink); }
-.game-page { background-color: var(--bg); }
-.game-page .crt-overlay { display: none; }
 
 /* --- 10. АДАПТИВ --- */
 @media (max-width: 860px) {
@@ -694,18 +695,9 @@ main.theme-dark-scope { background: var(--bg); color: var(--ink); }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
-/* --- 11. СТАРІ БЛОКИ: SCP-СИМУЛЯТОР І ІГРОВА КІМНАТА ---
-   Перенесені без змін; працюють на темних токенах (.scp-sim, .theme-dark-scope). */
+/* --- 11. SCP-СИМУЛЯТОР ---
+   Перенесений без змін; працює на темних токенах (.scp-sim). */
 
-.game-mode-image { width: 100%; height: 180px; object-fit: cover; border-radius: 3px; }
-canvas.game-mode-image { object-fit: contain; background: #080a0c; }
-.game-toolbar .tool-icon { width: 44px; height: 44px; padding: 0; font-size: 1.5rem; flex-shrink: 0; }
-.sound-switch { margin-left: auto; display: flex; align-items: center; gap: 8px; color: #ccc; cursor: pointer; }
-.sound-switch input { width: 18px; height: 18px; accent-color: #5fa8b8; }
-.maze-pause { display: none; position: absolute; inset: 0; margin: auto; width: 180px; height: 52px; color: #fff; background: #172327; border: 1px solid #5fa8b8; border-radius: 4px; font: inherit; cursor: pointer; }
-.is-paused .maze-pause { display: block; }
-.is-paused #mazeCanvas { opacity: 0.45; }
-.game-page .crt-overlay { display: none; }
 
 .scp-sim {
   margin-top: 2.4rem;
@@ -1194,331 +1186,212 @@ canvas.game-mode-image { object-fit: contain; background: #080a0c; }
   }
 }
 
-/* --- 20. ІГРОВА КІМНАТА --- */
-.game-page {
-  background-color: #030303;
-}
+/* --- ДОПОВНЕННЯ ДО ДИЗАЙНУ D --- */
+.facet-groups { display: flex; flex-direction: column; gap: 24px; }
 
-.crt-overlay {
-  position: fixed;
-  inset: 0;
+
+/* --- 12. ІГРОВА КІМНАТА ---
+   Каталог ігор і таблиця лідерів малюються з data/games.json (js/game-room/core.js).
+   Плеєр завжди темний (.theme-dark-scope), сторінка навколо — у темі сайту. */
+.hero--room {
   background:
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(95, 168, 184, 0.025), rgba(0, 0, 255, 0.045));
-  background-size: 100% 2px, 3px 100%;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.36;
+    linear-gradient(color-mix(in srgb, var(--tone-room) 7%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, color-mix(in srgb, var(--tone-room) 7%, transparent) 1px, transparent 1px) 0 0 / 28px 28px,
+    radial-gradient(ellipse at 72% 45%, color-mix(in srgb, var(--tone-room) 14%, transparent), transparent 60%),
+    var(--bg);
 }
-
-.game-selection {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-
-.game-mode-card {
-  background:
-    linear-gradient(145deg, rgba(95, 168, 184, 0.08), transparent 34%),
-    linear-gradient(180deg, rgba(158, 0, 0, 0.1), transparent 44%),
-    var(--surface);
-  border: 1px solid var(--border-red);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card), inset 0 0 50px rgba(0, 0, 0, 0.45);
-}
-
-.game-mode-card {
-  display: grid;
-  grid-template-rows: auto 1fr auto auto;
-  gap: 1.1rem;
-  min-height: 320px;
-  padding: 1.6rem;
-}
-
-.mode-kicker {
-  display: block;
-  color: var(--accent-cold);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-
-.game-mode-card h3 {
-  font-family: var(--font-headings);
-  color: var(--red-bright);
-  font-size: 1.65rem;
-  line-height: 1.25;
-  margin-bottom: 0.85rem;
-}
-
-.game-mode-card p,
-.maze-instructions {
-  color: var(--text-muted);
-  font-size: 0.92rem;
-  line-height: 1.7;
-}
-
-.difficulty-panel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-}
-
-.difficulty-btn,
-.icon-text-btn,
-.game-choice-btn,
-.game-choices button {
-  min-height: 44px;
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background var(--t-mid), color var(--t-mid), border-color var(--t-mid), box-shadow var(--t-mid), transform var(--t-fast);
-}
-
-.difficulty-btn,
-.icon-text-btn {
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 0.65rem 0.8rem;
-}
-
-.difficulty-btn:hover,
-.difficulty-btn.is-active,
-.icon-text-btn:hover {
-  color: #fff;
-  border-color: var(--accent-cold);
-  background: rgba(95, 168, 184, 0.14);
-  box-shadow: 0 0 16px rgba(95, 168, 184, 0.14);
-}
-
-.game-choice-btn {
-  width: 100%;
-  background: linear-gradient(90deg, var(--red-dark), #120707);
-  color: #fff;
-  border: 1px solid var(--red-bright);
-  padding: 0.9rem 1.2rem;
-  text-transform: uppercase;
-  letter-spacing: 0;
-}
-
-.game-choice-btn:hover,
-.game-choices button:hover:not(:disabled) {
-  background: var(--red-main);
-  color: #fff;
-  border-color: var(--red-bright);
-  box-shadow: 0 0 22px var(--red-glow);
-  transform: translateY(-2px);
-}
-
-.game-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-  min-height: 560px;
-  margin-top: 1.5rem;
-  padding: 1rem 0;
-  border-top: 1px solid var(--border);
-}
-
-.game-toolbar,
-.quest-hud,
-.maze-hud {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.7rem;
-}
-
-.game-toolbar {
-  justify-content: flex-start;
-}
-
-.quest-hud,
-.maze-hud {
-  justify-content: flex-start;
-}
-
-.quest-hud span,
-.maze-hud span {
-  min-height: 34px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--accent-ash);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.35rem 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.game-story {
-  flex-grow: 1;
-  min-height: 260px;
-  color: #d8d4cc;
-  background: rgba(0, 0, 0, 0.36);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  font-family: 'VT323', monospace;
-  font-size: 1.35rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  text-shadow: 0 0 5px rgba(200, 200, 200, 0.22);
-}
-
-.game-choices {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.game-choices button {
-  width: 100%;
-  background: transparent;
-  color: var(--red-bright);
-  border: 1px solid var(--red-dark);
-  padding: 0.85rem 1rem;
-  font-family: 'VT323', monospace;
-  font-size: 1.08rem;
-  letter-spacing: 0;
-  text-align: left;
-  text-transform: uppercase;
-}
-
-.game-choices button:disabled {
-  color: var(--text-dim);
-  border-color: var(--border);
-  cursor: not-allowed;
-}
-
-.quest-ending {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  font-family: var(--font-headings);
-  font-size: 1.35rem;
-  letter-spacing: 0;
-}
-
-.quest-ending.is-good {
-  color: #8cf29b;
-  border-color: rgba(140, 242, 155, 0.28);
-  background: rgba(30, 120, 48, 0.12);
-}
-
-.quest-ending.is-bad {
-  color: var(--red-hot);
-  border-color: var(--border-red);
-  background: rgba(158, 0, 0, 0.14);
-}
-
-.maze-shell {
-  align-items: stretch;
-}
-
-.maze-stage {
+.room-schematic {
   position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-#mazeCanvas {
-  width: 100%;
   aspect-ratio: 3 / 2;
-  height: auto;
-  background: #000;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  image-rendering: pixelated;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #070908;
+  border: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 3px;
+  padding: 3px;
+}
+.room-schematic span { background: #1b2420; border-radius: 2px; }
+.room-schematic span:nth-child(3n) { background: transparent; }
+.room-schematic span:nth-child(7n + 2) { background: transparent; }
+.room-schematic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 28% 38%, rgba(255, 214, 140, 0.28) 0, rgba(255, 214, 140, 0.08) 18%, rgba(0, 0, 0, 0.92) 34%);
+  animation: torch-flicker 3.2s infinite;
+}
+@keyframes torch-flicker {
+  0%, 100% { opacity: 1; }
+  42% { opacity: 0.86; }
+  44% { opacity: 1; }
+  71% { opacity: 0.92; }
 }
 
-.maze-result {
-  position: absolute;
-  inset: 1rem;
+.room__body { max-width: var(--page); margin: 0 auto; padding: 32px var(--gutter) 64px; display: flex; flex-direction: column; gap: 48px; }
+.room__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.room__title, .leaderboard h2 { margin: 0; font-family: var(--font-headings); font-size: clamp(28px, 3vw, 38px); font-weight: 700; }
+.is-playing .hero, .is-playing .room__body { display: none; }
+
+.game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 20px; }
+.game-card {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.9rem;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.88);
-  border: 1px solid var(--border-red);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-  backdrop-filter: blur(8px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  transition: border-color var(--t-fast);
 }
+.game-card:hover { border-color: var(--sa); }
+.game-card__media { aspect-ratio: 2 / 1; background: #080a0c; overflow: hidden; }
+.game-card__media img, .game-card__preview { width: 100%; height: 100%; object-fit: cover; display: block; }
+.game-card__media img { filter: var(--img-filter); }
+.game-card__body { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px 20px; flex: 1; }
+.game-card__meta { margin: 0; font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--sa); }
+.game-card__title { margin: 0; font-family: var(--font-headings); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.game-card__text { margin: 0; color: var(--muted); }
+.game-card__modes { display: flex; flex-wrap: wrap; gap: 6px; }
+.game-card__stat { margin: 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.game-card__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 6px; }
 
-.maze-result h3 {
-  font-family: var(--font-headings);
-  color: var(--red-bright);
-  font-size: 1.5rem;
-}
+.leaderboard { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: clamp(20px, 3vw, 32px); }
+.leaderboard__lead { margin: 6px 0 16px; color: var(--muted); }
+.leaderboard__tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.leaderboard__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.leaderboard__list[aria-busy="true"] { opacity: 0.6; }
+.leaderboard__row { display: grid; grid-template-columns: 40px 36px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 6px; border-bottom: 1px solid var(--line); }
+.leaderboard__row:nth-child(-n + 3) .leaderboard__rank { color: var(--sa); }
+.leaderboard__row.is-me { background: color-mix(in srgb, var(--sa) 12%, transparent); border-radius: 6px; }
+.leaderboard__rank { font-family: var(--font-mono); font-weight: 600; text-align: center; }
+.leaderboard__avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
+.leaderboard__name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard__score { font-family: var(--font-mono); }
+.leaderboard__empty { padding: 18px 6px; color: var(--muted); }
+.leaderboard__note { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
 
-.maze-result p {
-  color: var(--text);
-}
-
-.mobile-controls {
-  display: none;
-  grid-template-columns: 58px 58px 58px;
-  grid-template-rows: 58px 58px;
-  gap: 0.65rem;
-  justify-content: center;
-  margin-top: 0.5rem;
-  touch-action: none;
-}
-
-.d-btn {
+/* Плеєр */
+.player {
+  max-width: var(--page);
+  margin: 20px auto 40px;
+  padding: clamp(12px, 2vw, 20px);
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  background: rgba(50, 0, 0, 0.52);
-  border: 1px solid var(--red-main);
-  border-radius: var(--radius);
-  font-size: 1.35rem;
-  user-select: none;
-  touch-action: none;
+  flex-direction: column;
+  gap: 12px;
+  outline: none;
 }
-
-.d-btn:active {
-  background: var(--red-main);
-  box-shadow: 0 0 18px var(--red-glow);
+.player[hidden] { display: none; }
+.player:fullscreen { max-width: none; margin: 0; border-radius: 0; overflow-y: auto; }
+.player__bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.player__title { margin: 0 auto 0 4px; font-family: var(--font-headings); font-size: clamp(22px, 2.4vw, 30px); font-weight: 700; }
+.player__tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.player__btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer;
 }
+.player__btn[hidden] { display: none; }
+.player__btn:hover { border-color: var(--tone-room); }
+.player__btn svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.player__btn[aria-pressed="true"][data-player="pause"] { border-color: var(--tone-room); color: var(--tone-room); }
 
+.player__hud { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 10px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+.player__hud:empty { display: none; }
+.hud-item { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 13px; }
+.hud-item[hidden] { display: none; }
+.hud-item__label { color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+.hud-item__value { font-weight: 600; }
+.hud-item.is-danger .hud-item__value { color: var(--accent-text); }
+.hud-item--alert { color: #ffb15c; }
+.hud-item--toast { color: var(--tone-room); }
+.hud-skip { min-height: 36px; padding: 0 14px; font-size: 13px; margin-left: auto; }
+.meter { position: relative; width: 120px; height: 8px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.meter__fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--tone-room); border-radius: inherit; transition: width 200ms linear; }
+.meter.is-low .meter__fill { background: var(--accent-text); }
+.meter--fear .meter__fill { background: linear-gradient(90deg, #7d6bd1, var(--accent-text)); }
+
+.player__screen { position: relative; }
+.player__stage { min-height: 320px; }
+.player__overlay {
+  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 16px;
+  background: rgba(5, 4, 4, 0.78); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); border-radius: 10px;
+}
+.player__overlay[hidden] { display: none; }
+.player__dialog { width: min(440px, 100%); padding: 24px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); text-align: center; }
+.player__dialog.is-good { border-color: var(--tone-room); }
+.player__dialog.is-bad { border-color: var(--accent); }
+.player__dialog h3 { margin: 0 0 8px; font-family: var(--font-headings); font-size: 30px; font-weight: 700; }
+.player__dialog.is-good h3 { color: var(--tone-room); }
+.player__dialog.is-bad h3 { color: var(--accent-text); }
+.player__dialog p { margin: 0 0 12px; color: var(--muted); }
+.player__dialog ul { margin: 0 0 16px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 14px; text-align: left; }
+.player__dialog-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+/* Лабіринт */
+.maze-stage { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #050505; }
+.maze-stage canvas { display: block; width: min(100%, calc((100vh - 300px) * 1.5)); min-width: min(100%, 360px); height: auto; aspect-ratio: 3 / 2; margin: 0 auto; touch-action: none; cursor: crosshair; }
+.player:fullscreen .maze-stage canvas { width: min(100%, calc((100vh - 170px) * 1.5)); }
+.maze-stage.is-paused canvas { opacity: 0.45; }
+.player__touch { display: none; align-items: center; justify-content: center; gap: 28px; }
+.dpad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(2, 56px); gap: 6px; }
+.dpad__btn, .sprint-btn {
+  border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.dpad__btn svg { width: 22px; height: 22px; fill: currentColor; }
+.dpad__btn:active, .sprint-btn:active { background: var(--surface-3); border-color: var(--tone-room); }
 #btn-up { grid-column: 2; grid-row: 1; }
 #btn-left { grid-column: 1; grid-row: 2; }
 #btn-down { grid-column: 2; grid-row: 2; }
 #btn-right { grid-column: 3; grid-row: 2; }
-
-.maze-instructions {
-  text-align: center;
+.sprint-btn { width: 88px; height: 88px; border-radius: 50%; font-weight: 700; }
+@media (hover: none), (max-width: 768px) {
+  .player__touch { display: flex; }
+  .player__touch:empty { display: none; }
 }
 
-/* --- ДОПОВНЕННЯ ДО ДИЗАЙНУ D --- */
-.facet-groups { display: flex; flex-direction: column; gap: 24px; }
-main.theme-dark-scope { margin-top: 24px; margin-bottom: 24px; border-radius: 12px; }
+/* Текстовий квест */
+.quest {
+  display: flex; flex-direction: column; gap: 20px; padding: clamp(18px, 3vw, 32px); border-radius: 10px; border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 50% 0, rgba(158, 0, 0, 0.12), transparent 60%), var(--surface); min-height: 360px;
+}
+.quest__story { margin: 0; min-height: 7.5em; font-family: var(--font-mono); font-size: clamp(16px, 1.6vw, 19px); line-height: 1.75; white-space: pre-line; }
+.quest__choices { display: flex; flex-direction: column; gap: 10px; }
+.quest__choice {
+  display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); text-align: left; cursor: pointer; font-size: 16px;
+}
+.quest__choice:hover:not(:disabled) { border-color: var(--tone-room); }
+.quest__choice:disabled { opacity: 0.55; cursor: not-allowed; }
+.quest__choice kbd {
+  flex-shrink: 0; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px;
+  border: 1px solid var(--field); font-family: var(--font-mono); font-size: 13px; color: var(--tone-room);
+}
+.quest__choice small { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.quest__inventory { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.quest__item { padding: 2px 10px; border-radius: 999px; border: 1px solid var(--tone-room); color: var(--tone-room); font-size: 12px; }
+.quest__empty { color: var(--muted); }
+.quest-ending { margin: 0; font-family: var(--font-headings); font-size: clamp(26px, 3vw, 36px); font-weight: 700; }
+.quest-ending.is-bad { color: var(--accent-text); }
+.quest-ending.is-good { color: var(--tone-room); }
+.quest__found { margin: 0; font-family: var(--font-mono); font-size: 14px; color: var(--muted); }
+.quest__endings { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 8px; }
+.quest__endings li { padding: 10px 12px; border-radius: 8px; border: 1px dashed var(--line); font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.quest__endings li.is-found { border-style: solid; color: var(--ink); }
+.quest__endings li.is-good { border-style: solid; border-color: var(--tone-room); color: var(--tone-room); }
+.quest__endings li[aria-current] { box-shadow: 0 0 0 2px var(--accent-text); }
+.quest__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-/* Адаптив ігрової кімнати: після старого блоку, щоб його перекрити */
 @media (max-width: 768px) {
-  .game-selection { grid-template-columns: 1fr; }
-  .game-mode-card { min-height: 260px; }
-  .game-mode-card h3 { font-size: 1.5rem; }
-  .game-mode-image { height: 150px; }
-  .game-toolbar { justify-content: flex-start; }
-  .mobile-controls { display: grid; }
-}
-@media (max-width: 480px) {
-  .game-shell { padding: 1rem 0; min-height: 0; }
-  .game-story { min-height: 220px; font-size: 1.18rem; }
-  .difficulty-panel { grid-template-columns: 1fr; }
-  .mobile-controls { grid-template-columns: 54px 54px 54px; grid-template-rows: 54px 54px; }
-  .maze-result { inset: 0.6rem; }
+  .player__tools .player__btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .player__tools .player__btn { padding: 0; width: 44px; justify-content: center; }
+  .player__title { order: -1; flex-basis: 100%; margin: 0; }
+  .meter { width: 80px; }
+  .hud-skip { margin-left: 0; }
+  .player__stage { min-height: 0; }
 }

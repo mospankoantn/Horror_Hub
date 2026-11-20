@@ -175,20 +175,35 @@ async function browserChecks() {
     assert.equal(await page.locator('#message').inputValue(), 'Повідомлення, яке не можна втратити.');
     await page.unroute('**/save_contact.php');
 
-    // Test-only instrumentation exercises the actual game closure, not a copied engine.
-    const gameSource = fs.readFileSync('js/games.js', 'utf8');
-    const hooks = '\nwindow.__gameTest = { generateMaze, findPath, updateEnemy, startMazeGame, get state() { return mazeState; }, mute() { soundEnabled = false; stopDrone(); stopHeartbeat(); } };\n});';
+    // Game room: catalog from the manifest, routing, quest engine and the maze engine (GameRoom.debug).
+    const manifest = JSON.parse(fs.readFileSync('data/games.json', 'utf8'));
     await page.setViewportSize({ width: 1366, height: 900 });
-    await page.route('**/js/games.js', route => route.fulfill({ contentType: 'text/javascript', body: gameSource.replace(/\n\}\);\s*$/, hooks) }));
     await page.goto('/game.html');
-    await page.locator('#select-text-quest').click();
-    await page.locator('[data-action="restart-quest"]').click();
-    await page.locator('[data-action="skip-text"]').click();
-    assert.match(await page.locator('#game-story').innerText(), /Під дошками/);
-    async function choose(text) {
-      await page.locator('#game-choices button').filter({ hasText: text }).click();
-      const skip = page.locator('[data-action="skip-text"]');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await page.locator('.game-card').first().waitFor();
+    assert.equal(await page.locator('.game-card').count(), manifest.games.length, 'Every game in the manifest gets a card');
+    await page.locator('[data-play="quest-cinema"]').click();
+    await page.waitForURL(/#play\/quest-cinema/);
+    await page.locator('#player').waitFor({ state: 'visible' });
+    const skip = page.locator('[data-quest-skip]');
+    // Show the whole scene text, then wait for its buttons (choices or the ending actions).
+    const skipText = async () => {
+      await page.waitForFunction(() => !document.querySelector('[data-quest-skip]')?.disabled || document.querySelector('#game-choices button'));
       if (await skip.isEnabled()) await skip.click();
+      await page.locator('#game-choices button').first().waitFor();
+    };
+    await page.locator('#game-story').waitFor();
+    await skipText();
+    assert.match(await page.locator('#game-story').innerText(), /Під дошками/);
+    await page.keyboard.press('1');
+    await skipText();
+    assert.match(await page.locator('#game-story').innerText(), /У шафі лежать маски/, 'Keys 1–9 choose options');
+    await page.locator('#player [data-player="restart"]').click();
+    await skipText();
+    async function choose(text) {
+      await page.locator('#game-choices .quest__choice').filter({ hasText: text }).click();
+      await skipText();
     }
     await choose('Посвітити на шафу');
     await choose('Взяти ключ');
@@ -198,27 +213,64 @@ async function browserChecks() {
     await choose('Підійти до службового виходу');
     await choose('Вставити квиток');
     assert.match(await page.locator('.quest-ending').innerText(), /ВИ ВИБРАЛИСЯ/);
-    await page.locator('#text-quest-container [data-action="menu"]').click();
-    await page.locator('#select-maze-game').click();
-    await page.evaluate(() => window.__gameTest.mute());
+    await page.locator('.quest__found').waitFor();
+    assert.match(await page.locator('.quest__found').innerText(), /Знайдено 1 з 8/);
+    await page.goBack();
+    await page.locator('.game-card').first().waitFor();
+    await page.locator('#player').waitFor({ state: 'hidden' }); // back returns to the catalog
+    assert.match(await page.locator('[data-game="quest-cinema"] .game-card__stat').innerText(), /1 з 8/);
+
+    const mazeCard = page.locator('[data-game="maze"]');
+    await mazeCard.locator('[data-mode="nightmare"]').click();
+    assert.match(await mazeCard.locator('[data-play]').getAttribute('href'), /mode=nightmare/);
+    await mazeCard.locator('[data-mode="normal"]').click();
+    await mazeCard.locator('[data-play]').click();
+    await page.waitForURL(/#play\/maze\?mode=normal/);
+    await page.locator('#mazeCanvas').waitFor();
+    await page.evaluate(() => window.GameRoom.debug.maze.mute());
     const mazeReport = await page.evaluate(() => {
+      const game = window.GameRoom.debug.maze;
       let boundaries = true;
       let route = Infinity;
       let distance = 0;
+      let batteries = Infinity;
       for (let round = 0; round < 20; round++) {
-        window.__gameTest.startMazeGame();
-        const { state, findPath, updateEnemy } = window.__gameTest;
+        game.startMazeGame();
+        const { state } = game;
         boundaries &&= state.maze[0].every(x => x === 1) && state.maze.at(-1).every(x => x === 1) && state.maze.every(row => row[0] === 1 && row.at(-1) === 1);
-        route = Math.min(route, findPath({ col: 1, row: 1 }, { col: 13, row: 7 }).length);
-        for (let i = 0; i < 4000; i++) updateEnemy(16.67);
+        route = Math.min(route, game.findPath({ col: 1, row: 1 }, { col: 13, row: 7 }).length);
+        batteries = Math.min(batteries, state.batteries.length);
+        for (let i = 0; i < 4000; i++) game.updateEnemy(16.67);
         distance = Math.max(distance, Math.hypot(state.player.x - state.enemy.x, state.player.y - state.enemy.y));
       }
-      return { boundaries, route, distance };
+      // Battery pickup and sprint drain.
+      game.startMazeGame();
+      const { state } = game;
+      state.battery = 50;
+      const target = state.batteries[0];
+      state.player.x = target.x;
+      state.player.y = target.y;
+      const before = state.batteries.length;
+      game.collectBatteries();
+      const picked = { count: before - state.batteries.length, battery: state.battery };
+      state.battery = 100;
+      state.sprinting = false;
+      game.updateBattery(1000);
+      const walk = 100 - state.battery;
+      state.battery = 100;
+      state.sprinting = true;
+      game.updateBattery(1000);
+      const run = 100 - state.battery;
+      return { boundaries, route, distance, batteries, picked, ratio: run / walk };
     });
     assert.equal(mazeReport.boundaries, true);
     assert.ok(mazeReport.route > 1);
     assert.ok(mazeReport.distance < 2, 'Enemy must reach the player without getting stuck');
-    await page.locator('#maze-game-container .tool-icon[data-action="restart-maze"]').click();
+    assert.ok(mazeReport.batteries >= 2, 'Batteries are placed on the map');
+    assert.deepEqual(mazeReport.picked, { count: 1, battery: 85 });
+    assert.equal(Math.round(mazeReport.ratio), 2, 'Sprint drains the torch twice as fast');
+
+    await page.locator('#player [data-player="restart"]').click();
     await page.waitForTimeout(1500);
     const pixels = await page.locator('#mazeCanvas').evaluate(canvas => {
       const bytes = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
@@ -227,18 +279,19 @@ async function browserChecks() {
       return colored;
     });
     assert.ok(pixels > 1000, 'Canvas must not be blank');
-    await page.locator('#maze-game-container .tool-icon[data-action="pause-maze"]').click();
+    await page.locator('#player [data-player="pause"]').click();
     const beforePause = await page.locator('#mazeBattery').innerText();
     await page.waitForTimeout(400);
     assert.equal(await page.locator('#mazeBattery').innerText(), beforePause);
-    await page.locator('.maze-pause').click();
+    await page.locator('.player__dialog .btn--primary').click();
     await page.waitForTimeout(6000);
-    const battery = await page.evaluate(() => window.__gameTest.state.battery);
+    const battery = await page.evaluate(() => window.GameRoom.debug.maze.state.battery);
     assert.ok(battery > 90 && battery < 100, 'Battery must last longer than a few seconds');
     await page.screenshot({ path: path.join(output, 'maze-desktop.png'), fullPage: true });
+
     await page.setViewportSize({ width: 390, height: 844 });
     const mobileMove = await page.evaluate(() => {
-      const state = window.__gameTest.state;
+      const { state } = window.GameRoom.debug.maze;
       return { x: state.player.x, y: state.player.y, button: state.maze[1][2] === 0 ? '#btn-right' : '#btn-down' };
     });
     await page.locator(mobileMove.button).scrollIntoViewIfNeeded();
@@ -247,12 +300,26 @@ async function browserChecks() {
     await page.mouse.down();
     await page.waitForTimeout(200);
     await page.mouse.up();
-    const moved = await page.evaluate(() => ({ x: window.__gameTest.state.player.x, y: window.__gameTest.state.player.y }));
+    const moved = await page.evaluate(() => ({ x: window.GameRoom.debug.maze.state.player.x, y: window.GameRoom.debug.maze.state.player.y }));
     assert.ok(Math.hypot(moved.x - mobileMove.x, moved.y - mobileMove.y) > 5, 'Mobile controls must move the player');
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: path.join(output, 'maze-mobile.png'), fullPage: true });
+
+    // A win shows the result screen and stores a personal record (guest: no leaderboard submission).
+    await page.setViewportSize({ width: 1366, height: 900 });
+    await page.evaluate(() => {
+      const { state } = window.GameRoom.debug.maze;
+      state.player.x = state.exit.x;
+      state.player.y = state.exit.y;
+    });
+    await page.locator('.player__dialog.is-good').waitFor();
+    assert.match(await page.locator('.player__dialog').innerText(), /Ви вибралися[\s\S]*Час: \d\d:\d\d\.\d[\s\S]*Увійдіть/);
+    await page.goBack();
+    await page.locator('[data-game="maze"] .game-card__stat').waitFor();
+    assert.match(await page.locator('[data-game="maze"] .game-card__stat').innerText(), /Ваш рекорд \(«Нормально»\): \d\d:\d\d\.\d/);
+
     assert.deepEqual(errors, []);
-    console.log(`PASS: ${pages.length * 3} responsive page checks, mobile menu, search, static links and local covers, malformed catalogs, HTML/XSS sanitization, SCP, quest, 20 maze paths, pause, mobile movement and canvas pixels`);
+    console.log(`PASS: ${pages.length * 3} responsive page checks, mobile menu, search, static links and local covers, malformed catalogs, HTML/XSS sanitization, SCP, game catalog and routing, quest keys/endings, 20 maze paths, batteries, sprint, pause, mobile movement, win screen and canvas pixels`);
     await context.close();
   } finally { await browser.close(); }
 }

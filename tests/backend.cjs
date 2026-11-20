@@ -30,6 +30,36 @@ const fixture = mode => execFileSync(php, ['tests/db_fixture.php', mode, email],
     assert.equal((await post('/api_comments.php', { action: 'post', article_id: 'fixture:' + id, comment_text: text })).status(), 200);
     const comments = await (await client.get('/api_comments.php?action=get&article_id=fixture:' + id)).json();
     assert.equal(comments[0].comment_text, text, 'Comments must preserve raw text');
+    // Game room API: runs are timed by the server, tokens are single-use, progress accepts real endings only.
+    const games = (form) => post('/api_games.php', form);
+    assert.equal((await games({ action: 'start', game: 'nope', mode: 'normal' })).status(), 404);
+    assert.equal((await games({ action: 'start', game: 'maze', mode: 'impossible' })).status(), 422);
+    let run = await (await games({ action: 'start', game: 'maze', mode: 'normal' })).json();
+    assert.match(run.token, /^[a-f0-9]{64}$/);
+    assert.equal((await games({ action: 'finish', token: run.token, score_ms: '4000' })).status(), 422, 'A time longer than the real run is rejected');
+    assert.equal((await games({ action: 'finish', token: run.token, score_ms: '5000' })).status(), 409, 'A token is single-use');
+    run = await (await games({ action: 'start', game: 'maze', mode: 'normal' })).json();
+    assert.equal((await games({ action: 'finish', token: run.token, score_ms: '1500' })).status(), 422, 'Faster than minMs is rejected');
+    run = await (await games({ action: 'start', game: 'maze', mode: 'normal' })).json();
+    await new Promise((resolve) => setTimeout(resolve, 2600));
+    response = await games({ action: 'finish', token: run.token, score_ms: '4200' });
+    assert.equal(response.status(), 200, await response.text());
+    assert.equal((await response.json()).rank, 1);
+    let board = await (await client.get('/api_games.php?action=top&game=maze&mode=normal')).json();
+    assert.equal(board.entries[0].username, 'codex-' + id);
+    assert.equal(board.entries[0].score_ms, 4200);
+    assert.equal(board.me.rank, 1);
+    assert.equal((await client.get('/api_games.php?action=top&game=quest-cinema&mode=default')).status(), 404, 'Quests have no leaderboard');
+    assert.equal((await games({ action: 'progress', game: 'quest-cinema', endings: JSON.stringify(['not_an_ending']) })).status(), 422);
+    let progress = await (await games({ action: 'progress', game: 'quest-cinema', endings: JSON.stringify(['good_exit']) })).json();
+    assert.deepEqual(progress.endings, ['good_exit']);
+    assert.equal(progress.total, 8);
+    progress = await (await games({ action: 'progress', game: 'quest-cinema', endings: JSON.stringify(['shadow']) })).json();
+    assert.deepEqual([...progress.endings].sort(), ['good_exit', 'shadow'], 'Endings merge');
+    const guest = await request.newContext({ baseURL });
+    const guestAuth = await (await guest.get('/api_auth.php?action=status')).json();
+    assert.equal((await guest.post('/api_games.php', { headers: { 'X-CSRF-Token': guestAuth.csrf_token }, form: { action: 'start', game: 'maze', mode: 'normal' } })).status(), 401);
+
     fixture('promote');
     auth = await (await client.get('/api_auth.php?action=status')).json();
     assert.equal(auth.user.role, 'admin');
@@ -41,6 +71,9 @@ const fixture = mode => execFileSync(php, ['tests/db_fixture.php', mode, email],
     auth = await (await client.get('/api_auth.php?action=status')).json();
     assert.equal(auth.logged_in, false, 'Ban must invalidate logged-in user');
     assert.equal((await post('/api_auth.php', { action: 'login', email, password: 'New-password-456' })).status(), 401);
-    console.log('PASS: registration, duplicates, login/session rotation, profile, password verification, comments, role revocation and bans');
+    board = await (await guest.get('/api_games.php?action=top&game=maze&mode=normal')).json();
+    assert.ok(!board.entries.some((entry) => entry.username === 'codex-' + id), 'Banned players leave the leaderboard');
+    await guest.dispose();
+    console.log('PASS: registration, duplicates, login/session rotation, profile, password verification, comments, game runs, leaderboard, quest progress, role revocation and bans');
   } finally { await client.dispose(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

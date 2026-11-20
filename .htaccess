@@ -2,7 +2,7 @@ Options -Indexes
 # Missing addresses are rewritten to 404.php below, which works in a subfolder too.
 # ErrorDocument is only the fallback for servers without mod_rewrite (site at the domain root).
 ErrorDocument 404 /404.php
-<FilesMatch "(?i)(^\.|^(db|router|bootstrap|headers|env|site_builder)\.php$|\.(env|log|jsonl|sql|ini|toml|md|cmd|bat|ps1|bak)$|^(?!robots\.txt$).*\.txt$)">
+<FilesMatch "(?i)(^\.|^(db|router|bootstrap|headers|env|site_builder|layout|games)\.php$|\.(env|log|jsonl|sql|ini|toml|md|cmd|bat|ps1|bak)$|^(?!robots\.txt$).*\.txt$)">
     Require all denied
 </FilesMatch>
 <IfModule mod_rewrite.c>
