@@ -15,7 +15,7 @@
     },
     {
         "url": "local://internet_horror/backrooms",
-        "imageUrl": "images/placeholder.jpg",
+        "imageUrl": "images/covers/local-aefcb0b7091a0f.webp",
         "title": "Backrooms (Бекрумс): офісний лабіринт без виходу",
         "previewText": "Лімінальні простори, жовті кімнати, гул ламп і страх випадково випасти з реальності.",
         "release_date": "2019",
@@ -25,11 +25,12 @@
         "sectionLabel": "Крипіпасти та інтернет-хоррор",
         "id": 2,
         "localId": "internet_horror:backrooms",
-        "contentPath": "content/internet_horror/backrooms.html"
+        "contentPath": "content/internet_horror/backrooms.html",
+        "imageSource": "images/placeholder.jpg"
     },
     {
         "url": "https://telegra.ph/%D0%86stor%D1%96ya-ta-rozvitok-analogovogo-hororu-11-21",
-        "imageUrl": "https://theangrynoodle.com/wp-content/uploads/2023/03/hand-analog-horror-e1681127097973-scaled.jpg",
+        "imageUrl": "images/covers/3123a4bbe3be8ef2ee49.webp",
         "title": "Історія та розвиток аналогового хорору",
         "previewText": "Старі касети, телевізійні перешкоди, псевдоархіви й тривога перед медіа, яке поводиться неправильно.",
         "release_date": "2010-ті - 2020-ті",
@@ -37,11 +38,12 @@
         "genre": "Analog horror",
         "section": "internet_horror",
         "sectionLabel": "Крипіпасти та інтернет-хоррор",
-        "id": 3
+        "id": 3,
+        "imageSource": "https://theangrynoodle.com/wp-content/uploads/2023/03/hand-analog-horror-e1681127097973-scaled.jpg"
     },
     {
         "url": "local://internet_horror/scp",
-        "imageUrl": "https://images.unsplash.com/photo-1486541691124-29677acf0882?auto=format&fit=crop&w=900&q=70",
+        "imageUrl": "images/scp_cover.webp",
         "title": "SCP: хоррор у формі секретного архіву",
         "previewText": "Інтерактивне досьє: тести D-класу, знакові об'єкти, лор Фонду й реальна історія появи SCP.",
         "release_date": "2007 - дотепер",

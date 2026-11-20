@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Horror Hub — варіант C «Аналоговий жах»</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nosifer&amp;family=Unbounded:wght@500;700;900&amp;family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="background: {{t.bg}}; color: {{t.text}}; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.6; min-height: 100%;">
+
+  <div aria-hidden="true" style="background: {{t.strip}}; color: {{t.stripText}}; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px;">
+    <div style="max-width: 1320px; margin: 0 auto; padding: 6px clamp(16px, 3vw, 32px); display: flex; gap: 24px; justify-content: space-between;">
+      <span><span style="color: {{t.accent}};">●</span> REC</span>
+      <span>SP · 153 ЗАПИСИ</span>
+      <span>{{timecode}}</span>
+    </div>
+  </div>
+
+  <header style="position: sticky; top: 0; z-index: 5; background: {{t.bg}}; border-bottom: 2px solid {{t.text}};">
+    <div style="max-width: 1320px; margin: 0 auto; padding: 14px clamp(16px, 3vw, 32px); display: flex; align-items: center; gap: 16px 28px; flex-wrap: wrap;">
+      <a href="#top" style="font-family: 'Nosifer', Impact, sans-serif; font-size: 24px; color: {{t.accent}}; text-decoration: none; white-space: nowrap;">HORROR HUB</a>
+      <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}">
+        <nav aria-label="Головне меню" style="display: flex; gap: 2px 18px; flex-wrap: wrap; flex: 1 1 auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
+          <sc-for list="{{nav}}" as="item" hint-placeholder-count="7">
+            <a href="#top" style="{{item.style}}">{{item.label}}</a>
+          </sc-for>
+        </nav>
+      </sc-if>
+      <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+        <button type="button" aria-label="Пошук по сайту" style="width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid {{t.text}}; background: transparent; color: {{t.text}}; cursor: pointer;">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        </button>
+        <button type="button" role="switch" aria-checked="{{lightChecked}}" onClick="{{toggleTheme}}" aria-label="Світла тема" style="height: 44px; padding: 0 6px; display: inline-flex; align-items: center; gap: 4px; border: 2px solid {{t.text}}; background: transparent; color: {{t.text}}; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; cursor: pointer;">
+          <span style="{{nightStyle}}">НІЧ</span><span style="{{dayStyle}}">ДЕНЬ</span>
+        </button>
+        <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{toggleMenu}}" aria-label="Меню" aria-expanded="{{menuExpanded}}" style="width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid {{t.text}}; background: transparent; color: {{t.text}}; cursor: pointer;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </sc-if>
+      </div>
+    </div>
+    <sc-if value="{{showMenu}}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="Головне меню" style="display: flex; flex-direction: column; padding: 0 16px 16px; font-family: 'Unbounded', sans-serif; font-weight: 700;">
+        <sc-for list="{{nav}}" as="item" hint-placeholder-count="7">
+          <a href="#top" style="min-height: 52px; display: flex; align-items: center; border-bottom: 1px solid {{t.line}}; color: {{t.text}}; text-decoration: none; font-size: 20px;">{{item.label}}</a>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main id="top">
+    <section style="max-width: 1320px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(16px, 3vw, 32px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: clamp(24px, 4vw, 56px); align-items: end;">
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 2px; color: {{t.accent}};">▶ ОБРАНЕ · ПСИХОЛОГІЧНИЙ ЖАХ · 2001</span>
+        <h1 style="margin: 0; font-family: 'Unbounded', 'Arial Black', sans-serif; font-weight: 900; font-size: clamp(44px, 7.4vw, 104px); line-height: 0.92; letter-spacing: -2px; text-transform: uppercase;">Silent Hill 2</h1>
+        <p style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: clamp(18px, 2vw, 24px); line-height: 1.3;">Класичний жах, що заглядає в душу</p>
+        <p style="margin: 0; max-width: 520px; color: {{t.muted}}; font-size: 17px;">Психологічний survival horror, де місто працює як дзеркало провини, втрати й покарання.</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <a href="#top" style="height: 56px; padding: 0 28px; display: inline-flex; align-items: center; gap: 12px; background: {{t.accent}}; color: {{t.onAccent}}; font-family: 'JetBrains Mono', monospace; font-weight: 600; letter-spacing: 1px; text-decoration: none;">▶ ЧИТАТИ · 3 ХВ</a>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: {{t.muted}};">Team Silent</span>
+        </div>
+      </div>
+      <figure style="margin: 0; position: relative; border: 2px solid {{t.text}};">
+        <img src="/_blob/11f667c87dee7f4859f06dc90b515a0c" alt="Обкладинка Silent Hill 2" style="display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; filter: {{t.imgFilter}};">
+        <span aria-hidden="true" style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px); mix-blend-mode: multiply;"></span>
+        <span aria-hidden="true" style="position: absolute; top: 14px; left: 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #f1efe9; text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);">PLAY ▶</span>
+        <span aria-hidden="true" style="position: absolute; bottom: 14px; right: 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #f1efe9; text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);">00:03:00</span>
+      </figure>
+    </section>
+
+    <section aria-labelledby="shelves-c" style="border-top: 2px solid {{t.text}}; border-bottom: 2px solid {{t.text}}; background: {{t.surface}};">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 40px clamp(16px, 3vw, 32px);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+          <h2 id="shelves-c" style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(26px, 3vw, 40px); text-transform: uppercase; letter-spacing: -1px;">Полиця з касетами</h2>
+          <div role="tablist" aria-label="Десятиліття" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <sc-for list="{{decades}}" as="d" hint-placeholder-count="3">
+              <button type="button" role="tab" aria-selected="{{d.selected}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.label}} <span style="opacity: 0.7;">{{d.count}}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: grid; grid-auto-flow: column; grid-auto-columns: minmax(180px, 1fr); gap: 18px; overflow-x: auto; padding-bottom: 8px;">
+          <sc-for list="{{tapes}}" as="tape" hint-placeholder-count="6">
+            <a href="#top" style="display: flex; flex-direction: column; gap: 10px; color: {{t.text}}; text-decoration: none;">
+              <span style="position: relative; display: block; border: 2px solid {{t.text}};">
+                <img src="{{tape.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; filter: {{t.imgFilter}};">
+                <span style="position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 8px; background: {{t.text}}; color: {{t.bg}}; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px;">{{tape.year}} · {{tape.minutes}} ХВ</span>
+              </span>
+              <span style="font-weight: 700; line-height: 1.3;">{{tape.title}}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="beyond-c" style="max-width: 1320px; margin: 0 auto; padding: 48px clamp(16px, 3vw, 32px);">
+      <h2 id="beyond-c" style="margin: 0 0 24px; font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(26px, 3vw, 40px); text-transform: uppercase; letter-spacing: -1px;">Не лише ігри</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 20px;">
+        <a href="#top" style="position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 420px; padding: 28px; border: 2px solid {{t.text}}; color: #f1efe9; text-decoration: none; background: #111 url('/_blob/c625f88c1fb71bf1c93507b61fd8dbf4') center / cover;">
+          <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.85));"></span>
+          <span style="position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; color: #ff6a5c;">ІНТЕРНЕТ-ХОРРОР · 2019</span>
+          <span style="position: relative; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 32px; line-height: 1.1;">Backrooms: офісний лабіринт без виходу</span>
+          <span style="position: relative; color: #d8d5cf;">Лімінальні простори, жовті кімнати, гул ламп і страх випасти з реальності.</span>
+        </a>
+        <div style="display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 20px;">
+          <a href="#top" style="display: flex; gap: 18px; align-items: center; padding: 18px; border: 2px solid {{t.text}}; color: {{t.text}}; text-decoration: none;">
+            <img src="/_blob/1e54a17b0223e18a9c6a4b0311d28b71" alt="" style="width: 150px; aspect-ratio: 3 / 2; object-fit: cover; flex-shrink: 0;">
+            <span style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.accent}};">ІНТЕРАКТИВНЕ ДОСЬЄ</span>
+              <span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 19px; line-height: 1.2;">SCP: хоррор у формі секретного архіву</span>
+            </span>
+          </a>
+          <a href="#top" style="display: flex; gap: 18px; align-items: center; padding: 18px; border: 2px solid {{t.text}}; color: {{t.text}}; text-decoration: none;">
+            <img src="/_blob/c211b52ab658d9a111b381a2421ef1cf" alt="" style="width: 150px; aspect-ratio: 3 / 2; object-fit: cover; flex-shrink: 0; filter: {{t.imgFilter}};">
+            <span style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.accent}};">ОГЛЯД ФІЛЬМУ · 2018</span>
+              <span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 19px; line-height: 1.2;">«Спадковість»: сімейна трагедія як окультна пастка</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section style="background: {{t.band}}; color: {{t.bandText}};">
+      <div style="max-width: 1320px; margin: 0 auto; padding: 48px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between;">
+        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 720px;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 2px; color: {{t.bandAccent}};">ІГРОВА КІМНАТА</span>
+          <span style="font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(26px, 3.4vw, 44px); line-height: 1.05; text-transform: uppercase;">Підвал під сценою. Темний лабіринт.</span>
+          <span style="opacity: 0.8;">Текстовий квест і лабіринт із ліхтариком — прямо в браузері.</span>
+        </div>
+        <a href="#top" style="height: 60px; padding: 0 34px; display: inline-flex; align-items: center; background: {{t.bandAccent}}; color: {{t.band}}; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 16px; letter-spacing: 2px; text-decoration: none;">▶ ГРАТИ</a>
+      </div>
+    </section>
+  </main>
+
+  <footer style="max-width: 1320px; margin: 0 auto; padding: 36px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: {{t.muted}};">
+    <span style="font-family: 'Nosifer', Impact, sans-serif; font-size: 18px; color: {{t.accent}};">HORROR HUB</span>
+    <nav aria-label="Службові сторінки" style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <a href="#top" style="color: {{t.muted}};">Контакти</a>
+      <a href="#top" style="color: {{t.muted}};">Конфіденційність</a>
+      <a href="https://t.me/moyi_statti" style="color: {{t.muted}};">Telegram</a>
+    </nav>
+    <span>© 2026 · STOP ■</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"compact":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: null, menuOpen: false, decade: '2000-ні' };
+  }
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'dark';
+    const dark = theme === 'dark';
+    const compact = Boolean(this.props.compact);
+    const t = dark ? {
+      bg: '#0a0a0a', surface: '#121212', line: '#2b2b2b', text: '#f1efe9', muted: '#a5a29b',
+      accent: '#ff4a3a', onAccent: '#0a0a0a', strip: '#000000', stripText: '#a5a29b',
+      band: '#f1efe9', bandText: '#0a0a0a', bandAccent: '#0a0a0a',
+      imgFilter: 'contrast(1.1) saturate(0.85)'
+    } : {
+      bg: '#ecebe5', surface: '#e2e0d8', line: '#c9c6bb', text: '#111111', muted: '#55534c',
+      accent: '#c8261a', onAccent: '#ffffff', strip: '#111111', stripText: '#cfccc2',
+      band: '#111111', bandText: '#ecebe5', bandAccent: '#ff5a4a',
+      imgFilter: 'contrast(1.05) saturate(0.75) brightness(1.04)'
+    };
+    const navLabels = ['Ігри', 'Кіно', 'Огляди', 'Статті', 'Інтернет-хоррор', 'Культура', 'Ігрова кімната'];
+    const nav = navLabels.map((label, i) => ({
+      label,
+      style: `padding: 10px 0; text-decoration: none; color: ${i === 0 ? t.text : t.muted}; ${i === 0 ? `box-shadow: inset 0 -3px 0 ${t.accent};` : ''}`
+    }));
+    const shelves = {
+      '1990-ті': [
+        { title: 'Alone in the Dark: перший справжній жах у 3D', img: '/_blob/0b5eae591cf31bd766362e87ae783d54', year: '1992', minutes: 4 },
+        { title: 'Clock Tower (1995): натхненна Ардженто', img: '/_blob/667789810392b4662f672d7bf46c165e', year: '1995', minutes: 3 },
+        { title: 'Resident Evil (1996): народження survival horror', img: '/_blob/1ae692c0f8715468898de360d10cb995', year: '1996', minutes: 4 },
+        { title: 'System Shock 2: космічний кошмар', img: '/_blob/fa832861dc484b44410f28d1e24b7fda', year: '1999', minutes: 4 },
+        { title: 'Koudelka: темна симфонія хоррору та RPG', img: '/_blob/ad897575e2755701c5821671ce12fa57', year: '1999', minutes: 3 }
+      ],
+      '2000-ні': [
+        { title: 'Fatal Frame: японський хоррор крізь об’єктив', img: '/_blob/56a66e5aeda05dd0dcce3dea35cfb084', year: '2001', minutes: 3 },
+        { title: 'Eternal Darkness: Sanity’s Requiem', img: '/_blob/64b3d035533e885927eeabbbbd712be3', year: '2002', minutes: 5 },
+        { title: 'Yume Nikki: мандрівка світом снів', img: '/_blob/3a8b12c4440cd3595e3486639e649ed6', year: '2004', minutes: 7 },
+        { title: 'Haunting Ground: дівчина, пес і замок', img: '/_blob/d396291ebf90a07672b7ce175c3fc5e7', year: '2005', minutes: 4 },
+        { title: 'Penumbra: Overture — фізика страху', img: '/_blob/9aee2c792cd4abd9a18155e0604f40d8', year: '2007', minutes: 6 }
+      ]
+    };
+    const counts = { '1990-ті': 48, '2000-ні': 76 };
+    const decades = Object.keys(shelves).map((label) => {
+      const on = this.state.decade === label;
+      return {
+        label, count: counts[label], selected: String(on),
+        pick: () => this.setState({ decade: label }),
+        style: `height: 44px; padding: 0 16px; border: 2px solid ${t.text}; background: ${on ? t.text : 'transparent'}; color: ${on ? t.bg : t.text}; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; cursor: pointer;`
+      };
+    });
+    const pill = (on) => `padding: 6px 10px; background: ${on ? t.text : 'transparent'}; color: ${on ? t.bg : t.text};`;
+    return {
+      t, nav, decades, compact,
+      tapes: shelves[this.state.decade],
+      timecode: dark ? '23:59:59' : '12:00:00',
+      nightStyle: pill(dark), dayStyle: pill(!dark),
+      lightChecked: String(!dark),
+      toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' }),
+      showFullNav: !compact,
+      showMenu: compact && this.state.menuOpen,
+      menuExpanded: String(this.state.menuOpen),
+      toggleMenu: () => this.setState({ menuOpen: !this.state.menuOpen })
+    };
+  }
+}
+</script>
+</body>
+</html>

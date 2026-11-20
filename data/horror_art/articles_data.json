@@ -15,7 +15,7 @@
     },
     {
         "url": "local://horror_art/interactive-horror-art",
-        "imageUrl": "images/article1-preview.png",
+        "imageUrl": "images/covers/local-b9f8fdb4bafc3b.webp",
         "title": "Коли картина стає кімнатою: інтерактивний жах",
         "previewText": "Про композицію, світло, камеру й те, як хоррор-ігри перетворюють глядача на учасника образу.",
         "release_date": "1990-ті - 2020-ті",
@@ -25,6 +25,7 @@
         "sectionLabel": "Жах у мистецтві",
         "id": 2,
         "localId": "horror_art:interactive-horror-art",
-        "contentPath": "content/horror_art/interactive-horror-art.html"
+        "contentPath": "content/horror_art/interactive-horror-art.html",
+        "imageSource": "images/article1-preview.png"
     }
 ]

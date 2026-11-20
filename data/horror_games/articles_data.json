@@ -1,7 +1,7 @@
 [
     {
         "url": "https://telegra.ph/Silent-Hill-2-Klasichnij-zhah-shcho-zaglyadaye-v-dushu-11-25",
-        "imageUrl": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2vyg.jpg",
+        "imageUrl": "images/covers/f2e102e84454df43f6fc.webp",
         "title": "Silent Hill 2: Класичний жах, що заглядає в душу",
         "previewText": "Психологічний survival horror, де місто працює як дзеркало провини, втрати й покарання.",
         "release_date": "2001",
@@ -9,11 +9,12 @@
         "genre": "Survival horror, psychological",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 1
+        "id": 1,
+        "imageSource": "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2vyg.jpg"
     },
     {
         "url": "https://telegra.ph/Resident-Evil-1996-Gra-shcho-dala-zhittya-zhanru-vizhivannya-v-horror%D1%96-11-17",
-        "imageUrl": "https://www.imfdb.org/images/thumb/e/e1/Residentevilps1.jpg/300px-Residentevilps1.jpg",
+        "imageUrl": "images/covers/7fcdb4070cbd13682523.webp",
         "title": "Resident Evil (1996): гра, що дала життя survival horror",
         "previewText": "Особняк, обмежені ресурси, зомбі й дизайн, який заклав мову класичного хоррору на виживання.",
         "release_date": "1996",
@@ -21,11 +22,12 @@
         "genre": "Survival horror",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 2
+        "id": 2,
+        "imageSource": "https://www.imfdb.org/images/thumb/e/e1/Residentevilps1.jpg/300px-Residentevilps1.jpg"
     },
     {
         "url": "https://telegra.ph/Clock-Tower-1995-Klasika-horror-%D1%96gor-nathnenna-Ardzhento-11-15",
-        "imageUrl": "https://m.media-amazon.com/images/M/MV5BMTg2MjljMGYtZWY1My00OTg4LThlNDMtN2JiZmVlYjMwYzE0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+        "imageUrl": "images/covers/4c21b99b1148758d3113.webp",
         "title": "Clock Tower (1995): класика, натхненна Ардженто",
         "previewText": "Беззахисність, переслідування й Scissorman як ранній урок того, що втеча теж може бути механікою страху.",
         "release_date": "1995",
@@ -33,11 +35,12 @@
         "genre": "Survival horror, point-and-click",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 3
+        "id": 3,
+        "imageSource": "https://m.media-amazon.com/images/M/MV5BMTg2MjljMGYtZWY1My00OTg4LThlNDMtN2JiZmVlYjMwYzE0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
     },
     {
         "url": "https://telegra.ph/Fatal-Frame-Project-Zero-Klasika-yaponskogo-hororu-u-sv%D1%96t%D1%96-v%D1%96deo%D1%96gor-11-18",
-        "imageUrl": "https://images.igdb.com/igdb/image/upload/t_1080p/co7nlq.jpg",
+        "imageUrl": "images/covers/0dd65efb44c463c6edad.webp",
         "title": "Fatal Frame: японський хоррор крізь об'єктив камери",
         "previewText": "Гра, де фотографія стає зброєю, а кожен кадр змушує дивитися просто в обличчя привиду.",
         "release_date": "2001",
@@ -45,11 +48,12 @@
         "genre": "Survival horror",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 4
+        "id": 4,
+        "imageSource": "https://images.igdb.com/igdb/image/upload/t_1080p/co7nlq.jpg"
     },
     {
         "url": "https://telegra.ph/System-Shock-2-Kosm%D1%96chnij-koshmar-01-31",
-        "imageUrl": "https://cdn.mos.cms.futurecdn.net/yWwQFwFyL9qThw6nTeoi5D.jpg",
+        "imageUrl": "images/covers/8649cc92f1dff79557e5.webp",
         "title": "System Shock 2: космічний кошмар",
         "previewText": "Survival horror, RPG і immersive sim в одній холодній станції, де правила системи лякають не менше за ворогів.",
         "release_date": "1999",
@@ -57,11 +61,12 @@
         "genre": "Action RPG, immersive sim",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 5
+        "id": 5,
+        "imageSource": "https://cdn.mos.cms.futurecdn.net/yWwQFwFyL9qThw6nTeoi5D.jpg"
     },
     {
         "url": "https://telegra.ph/Yume-Nikki2004-Mandr%D1%96vka-po-Sv%D1%96tu-Sn%D1%96v-%D1%96-Tayemnic-03-08",
-        "imageUrl": "https://i.ytimg.com/vi/KU3HF1y2ZgE/maxresdefault.jpg",
+        "imageUrl": "images/covers/8723c1331f5048bcc809.webp",
         "title": "Yume Nikki: мандрівка світом снів і таємниць",
         "previewText": "Сновидна інді-легенда, де страх народжується з тиші, дивних кімнат і відсутності пояснень.",
         "release_date": "2004",
@@ -69,6 +74,7 @@
         "genre": "Adventure, psychological horror",
         "section": "horror_games",
         "sectionLabel": "Ігри Жахів",
-        "id": 6
+        "id": 6,
+        "imageSource": "https://i.ytimg.com/vi/KU3HF1y2ZgE/maxresdefault.jpg"
     }
 ]

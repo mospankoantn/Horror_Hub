@@ -8,10 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!profileInfo || !profileForm || !avatarInput || !profileMessage) return;
 
   try {
-    const response = await fetch('api_auth.php?action=status', {
-      headers: { Accept: 'application/json' }
-    });
-    const auth = await response.json();
+    const auth = await HorrorHub.status();
 
     if (!auth.logged_in || !auth.user) {
       window.location.href = 'login.html';
@@ -35,16 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formData = new FormData(profileForm);
       formData.append('action', 'update_profile');
 
-      const response = await fetch('api_auth.php', {
-        method: 'POST',
-        body: formData,
-        headers: { Accept: 'application/json' }
-      });
-      const result = await response.json();
-
-      if (!response.ok || result.status !== 'success') {
-        throw new Error(result.message || 'Не вдалося зберегти зміни.');
-      }
+      const result = await HorrorHub.post('api_auth.php', formData);
 
       showProfileMessage(result.message, 'success');
       window.setTimeout(() => window.location.reload(), 900);

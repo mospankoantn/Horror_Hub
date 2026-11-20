@@ -1,25 +1,110 @@
+window.HorrorHub = (() => {
+  let statusRequest;
+  async function request(url, options = {}) {
+    const response = await fetch(url, {
+      ...options, credentials: 'same-origin',
+      headers: { Accept: 'application/json', ...options.headers }
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data || data.status === 'error') {
+      throw new Error(data?.message || 'Не вдалося зв’язатися із сервером.');
+    }
+    return data;
+  }
+  function status(refresh = false) {
+    if (refresh || !statusRequest) {
+      statusRequest = request('api_auth.php?action=status').catch((error) => {
+        statusRequest = null;
+        throw error;
+      });
+    }
+    return statusRequest;
+  }
+  async function post(url, body) {
+    const auth = await status();
+    const data = await request(url, {
+      method: 'POST', body, headers: { 'X-CSRF-Token': auth.csrf_token }
+    });
+    if (data.status !== 'success') throw new Error('Некоректна відповідь сервера. Спробуйте ще раз.');
+    if (url === 'api_auth.php') statusRequest = null;
+    return data;
+  }
+  return { request, status, post };
+})();
+
 document.addEventListener('DOMContentLoaded', async () => {
-  ensureSiteNavigation();
+  setupHeader();
+  addSkipLink();
 
   const userMenu = document.getElementById('user-menu');
   if (!userMenu) return;
-
   userMenu.classList.add('user-menu');
 
   try {
-    const response = await fetch('api_auth.php?action=status', {
-      headers: { Accept: 'application/json' }
-    });
-    const data = await response.json();
-
-    if (data.logged_in && data.user) {
-      renderUserMenu(data.user);
-    } else {
-      renderGuestMenu();
-    }
+    const data = await HorrorHub.status();
+    if (data.logged_in && data.user) renderUserMenu(data.user);
+    else renderGuestMenu();
   } catch (error) {
     console.error('Auth error:', error);
     renderGuestMenu();
+  }
+
+  // Theme switch, section menu on phones and the "/" search shortcut (markup: includes/layout.php).
+  function setupHeader() {
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+
+    const themeButton = header.querySelector('.theme-toggle');
+    const updateThemeButton = () => {
+      const light = document.documentElement.dataset.theme === 'light';
+      themeButton?.setAttribute('aria-label', light ? 'Увімкнути темну тему' : 'Увімкнути світлу тему');
+      themeButton?.setAttribute('title', light ? 'Темна тема' : 'Світла тема');
+    };
+    updateThemeButton();
+    themeButton?.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('hh-theme', next); } catch (error) { /* storage blocked */ }
+      updateThemeButton();
+    });
+
+    const navToggle = header.querySelector('.nav-toggle');
+    const setOpen = (open) => {
+      header.classList.toggle('is-open', open);
+      navToggle?.setAttribute('aria-expanded', String(open));
+    };
+    navToggle?.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
+    header.querySelector('.site-nav')?.addEventListener('click', (event) => {
+      if (event.target.closest('a')) setOpen(false);
+    });
+    window.matchMedia('(min-width: 769px)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+
+    const search = document.getElementById('searchInput');
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.classList.contains('is-open')) {
+        setOpen(false);
+        navToggle?.focus();
+        return;
+      }
+      const typing = event.target.closest?.('input, textarea, select, [contenteditable="true"]');
+      if (event.key === '/' && !typing && !event.ctrlKey && !event.metaKey && !event.altKey && search) {
+        event.preventDefault();
+        search.focus();
+      }
+    });
+  }
+
+  function addSkipLink() {
+    const main = document.querySelector('main');
+    if (!main) return;
+    main.id ||= 'main-content';
+    const skip = document.createElement('a');
+    skip.className = 'skip-link';
+    skip.href = '#' + main.id;
+    skip.textContent = 'До основного вмісту';
+    document.body.prepend(skip);
   }
 
   function renderUserMenu(user) {
@@ -37,11 +122,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const name = document.createElement('span');
     name.textContent = user.username || 'Профіль';
-
     profileLink.append(avatar, name);
 
     const items = [profileLink];
-
     if (user.role === 'admin') {
       const adminLink = document.createElement('a');
       adminLink.href = 'admin/admin.php';
@@ -50,21 +133,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       items.push(adminLink);
     }
 
-    const logoutLink = document.createElement('a');
-    logoutLink.href = '#';
-    logoutLink.className = 'user-menu__logout';
-    logoutLink.textContent = 'Вийти';
-    logoutLink.addEventListener('click', async (event) => {
-      event.preventDefault();
-      await fetch('api_auth.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'action=logout'
-      });
-      window.location.reload();
+    const logoutButton = document.createElement('button');
+    logoutButton.type = 'button';
+    logoutButton.className = 'user-menu__logout';
+    logoutButton.textContent = 'Вийти';
+    logoutButton.addEventListener('click', async () => {
+      logoutButton.disabled = true;
+      try {
+        await HorrorHub.post('api_auth.php', new URLSearchParams({ action: 'logout' }));
+        window.location.reload();
+      } catch (error) {
+        logoutButton.textContent = error.message;
+        logoutButton.disabled = false;
+      }
     });
-    items.push(logoutLink);
-
+    items.push(logoutButton);
     userMenu.replaceChildren(...items);
   }
 
@@ -72,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loginLink = document.createElement('a');
     loginLink.href = 'login.html';
     loginLink.className = 'user-menu__login';
-    loginLink.textContent = 'Увійти / Реєстрація';
+    loginLink.textContent = 'Увійти';
     userMenu.replaceChildren(loginLink);
   }
 
@@ -83,67 +166,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
       return 'images/default_avatar.png';
     }
-  }
-
-  function ensureSiteNavigation() {
-    const navigationItems = [
-      { href: 'index.html', label: 'Головна' },
-      { href: 'horror_games.html', label: 'Ігри Жахів' },
-      { href: 'horror_movies.html', label: 'Фільми Жахів' },
-      { href: 'reviews.html', label: 'Огляди' },
-      { href: 'articles.html', label: 'Статті' },
-      { href: 'internet_horror.html', label: 'Інтернет Хоррор' },
-      { href: 'horror_art.html', label: 'Мистецтво' },
-      { href: 'horror_literature.html', label: 'Література' },
-      { href: 'game.html', label: 'Ігрова Кімната' },
-      { href: 'contact.html', label: 'Контакти' }
-    ];
-
-    const currentPage = getCurrentPageName();
-
-    document.querySelectorAll('nav').forEach((nav) => {
-      const userMenuNode = nav.querySelector('#user-menu');
-      const telegramLink = nav.querySelector('a.tg-link');
-      const existingLinks = new Map(
-        Array.from(nav.querySelectorAll('a[href]')).map((link) => [normalizeHref(link.getAttribute('href')), link])
-      );
-
-      let insertBeforeNode = telegramLink || userMenuNode || null;
-
-      navigationItems.forEach((item) => {
-        const normalizedHref = normalizeHref(item.href);
-        let link = existingLinks.get(normalizedHref);
-
-        if (!link) {
-          link = document.createElement('a');
-          link.href = item.href;
-          link.textContent = item.label;
-          nav.insertBefore(link, insertBeforeNode);
-          existingLinks.set(normalizedHref, link);
-        }
-
-        link.classList.toggle('active', normalizedHref === currentPage || (currentPage === 'article.html' && normalizedHref === 'articles.html'));
-      });
-
-      const desiredOrder = navigationItems
-        .map((item) => existingLinks.get(normalizeHref(item.href)))
-        .filter(Boolean);
-
-      desiredOrder.forEach((link) => {
-        nav.insertBefore(link, insertBeforeNode);
-      });
-    });
-  }
-
-  function getCurrentPageName() {
-    const path = window.location.pathname.split('/').pop() || 'index.html';
-    return normalizeHref(path);
-  }
-
-  function normalizeHref(href) {
-    return String(href || '')
-      .split('#')[0]
-      .split('?')[0]
-      .replace(/^\.?\//, '');
   }
 });

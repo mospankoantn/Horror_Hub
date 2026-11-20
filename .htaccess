@@ -1,12 +1,34 @@
-# 1. Забороняємо серверу показувати список файлів у цій папці (щоб ніхто не бачив, що там лежить)
 Options -Indexes
-
-# 2. Дозволяємо доступ до файлу admin.php (щоб ви могли ввести пароль)
-<Files "admin.php">
-    Require all granted
-</Files>
-
-# 3. Забороняємо доступ до самого файлу .htaccess хакерам
-<FilesMatch "^\.ht">
+# Missing addresses are rewritten to 404.php below, which works in a subfolder too.
+# ErrorDocument is only the fallback for servers without mod_rewrite (site at the domain root).
+ErrorDocument 404 /404.php
+<FilesMatch "(?i)(^\.|^(db|router|bootstrap|headers|env|site_builder)\.php$|\.(env|log|jsonl|sql|ini|toml|md|cmd|bat|ps1|bak)$|^(?!robots\.txt$).*\.txt$)">
     Require all denied
 </FilesMatch>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)(\.|includes/|dev/|scripts/|tests/|storage/|messages/|database/|node_modules/|vendor/|Мусор/) - [F,NC]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    RewriteRule ^robots\.txt$ robots.php [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ 404.php [L]
+</IfModule>
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/x-icon "access plus 30 days"
+</IfModule>
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    # Raw article sources duplicate the static pages in /statti/: keep them out of search results.
+    <If "%{REQUEST_URI} =~ m#/(articles|content)/#">
+        Header always set X-Robots-Tag "noindex"
+    </If>
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: http: data:; connect-src 'self' https://api.telegra.ph; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+</IfModule>

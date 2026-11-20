@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Horror Hub — варіант D: навігація B, кольори A, підтеми розділів</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nosifer&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="background: {{t.bg}}; color: {{t.text}}; font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100%;">
+
+  <header style="position: sticky; top: 0; z-index: 5; background: {{t.header}}; border-bottom: 1px solid {{t.line}}; backdrop-filter: blur(12px);">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 12px clamp(16px, 3vw, 28px); display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap;">
+      <a href="#top" onClick="{{goHome}}" style="display: flex; align-items: baseline; gap: 10px; text-decoration: none; white-space: nowrap;">
+        <span style="font-family: 'Nosifer', Impact, sans-serif; font-size: 21px; color: {{t.accentText}};">HORROR HUB</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{sec.accent}};">{{sec.badge}}</span>
+      </a>
+      <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}">
+        <label style="flex: 1 1 340px; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 999px; border: 1px solid {{t.field}}; background: {{t.surface}};">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: {{t.muted}}; flex-shrink: 0;"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);">{{sec.searchLabel}}</span>
+          <input type="search" placeholder="{{sec.placeholder}}" style="flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; color: {{t.text}}; font: inherit; font-size: 15px;">
+          <kbd style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 2px 7px; border-radius: 4px; border: 1px solid {{t.line}}; color: {{t.muted}};">/</kbd>
+        </label>
+      </sc-if>
+      <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+        <button type="button" onClick="{{toggleTheme}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1px solid {{t.line}}; background: transparent; color: {{t.text}}; cursor: pointer;">
+          <sc-if value="{{isDark}}" hint-placeholder-val="{{ true }}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          </sc-if>
+          <sc-if value="{{isLight}}" hint-placeholder-val="{{ false }}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"></path></svg>
+          </sc-if>
+        </button>
+        <sc-if value="{{showFullNav}}" hint-placeholder-val="{{ true }}">
+          <a href="#top" style="height: 44px; padding: 0 18px; display: inline-flex; align-items: center; border-radius: 999px; background: {{t.accent}}; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none;">Увійти</a>
+        </sc-if>
+        <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{toggleMenu}}" aria-label="Розділи" aria-expanded="{{menuExpanded}}" style="width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1px solid {{t.line}}; background: transparent; color: {{t.text}}; cursor: pointer;">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 0 16px 12px;">
+        <label style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 999px; border: 1px solid {{t.field}}; background: {{t.surface}};">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: {{t.muted}};"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);">{{sec.searchLabel}}</span>
+          <input type="search" placeholder="{{sec.placeholder}}" style="flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; color: {{t.text}}; font: inherit; font-size: 15px;">
+        </label>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showTabs}}" hint-placeholder-val="{{ true }}">
+      <nav aria-label="Розділи" style="{{tabsStyle}}">
+        <sc-for list="{{tabs}}" as="tab" hint-placeholder-count="7">
+          <a href="#top" onClick="{{tab.go}}" aria-current="{{tab.current}}" style="{{tab.style}}">{{tab.label}}</a>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main id="top">
+    <section style="position: relative; overflow: hidden; border-bottom: 1px solid {{t.line}}; background: {{sec.heroBg}};">
+      <sc-if value="{{isMovies}}" hint-placeholder-val="{{ false }}">
+        <div aria-hidden="true" style="height: 22px; background: {{filmStrip}};"></div>
+      </sc-if>
+      <div style="max-width: 1280px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(16px, 3vw, 28px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: clamp(24px, 4vw, 56px); align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 2px; color: {{sec.accent}};">{{sec.kicker}}</span>
+          <h1 style="{{sec.titleStyle}}">{{sec.title}}</h1>
+          <p style="margin: 0; max-width: 560px; font-size: 18px; color: {{t.muted}}; text-wrap: pretty;">{{sec.lead}}</p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+            <sc-for list="{{sec.quick}}" as="q" hint-placeholder-count="4">
+              <a href="#results" style="height: 40px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.text}}; font-size: 14px; font-weight: 600; text-decoration: none;">{{q}}</a>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+            <sc-for list="{{mosaic}}" as="m" hint-placeholder-count="4">
+              <a href="#top" onClick="{{m.go}}" style="position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; min-height: 190px; padding: 16px; border-radius: 6px; overflow: hidden; border: 1px solid {{t.line}}; background: {{m.bg}}; color: #f3ede4; text-decoration: none;">
+                <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10, 8, 8, 0) 30%, rgba(10, 8, 8, 0.9));"></span>
+                <span style="position: relative; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 2px; color: {{m.accent}};">{{m.label}}</span>
+                <span style="position: relative; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 700; line-height: 1.1;">{{m.title}}</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMovies}}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 12px; background: {{t.filmBase}}; border-radius: 4px;">
+            <sc-for list="{{posters}}" as="p" hint-placeholder-count="4">
+              <figure style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+                <img src="{{p.img}}" alt="{{p.alt}}" style="width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 2px; filter: {{t.imgFilter}};">
+                <figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #d8cfc2;">{{p.caption}}</figcaption>
+              </figure>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isGames}}" hint-placeholder-val="{{ false }}">
+          <figure style="margin: 0; position: relative; padding: 14px; border-radius: 22px; background: {{t.crtFrame}}; box-shadow: inset 0 0 0 1px {{t.line}};">
+            <img src="/_blob/11f667c87dee7f4859f06dc90b515a0c" alt="Silent Hill 2" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; filter: contrast(1.08) saturate(0.85);">
+            <span aria-hidden="true" style="position: absolute; inset: 14px; border-radius: 14px; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px); box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.7);"></span>
+            <figcaption style="position: absolute; left: 30px; bottom: 28px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 3px; color: #b8ecf5; text-shadow: 0 0 8px rgba(124, 192, 207, 0.9);">SILENT HILL 2 · 2001</figcaption>
+          </figure>
+        </sc-if>
+
+        <sc-if value="{{isInternet}}" hint-placeholder-val="{{ false }}">
+          <figure style="margin: 0; position: relative;">
+            <img src="/_blob/c625f88c1fb71bf1c93507b61fd8dbf4" alt="Жовті кімнати Backrooms" style="display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 2px; box-shadow: -6px 0 0 rgba(226, 80, 80, 0.55), 6px 0 0 rgba(90, 200, 220, 0.45);">
+            <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 38%; height: 14px; background: rgba(226, 214, 92, 0.28); mix-blend-mode: screen;"></span>
+            <figcaption style="margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{sec.accent}};">&gt; backrooms / level 0 — гул ламп, жовті шпалери, нескінченність_</figcaption>
+          </figure>
+        </sc-if>
+
+        <sc-if value="{{isCulture}}" hint-placeholder-val="{{ false }}">
+          <blockquote style="margin: 0; padding: clamp(24px, 4vw, 44px); border: 1px solid {{t.line}}; background: {{t.surface}}; display: flex; flex-direction: column; gap: 18px;">
+            <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.2;"><span style="float: left; font-size: 3.2em; line-height: 0.8; padding: 6px 10px 0 0; font-style: normal; color: {{sec.accent}};">Н</span>айдавніша й найсильніша емоція людства — страх, а найдавніший і найсильніший його різновид — страх невідомого.</p>
+            <footer style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 1px; color: {{t.muted}};">— Г. Ф. ЛАВКРАФТ, «НАДПРИРОДНИЙ ЖАХ У ЛІТЕРАТУРІ», 1927</footer>
+          </blockquote>
+        </sc-if>
+      </div>
+      <sc-if value="{{isMovies}}" hint-placeholder-val="{{ false }}">
+        <div aria-hidden="true" style="height: 22px; background: {{filmStrip}};"></div>
+      </sc-if>
+    </section>
+
+    <div id="results" style="max-width: 1280px; margin: 0 auto; padding: 28px clamp(16px, 3vw, 28px) 64px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start;">
+
+      <sc-if value="{{compact}}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{toggleFilters}}" aria-expanded="{{filtersExpanded}}" style="flex: 1 1 100%; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-radius: 999px; border: 1px solid {{t.field}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-weight: 600; cursor: pointer;">Фільтри<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{t.muted}};">{{sec.found}}</span></button>
+      </sc-if>
+
+      <sc-if value="{{showSidebar}}" hint-placeholder-val="{{ true }}">
+        <aside aria-label="Фільтри" style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 24px;">
+          <sc-for list="{{facets}}" as="f" hint-placeholder-count="2">
+            <div role="group" aria-label="{{f.title}}" style="display: flex; flex-direction: column; gap: 10px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.muted}};">{{f.title}}</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <sc-for list="{{f.items}}" as="o" hint-placeholder-count="4">
+                  <button type="button" onClick="{{o.toggle}}" aria-pressed="{{o.pressed}}" style="{{o.style}}">{{o.label}}<sc-if value="{{o.hasCount}}" hint-placeholder-val="{{ false }}"><span style="opacity: 0.7; font-family: 'IBM Plex Mono', monospace; font-size: 12px;">{{o.count}}</span></sc-if></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <a href="#top" style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 6px; border: 1px dashed {{t.field}}; color: {{t.text}}; text-decoration: none;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 2px; color: {{t.accentText}};">ІГРОВА КІМНАТА</span>
+            <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 700; line-height: 1.15;">Квест «Підвал під сценою» і Темний лабіринт</span>
+            <span style="font-size: 14px; color: {{t.muted}};">Грати в браузері →</span>
+          </a>
+        </aside>
+      </sc-if>
+
+      <section aria-labelledby="found-d" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 1px solid {{t.line}};">
+          <h2 id="found-d" style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; letter-spacing: 1px;">{{sec.found}}</h2>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: {{t.muted}};">Сортувати
+              <select style="height: 40px; padding: 0 10px; border-radius: 999px; border: 1px solid {{t.field}}; background: {{t.surface}}; color: {{t.text}}; font: inherit; font-size: 14px;">
+                <option>Спочатку нові</option>
+                <option>Рік: старіші спершу</option>
+                <option>Рік: новіші спершу</option>
+              </select>
+            </label>
+            <div role="group" aria-label="Вигляд" style="display: flex; border: 1px solid {{t.field}}; border-radius: 999px; overflow: hidden;">
+              <button type="button" onClick="{{showList}}" aria-pressed="{{listPressed}}" style="{{listBtn}}">Список</button>
+              <button type="button" onClick="{{showCards}}" aria-pressed="{{cardsPressed}}" style="{{cardsBtn}}">Картки</button>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+          <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column;">
+            <sc-for list="{{items}}" as="a" hint-placeholder-count="6">
+              <li style="border-bottom: 1px solid {{t.line}};">
+                <a href="#top" style="display: flex; gap: 18px; align-items: center; padding: 14px 4px; color: {{t.text}}; text-decoration: none;">
+                  <sc-if value="{{a.hasImg}}" hint-placeholder-val="{{ true }}">
+                    <img src="{{a.img}}" alt="" style="{{a.thumbStyle}}">
+                  </sc-if>
+                  <sc-if value="{{a.noImg}}" hint-placeholder-val="{{ false }}">
+                    <span aria-hidden="true" style="width: 112px; height: 76px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid {{t.line}}; background: {{t.surface}}; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 44px; font-weight: 700; color: {{a.accent}};">{{a.initial}}</span>
+                  </sc-if>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{a.accent}};">{{a.kind}} · {{a.meta}}</span>
+                    <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 23px; font-weight: 700; line-height: 1.15;">{{a.title}}</span>
+                    <span style="font-size: 14px; color: {{t.muted}}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{a.preview}}</span>
+                  </span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{t.muted}}; white-space: nowrap;">{{a.minutes}} хв</span>
+                </a>
+              </li>
+            </sc-for>
+          </ol>
+        </sc-if>
+
+        <sc-if value="{{isCards}}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 18px;">
+            <sc-for list="{{items}}" as="a" hint-placeholder-count="6">
+              <a href="#top" style="display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 6px; border: 1px solid {{t.line}}; background: {{t.surface}}; color: {{t.text}}; text-decoration: none;">
+                <sc-if value="{{a.hasImg}}" hint-placeholder-val="{{ true }}">
+                  <img src="{{a.img}}" alt="" style="{{a.cardImgStyle}}">
+                </sc-if>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{a.accent}};">{{a.kind}} · {{a.meta}}</span>
+                <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px; font-weight: 700; line-height: 1.15;">{{a.title}}</span>
+                <sc-if value="{{a.noImg}}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 14px; color: {{t.muted}};">{{a.preview}}</span>
+                </sc-if>
+              </a>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </main>
+
+  <footer style="border-top: 1px solid {{t.line}}; background: {{t.bg2}};">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 44px clamp(16px, 3vw, 28px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 28px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'Nosifer', Impact, sans-serif; font-size: 20px; color: {{t.accentText}};">HORROR HUB</span>
+        <span style="font-size: 14px; color: {{t.muted}};">Україномовний провідник у темряву: кіно, ігри, мережеві легенди й культура жаху.</span>
+      </div>
+      <nav aria-label="Розділи в підвалі" style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+        <span style="font-weight: 700;">Розділи</span>
+        <sc-for list="{{tabs}}" as="tab" hint-placeholder-count="7">
+          <a href="#top" onClick="{{tab.go}}" style="color: {{t.muted}}; text-decoration: none;">{{tab.label}}</a>
+        </sc-for>
+      </nav>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+        <span style="font-weight: 700;">Сайт</span>
+        <a href="#top" style="color: {{t.muted}}; text-decoration: none;">Контакти</a>
+        <a href="#top" style="color: {{t.muted}}; text-decoration: none;">Конфіденційність</a>
+        <a href="https://t.me/moyi_statti" style="color: {{t.muted}}; text-decoration: none;">Telegram-канал</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"section":{"editor":"enum","options":["home","movies","games","internet","culture"],"default":"home"},"compact":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: null, section: null, menuOpen: false, filtersOpen: false, view: 'list', picked: {} };
+  }
+  renderVals() {
+    const theme = this.state.theme || this.props.theme || 'dark';
+    const dark = theme === 'dark';
+    const compact = Boolean(this.props.compact);
+    const key = this.state.section || this.props.section || 'home';
+    const t = dark ? {
+      bg: '#0c0a0a', bg2: '#100d0d', surface: '#171213', line: '#2e2425', field: '#4d3f3f', header: 'rgba(12, 10, 10, 0.9)',
+      text: '#ece6dd', muted: '#a9a198', accent: '#b3202a', accentText: '#f07a70',
+      filmBase: '#050404', crtFrame: '#1d1a1a', imgFilter: 'saturate(0.85) contrast(1.05)', holes: '#f3ede4'
+    } : {
+      bg: '#f3ede4', bg2: '#ebe3d7', surface: '#fbf8f2', line: '#d8cdbd', field: '#a89a87', header: 'rgba(243, 237, 228, 0.92)',
+      text: '#1d1716', muted: '#5d534c', accent: '#9c1c24', accentText: '#9c1c24',
+      filmBase: '#1d1716', crtFrame: '#2a2524', imgFilter: 'sepia(0.12) saturate(0.9)', holes: '#f3ede4'
+    };
+    const tone = {
+      home: dark ? '#f07a70' : '#9c1c24',
+      movies: dark ? '#e3ad57' : '#7d520f',
+      games: dark ? '#7cc0cf' : '#1d5a68',
+      internet: dark ? '#e2d65c' : '#625b0c',
+      culture: dark ? '#d2b07a' : '#74531c',
+      reviews: dark ? '#f07a70' : '#9c1c24'
+    };
+    const bg = t.bg;
+    const serifTitle = "margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700; font-size: clamp(40px, 5.4vw, 72px); line-height: 1; letter-spacing: -0.5px; text-wrap: balance;";
+    const sections = {
+      home: {
+        badge: 'УСЕ ПРО ЖАХ', kicker: 'КІНО · ІГРИ · МЕРЕЖЕВІ ЛЕГЕНДИ · КУЛЬТУРА',
+        title: 'Провідник у темряву', titleStyle: serifTitle,
+        lead: 'Культові фільми жахів, ігри, крипіпасти, огляди й історія жанру — 153 матеріали українською.',
+        quick: ['Що подивитися вночі', 'Класика 90-х', 'Аналоговий хоррор', 'Готика й Лавкрафт'],
+        placeholder: 'Фільм, гра, крипіпаста або рік…', searchLabel: 'Пошук по всьому сайту',
+        heroBg: `radial-gradient(ellipse at 75% 40%, ${dark ? 'rgba(179, 32, 42, 0.22)' : 'rgba(156, 28, 36, 0.10)'}, transparent 60%), ${bg}`,
+        found: '153 МАТЕРІАЛИ'
+      },
+      movies: {
+        badge: 'КІНОЗАЛ', kicker: '▶ СЕАНС ПОЧИНАЄТЬСЯ · ФІЛЬМИ ЖАХІВ',
+        title: 'Фільми жахів', titleStyle: serifTitle,
+        lead: 'Від «Психо» й «Екзорциста» до «Сяйва», «Пастки» та «Спадковості»: як кіно навчило нас боятися.',
+        quick: ['Культова класика', 'Психологічний хоррор', 'Огляди фільмів'],
+        placeholder: 'Фільм, режисер або рік…', searchLabel: 'Пошук фільмів жахів',
+        heroBg: `linear-gradient(180deg, ${dark ? 'rgba(227, 173, 87, 0.10)' : 'rgba(125, 82, 15, 0.07)'}, transparent 70%), ${bg}`,
+        found: '3 МАТЕРІАЛИ ПРО КІНО'
+      },
+      games: {
+        badge: 'ІГРОВИЙ АРХІВ', kicker: 'PRESS START · ІГРИ ЖАХІВ',
+        title: 'Ігри жахів', titleStyle: serifTitle,
+        lead: 'Survival horror, психологічні кошмари й забуті перлини — від Alone in the Dark до Penumbra.',
+        quick: ['Survival horror', 'Психологічні', 'PS1-епоха', 'Інді та флеш'],
+        placeholder: 'Гра, студія або рік — напр. «Capcom 1996»', searchLabel: 'Пошук ігор жахів',
+        heroBg: `repeating-linear-gradient(0deg, ${dark ? 'rgba(124, 192, 207, 0.05)' : 'rgba(29, 90, 104, 0.05)'} 0 1px, transparent 1px 4px), radial-gradient(ellipse at 70% 35%, ${dark ? 'rgba(124, 192, 207, 0.14)' : 'rgba(29, 90, 104, 0.10)'}, transparent 60%), ${bg}`,
+        found: 'ІГРИ ЖАХІВ · СТОРІНКА 1'
+      },
+      internet: {
+        badge: 'МЕРЕЖЕВИЙ ФОЛЬКЛОР', kicker: '> ПІДКЛЮЧЕННЯ… ІНТЕРНЕТ-ХОРРОР',
+        title: 'ІНТЕРНЕТ-ХОРРОР', titleStyle: "margin: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: clamp(34px, 4.4vw, 58px); line-height: 1.05; letter-spacing: -1px;",
+        lead: 'Крипіпасти, Backrooms, аналоговий хоррор і SCP: страхи, що виросли з форумів, відео й вікі.',
+        quick: ['Крипіпасти', 'Лімінальні простори', 'Аналоговий хоррор', 'SCP'],
+        placeholder: 'Крипіпаста, вікі або мем…', searchLabel: 'Пошук інтернет-хоррору',
+        heroBg: `radial-gradient(${dark ? 'rgba(226, 214, 92, 0.16)' : 'rgba(98, 91, 12, 0.14)'} 1px, transparent 1px) 0 0 / 18px 18px, ${bg}`,
+        found: '4 МАТЕРІАЛИ'
+      },
+      culture: {
+        badge: 'КНИГИ Й ПОЛОТНА', kicker: 'ЛІТЕРАТУРА · МИСТЕЦТВО',
+        title: 'Культура жаху', titleStyle: "margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 600; font-size: clamp(42px, 5.6vw, 76px); line-height: 1; text-wrap: balance;",
+        lead: 'Готичні романи, По й Лавкрафт, Ґоя й Ґігер, міські легенди — звідки жанр узяв свою мову.',
+        quick: ['Готика', 'Лавкрафт', 'Живопис і гравюра', 'Міські легенди'],
+        placeholder: 'Автор, книга або художник…', searchLabel: 'Пошук у розділі «Культура»',
+        heroBg: `repeating-linear-gradient(135deg, ${dark ? 'rgba(210, 176, 122, 0.07)' : 'rgba(116, 83, 28, 0.06)'} 0 1px, transparent 1px 9px), ${bg}`,
+        found: '4 МАТЕРІАЛИ'
+      }
+    };
+    const sec = { ...sections[key], accent: tone[key] };
+    const go = (s) => () => this.setState({ section: s, filtersOpen: false, menuOpen: false, picked: {} });
+
+    const tabDefs = [['home', 'Усе'], ['movies', 'Кіно'], ['games', 'Ігри'], ['internet', 'Інтернет-хоррор'], ['culture', 'Культура'], ['reviews', 'Огляди'], ['room', 'Ігрова кімната']];
+    const tabs = tabDefs.map(([s, label]) => {
+      const on = s === key;
+      return {
+        label, current: on ? 'page' : 'false', go: sections[s] ? go(s) : () => {},
+        style: compact
+          ? `min-height: 48px; display: flex; align-items: center; padding: 0 4px; border-bottom: 1px solid ${t.line}; font-weight: 600; text-decoration: none; color: ${on ? tone[s] || t.text : t.text};`
+          : `display: inline-flex; align-items: center; height: 46px; padding: 0 14px; white-space: nowrap; font-size: 14px; font-weight: 600; text-decoration: none; color: ${on ? t.text : t.muted}; box-shadow: ${on ? `inset 0 -3px 0 ${tone[s] || t.accentText}` : 'none'};`
+      };
+    });
+    const tabsStyle = compact
+      ? 'display: flex; flex-direction: column; padding: 0 16px 12px;'
+      : 'max-width: 1280px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 28px); display: flex; gap: 4px; overflow-x: auto;';
+
+    const kinds = {
+      movies: ['КІНО', tone.movies], games: ['ГРА', tone.games], internet: ['ІНТЕРНЕТ', tone.internet],
+      culture: ['КУЛЬТУРА', tone.culture], reviews: ['ОГЛЯД', tone.reviews]
+    };
+    const ratio = { movies: '2 / 3', games: '4 / 3', internet: '16 / 9', reviews: '3 / 2' };
+    const item = (k, title, meta, minutes, preview, img) => {
+      const [kind, accent] = kinds[k];
+      const hasImg = Boolean(img);
+      return {
+        kind, accent, title, meta, minutes, preview, img, hasImg, noImg: !hasImg, initial: title.replace(/^[«"]/, '').charAt(0),
+        thumbStyle: `width: ${k === 'movies' ? 56 : 112}px; height: 76px; flex-shrink: 0; object-fit: cover; border-radius: 3px; filter: ${t.imgFilter};`,
+        cardImgStyle: `width: 100%; aspect-ratio: ${ratio[k] || '3 / 2'}; object-fit: cover; border-radius: 3px; filter: ${t.imgFilter};`
+      };
+    };
+    const lists = {
+      movies: [
+        item('movies', 'Культові фільми жахів: короткий путівник', '1960-ті – 2010-ті · Гічкок, Фрідкін, Кубрик, Піл, Астер', 2, 'Від «Психо» й «Екзорциста» до «Сяйва», «Пастки» та «Спадковості»: чому ці фільми стали мовою жанру.', '/_blob/86961d2ccfed282194edfb7402dd0374'),
+        item('reviews', 'Огляд фільму «Спадковість»', '2018 · Арі Астер', 2, 'Сімейна трагедія, окультна пастка й повільний розпад довіри.', '/_blob/c211b52ab658d9a111b381a2421ef1cf'),
+        item('movies', 'Психологічний хоррор у кіно', 'XX–XXI ст. · різні режисери', 2, 'Страх без простого монстра: провина, родина, ізоляція й недовіра до власного сприйняття.', '/_blob/873a85bc6e82ff7c3fa7b18022ddfa8e')
+      ],
+      games: [
+        item('games', 'Resident Evil (1996): гра, що дала життя survival horror', '1996 · Capcom', 4, 'Особняк, обмежені ресурси, зомбі й дизайн, що заклав мову жанру.', '/_blob/1ae692c0f8715468898de360d10cb995'),
+        item('games', 'Alone in the Dark: перший справжній жах у трьох вимірах', '1992 · Infogrames', 4, 'Коли хтось згадує першу хоррор-гру, ви, напевно, думаєте про «Оселю зла»…', '/_blob/0b5eae591cf31bd766362e87ae783d54'),
+        item('games', 'Fatal Frame (Project Zero): класика японського хорору', '2001 · Tecmo', 3, 'Камера проти привидів і страх, що дихає в спину.', '/_blob/56a66e5aeda05dd0dcce3dea35cfb084'),
+        item('games', 'Eternal Darkness: Sanity’s Requiem', '2002 · Silicon Knights', 5, 'Гра, що змушує засумніватися у власному глузді й у вашій консолі.', '/_blob/64b3d035533e885927eeabbbbd712be3'),
+        item('games', 'Yume Nikki (2004): мандрівка світом снів', '2004 · Kikiyama', 7, 'Інді-легенда, створена в RPG Maker, про сни й таємниці.', '/_blob/3a8b12c4440cd3595e3486639e649ed6'),
+        item('games', 'Penumbra: Overture — фізика страху', '2007 · Frictional Games', 6, 'Гра з технологічної демки, що змінила ДНК жанру.', '/_blob/9aee2c792cd4abd9a18155e0604f40d8')
+      ],
+      internet: [
+        item('internet', 'SCP: хоррор у формі секретного архіву', '2007 – дотепер · SCP Wiki', 2, 'Інтерактивне досьє: тести D-класу, знакові об’єкти, лор Фонду.', '/_blob/1e54a17b0223e18a9c6a4b0311d28b71'),
+        item('internet', 'Backrooms: офісний лабіринт без виходу', '2019 · інтернет-фольклор', 3, 'Лімінальні простори, жовті кімнати, гул ламп.', '/_blob/c625f88c1fb71bf1c93507b61fd8dbf4'),
+        item('internet', 'Історія та розвиток аналогового хорору', '2010-ті – 2020-ті · веб-серіали', 3, 'Старі касети, телевізійні перешкоди й псевдоархіви.', '/_blob/a9a76905599e15a7bcf5bf000d2496e2'),
+        item('internet', 'Класичні крипіпасти: фольклор форумів і проклятих файлів', '2000-ні · інтернет-фольклор', 3, 'Короткі історії з форумів, прокляті ігри й міські легенди як нова усна традиція.', '/_blob/c57d2f1578602060aa8524aed6993197')
+      ],
+      culture: [
+        item('culture', 'Жах у літературі: від готики до Лавкрафта', 'XVIII–XX ст. · По, Шеллі, Лавкрафт', 3, 'Готичні замки, психологія По, наукова тривога Шеллі й космічний страх Лавкрафта.', ''),
+        item('culture', 'Жах у мистецтві: від Ґої до Ґігера', 'XVIII–XX ст. · Ґоя, Беклін, Ґігер', 2, 'Як живопис, гравюра, сюрреалізм і біомеханіка сформували візуальну мову хоррору.', ''),
+        item('culture', 'Міські легенди: література, що прикидається чуткою', 'XX–XXI ст. · фольклор', 2, 'Місток між фольклором, крипіпастами та інтернет-хоррором.', ''),
+        item('culture', 'Коли картина стає кімнатою: інтерактивний жах', '1990-ті – 2020-ті · різні автори', 2, 'Композиція, світло й камера: як ігри перетворюють глядача на учасника образу.', '')
+      ]
+    };
+    lists.home = [
+      lists.movies[0], lists.games[0], lists.internet[1], lists.culture[0],
+      item('reviews', 'Огляд ремейку Silent Hill 2: що важливо перевірити', '2024 · Bloober Team / Konami', 3, 'Атмосфера, темп, символи й те, чи не губиться біль оригіналу.', '/_blob/e617545cd851a68f51f2cccbf782a647'),
+      lists.internet[2], lists.movies[1], lists.games[5]
+    ];
+
+    const picked = this.state.picked;
+    const facet = (title, labels) => ({
+      title,
+      items: labels.map(([label, count]) => {
+        const id = title + ':' + label, on = Boolean(picked[id]);
+        return {
+          label, count: count || '', hasCount: Boolean(count), pressed: String(on),
+          toggle: () => this.setState({ picked: { ...picked, [id]: !on } }),
+          style: `min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer; border: 1px solid ${on ? sec.accent : t.line}; background: ${on ? sec.accent : 'transparent'}; color: ${on ? t.bg : t.text};`
+        };
+      })
+    });
+    const facets = {
+      home: [facet('РОЗДІЛ', [['Кіно'], ['Ігри'], ['Інтернет-хоррор'], ['Культура'], ['Огляди']]), facet('ДЕСЯТИЛІТТЯ', [['до 1980', 6], ['1980-ті', 10], ['1990-ті', 48], ['2000-ні', 76], ['2010+', 8]])],
+      movies: [facet('ТИП', [['Статті', 2], ['Огляди', 1]]), facet('РЕЖИСЕРИ', [['Гічкок'], ['Фрідкін'], ['Кубрик'], ['Піл'], ['Астер']])],
+      games: [facet('ДЕСЯТИЛІТТЯ', [['1980-ті'], ['1990-ті'], ['2000-ні'], ['2010+']]), facet('ПІДЖАНР', [['Survival horror'], ['Психологічний'], ['Point-and-click'], ['Immersive sim']]), facet('СТУДІЯ', [['Capcom'], ['Konami'], ['Frictional Games'], ['Tecmo']])],
+      internet: [facet('ФОРМАТ', [['Крипіпаста'], ['Лімінальне'], ['Аналоговий хоррор'], ['Колективна вигадка']])],
+      culture: [facet('ТИП', [['Література', 2], ['Мистецтво', 2]]), facet('ІМЕНА', [['По'], ['Шеллі'], ['Лавкрафт'], ['Ґоя'], ['Беклін'], ['Ґігер']])]
+    };
+
+    const mosaic = [
+      { label: 'КІНО', title: 'Культові фільми жахів', accent: dark ? tone.movies : '#e3ad57', go: go('movies'), bg: `#111 url('/_blob/86961d2ccfed282194edfb7402dd0374') center 20% / cover` },
+      { label: 'ІГРИ', title: 'Silent Hill 2', accent: dark ? tone.games : '#7cc0cf', go: go('games'), bg: `#111 url('/_blob/11f667c87dee7f4859f06dc90b515a0c') center / cover` },
+      { label: 'ІНТЕРНЕТ-ХОРРОР', title: 'Backrooms', accent: dark ? tone.internet : '#e2d65c', go: go('internet'), bg: `#111 url('/_blob/c625f88c1fb71bf1c93507b61fd8dbf4') center / cover` },
+      { label: 'КУЛЬТУРА', title: 'Від готики до Лавкрафта', accent: dark ? tone.culture : '#d2b07a', go: go('culture'), bg: `repeating-linear-gradient(135deg, rgba(210, 176, 122, 0.12) 0 1px, transparent 1px 9px), #1a1413` }
+    ];
+    const posters = [
+      { img: '/_blob/873a85bc6e82ff7c3fa7b18022ddfa8e', alt: 'Постер «Психо»', caption: '1960' },
+      { img: '/_blob/ec6c9870d76fd3aab1d9a3e4209fab24', alt: 'Постер «Екзорциста»', caption: '1973' },
+      { img: '/_blob/86961d2ccfed282194edfb7402dd0374', alt: 'Постер «Сяйва»', caption: '1980' },
+      { img: '/_blob/d9b8c8ee451fde99a810ad23120615c7', alt: 'Постер «Пастки»', caption: '2017' }
+    ];
+    const filmStrip = `repeating-linear-gradient(90deg, transparent 0 12px, ${dark ? 'rgba(243, 237, 228, 0.75)' : '#f3ede4'} 12px 24px) center / 100% 9px no-repeat, ${t.filmBase}`;
+
+    const isList = this.state.view === 'list';
+    const toggleStyle = (on) => `height: 40px; padding: 0 16px; border: 0; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: ${on ? t.text : 'transparent'}; color: ${on ? t.bg : t.text};`;
+    return {
+      t, sec, tabs, tabsStyle, mosaic, posters, filmStrip, compact,
+      items: lists[key], facets: facets[key],
+      isHome: key === 'home', isMovies: key === 'movies', isGames: key === 'games', isInternet: key === 'internet', isCulture: key === 'culture',
+      goHome: go('home'),
+      isList, isCards: !isList, listPressed: String(isList), cardsPressed: String(!isList),
+      listBtn: toggleStyle(isList), cardsBtn: toggleStyle(!isList),
+      showList: () => this.setState({ view: 'list' }), showCards: () => this.setState({ view: 'cards' }),
+      isDark: dark, isLight: !dark,
+      themeLabel: dark ? 'Увімкнути світлу тему' : 'Увімкнути темну тему',
+      toggleTheme: () => this.setState({ theme: dark ? 'light' : 'dark' }),
+      showFullNav: !compact,
+      showTabs: !compact || this.state.menuOpen,
+      menuExpanded: String(this.state.menuOpen),
+      toggleMenu: () => this.setState({ menuOpen: !this.state.menuOpen }),
+      showSidebar: !compact || this.state.filtersOpen,
+      filtersExpanded: String(this.state.filtersOpen),
+      toggleFilters: () => this.setState({ filtersOpen: !this.state.filtersOpen })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "A-Light.dc.html": { "expand": "fill", "h": 2700, "is_interactive": true, "title": "A · Кінотеатр — світла", "w": 1440, "x": 1520, "y": 0 },
+    "A-Phone.dc.html": { "h": 844, "is_interactive": true, "title": "A · Кінотеатр — телефон", "w": 390, "x": 3040, "y": 0 },
+    "B-Light.dc.html": { "expand": "fill", "h": 2500, "is_interactive": true, "title": "B · Архівна справа — світла", "w": 1440, "x": 1520, "y": 3120 },
+    "B-Phone.dc.html": { "h": 844, "is_interactive": true, "title": "B · Архівна справа — телефон", "w": 390, "x": 3040, "y": 3120 },
+    "B.dc.html": { "expand": "fill", "h": 2500, "is_interactive": true, "title": "B · Архівна справа — темна", "w": 1440, "x": 0, "y": 3120 },
+    "C-Light.dc.html": { "expand": "fill", "h": 2800, "is_interactive": true, "title": "C · Аналоговий жах — світла", "w": 1440, "x": 1520, "y": 6040 },
+    "C-Phone.dc.html": { "h": 844, "is_interactive": true, "title": "C · Аналоговий жах — телефон", "w": 390, "x": 3040, "y": 6040 },
+    "C.dc.html": { "expand": "fill", "h": 2800, "is_interactive": true, "title": "C · Аналоговий жах — темна", "w": 1440, "x": 0, "y": 6040 },
+    "Main.dc.html": { "expand": "fill", "h": 2700, "is_interactive": true, "title": "A · Кінотеатр — темна", "w": 1440, "x": 0, "y": 0 },
+    "D.dc.html": { "expand": "fill", "h": 2400, "is_interactive": true, "title": "D · Головна — темна", "w": 1440, "x": 0, "y": 9260 },
+    "D-Light.dc.html": { "expand": "fill", "h": 2400, "is_interactive": true, "title": "D · Головна — світла", "w": 1440, "x": 1520, "y": 9260 },
+    "D-Phone.dc.html": { "h": 844, "is_interactive": true, "title": "D · Кіно на телефоні", "w": 390, "x": 3040, "y": 9260 },
+    "D-Movies.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Кіно — темна", "w": 1440, "x": 0, "y": 12080 },
+    "D-Games.dc.html": { "expand": "fill", "h": 2200, "is_interactive": true, "title": "D · Ігри — темна", "w": 1440, "x": 1520, "y": 12080 },
+    "D-Internet.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Інтернет-хоррор — темна", "w": 1440, "x": 3040, "y": 12080 },
+    "D-Culture.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Культура — темна", "w": 1440, "x": 4560, "y": 12080 },
+    "D-Movies-Light.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Кіно — світла", "w": 1440, "x": 0, "y": 14700 },
+    "D-Games-Light.dc.html": { "expand": "fill", "h": 2200, "is_interactive": true, "title": "D · Ігри — світла", "w": 1440, "x": 1520, "y": 14700 },
+    "D-Internet-Light.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Інтернет-хоррор — світла", "w": 1440, "x": 3040, "y": 14700 },
+    "D-Culture-Light.dc.html": { "expand": "fill", "h": 2000, "is_interactive": true, "title": "D · Культура — світла", "w": 1440, "x": 4560, "y": 14700 }
+  },
+  "createdOnFiles": { "at": "2026-11-20T19:45:00Z", "v": 1 },
+  "designSystems": [],
+  "launch": { "view": "canvas" },
+  "notes": {
+    "titleA": { "kind": "title1", "maxW": 3430, "text": "A · Кінотеатр — поточний дух, сучасна збірка", "w": 240, "x": 0, "y": -300 },
+    "titleB": { "kind": "title1", "maxW": 3430, "text": "B · Архівна справа — зручність пошуку понад усе", "w": 240, "x": 0, "y": 2820 },
+    "titleC": { "kind": "title1", "maxW": 3430, "text": "C · Аналоговий жах — сміливий журнальний стиль", "w": 240, "x": 0, "y": 5740 },
+    "titleD": { "kind": "title1", "maxW": 3430, "text": "D · Навігація B + кольори A: весь хорор на головній", "x": 0, "y": 8960 },
+    "titleD2": { "kind": "title1", "maxW": 6000, "text": "D · Підтеми розділів — темна тема", "x": 0, "y": 11780 },
+    "titleD3": { "kind": "title1", "maxW": 6000, "text": "D · Підтеми розділів — світла тема", "x": 0, "y": 14400 }
+  },
+  "order": [
+    "Main.dc.html", "A-Light.dc.html", "A-Phone.dc.html",
+    "B.dc.html", "B-Light.dc.html", "B-Phone.dc.html",
+    "C.dc.html", "C-Light.dc.html", "C-Phone.dc.html",
+    "D.dc.html", "D-Light.dc.html", "D-Phone.dc.html",
+    "D-Movies.dc.html", "D-Games.dc.html", "D-Internet.dc.html", "D-Culture.dc.html",
+    "D-Movies-Light.dc.html", "D-Games-Light.dc.html", "D-Internet-Light.dc.html", "D-Culture-Light.dc.html"
+  ],
+  "pages": [],
+  "title": "Horror Hub — три варіанти редизайну"
+}

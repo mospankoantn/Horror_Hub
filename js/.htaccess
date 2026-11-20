@@ -1,12 +1,1 @@
-# 1. Забороняємо серверу показувати список файлів у цій папці (щоб ніхто не бачив, що там лежить)
 Options -Indexes
-
-# 2. Дозволяємо доступ до файлу admin.php (щоб ви могли ввести пароль)
-<Files "admin.php">
-    Require all granted
-</Files>
-
-# 3. Забороняємо доступ до самого файлу .htaccess хакерам
-<FilesMatch "^\.ht">
-    Require all denied
-</FilesMatch>

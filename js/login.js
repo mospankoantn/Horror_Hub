@@ -27,16 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showMessage(message, '', '');
 
       try {
-        const response = await fetch('api_auth.php', {
-          method: 'POST',
-          body: formData,
-          headers: { Accept: 'application/json' }
-        });
-        const data = await response.json();
-
-        if (!response.ok || data.status !== 'success') {
-          throw new Error(data.message || 'Сталася помилка. Спробуйте ще раз.');
-        }
+        const data = await HorrorHub.post('api_auth.php', formData);
 
         showMessage(message, data.message, 'success');
         form.reset();
