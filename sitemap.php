@@ -16,6 +16,7 @@ foreach ($static as $page) {
     $entries[] = [$page === 'index.html' ? '' : $page, gmdate('Y-m-d', (int)filemtime(__DIR__ . '/' . $page))];
 }
 foreach ($pages as $page) {
+    if (!empty($page['stub'])) continue; // stub pages are noindex
     $path = (string)($page['path'] ?? '');
     if (!preg_match('#^statti/[a-z0-9-]+\.html$#', $path) || !is_file(__DIR__ . '/' . $path)) continue;
     $lastmod = (string)($page['lastmod'] ?? '');

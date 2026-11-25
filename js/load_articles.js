@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.className = 'entry__body';
     const meta = document.createElement('p');
     meta.className = 'entry__meta';
-    meta.textContent = [data.kindLabel, data.release_date, data.developer].filter(Boolean).join(' · ');
+    meta.textContent = [data.kindLabel, data.release_date, data.developer, data.stub ? 'Готується' : ''].filter(Boolean).join(' · ');
     const title = document.createElement('h2');
     title.className = 'entry__title';
     const link = document.createElement('a');
@@ -385,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['title', 'url', 'localId', 'previewText', 'imageUrl', 'section', 'genre', 'developer', 'release_date'].forEach((key) => {
       article[key] = typeof raw[key] === 'string' ? raw[key].trim() : '';
     });
+    article.stub = raw.stub === true;
     if (!article.localId && typeof raw.local_id === 'string') article.localId = raw.local_id.trim();
     article.imageUrl = safeImage(article.imageUrl);
     const [kind, kindLabel] = KINDS[article.section] || ['games', 'Стаття'];

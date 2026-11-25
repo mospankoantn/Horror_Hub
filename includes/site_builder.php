@@ -168,7 +168,7 @@ function hh_build_site(array $options = []): array {
             'section' => $article['section'],
             'lastmod' => gmdate('Y-m-d', $article['modified']),
             'minutes' => hh_reading_minutes($body),
-        ];
+        ] + (empty($article['item']['stub']) ? [] : ['stub' => true]); // unfinished: noindex, not in the sitemap
         $stats['pages']++;
     }
     foreach (glob($pagesDir . '/*.html') ?: [] as $file) {
@@ -550,10 +550,12 @@ function hh_http_get(string $url, int $limit): ?array {
 /* ---------- Page rendering ---------- */
 
 function hh_related(string $id, array $articles, array $sectionIds): array {
-    $pool = array_values(array_filter($sectionIds, static fn($other) => $other !== $id));
+    // Stub pages (item "stub": true) are never recommended: "read also" leads only to finished articles.
+    $finished = static fn($other) => $other !== $id && empty($articles[$other]['item']['stub']);
+    $pool = array_values(array_filter($sectionIds, $finished));
     if (count($pool) < 3) {
         foreach (array_keys($articles) as $other) {
-            if ($other !== $id && !in_array($other, $pool, true)) $pool[] = $other;
+            if ($finished($other) && !in_array($other, $pool, true)) $pool[] = $other;
             if (count($pool) >= 12) break;
         }
     }
@@ -634,7 +636,7 @@ function hh_render_article_page(array $article, string $body, array $related): s
         '<base href="../">',
         '<title>' . hh_e($title) . ' — Horror Hub</title>',
         '<meta name="description" content="' . hh_e($description) . '">',
-        '<meta name="robots" content="index, follow, max-image-preview:large">',
+        '<meta name="robots" content="' . (empty($item['stub']) ? 'index, follow, max-image-preview:large' : 'noindex, follow') . '">',
     ];
     if ($canonical !== '') $head[] = '<link rel="canonical" href="' . hh_e($canonical) . '">';
     $head[] = '<meta property="og:type" content="article">';

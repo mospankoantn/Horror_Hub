@@ -167,7 +167,7 @@ foreach ($catalogPages as $file => [$section, $active, $title, $description, $ki
         . "        <span id=\"pageInfo\" class=\"page-info\">Сторінка 1 з 1</span>\n"
         . "        <button type=\"button\" id=\"nextPage\" class=\"btn\">Наступна →</button>\n"
         . "      </nav>\n    </section>\n  </div>\n</main>\n\n"
-        . hh_site_footer() . "\n\n<script src=\"js/load_articles.js?v=20261120-d\"></script>\n</body>\n</html>\n";
+        . hh_site_footer() . "\n\n<script src=\"js/load_articles.js?v=20261125-stub\"></script>\n</body>\n</html>\n";
     file_put_contents("$root/$file", $html);
     echo "generated $file\n";
 }

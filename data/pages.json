@@ -1008,6 +1008,294 @@
             "lastmod": "2026-04-30",
             "minutes": 2
         },
+        "horror_literature:afinodor": {
+            "path": "statti/afinodor.html",
+            "title": "Афінодор",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:ambroz-birs": {
+            "path": "statti/ambroz-birs.html",
+            "title": "Амброз Бірс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:andzhey-sapkovskyy": {
+            "path": "statti/andzhey-sapkovskyy.html",
+            "title": "Анджей Сапковський",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:artur-meken": {
+            "path": "statti/artur-meken.html",
+            "title": "Артур Мекен",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:avhust-derlet": {
+            "path": "statti/avhust-derlet.html",
+            "title": "Август Дерлет",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:ayra-levin": {
+            "path": "statti/ayra-levin.html",
+            "title": "Айра Левін",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:bentli-littl": {
+            "path": "statti/bentli-littl.html",
+            "title": "Бентлі Літтл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:beovulf": {
+            "path": "statti/beovulf.html",
+            "title": "Беовульф",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:brayan-lamly": {
+            "path": "statti/brayan-lamly.html",
+            "title": "Брайан Ламли",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:brem-stoker": {
+            "path": "statti/brem-stoker.html",
+            "title": "Брем Стокер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:charlz-dikens": {
+            "path": "statti/charlz-dikens.html",
+            "title": "Чарлз Дікенс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:charlz-robert-metyurin": {
+            "path": "statti/charlz-robert-metyurin.html",
+            "title": "Чарльз Роберт Метьюрін",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dafna-dyu-morye": {
+            "path": "statti/dafna-dyu-morye.html",
+            "title": "Дафна дю Мор'є",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dante-alihyeri": {
+            "path": "statti/dante-alihyeri.html",
+            "title": "Данте Аліг'єрі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzheffri-choser": {
+            "path": "statti/dzheffri-choser.html",
+            "title": "Джеффрі Чосер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzho-hill": {
+            "path": "statti/dzho-hill.html",
+            "title": "Джо Гілл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhon-gardner": {
+            "path": "statti/dzhon-gardner.html",
+            "title": "Джон Ґарднер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhon-milton": {
+            "path": "statti/dzhon-milton.html",
+            "title": "Джон Мілтон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhon-polidori": {
+            "path": "statti/dzhon-polidori.html",
+            "title": "Джон Полідорі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhon-ronald-ruel-tolkin": {
+            "path": "statti/dzhon-ronald-ruel-tolkin.html",
+            "title": "Джон Роналд Руел Толкін",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhon-vebster": {
+            "path": "statti/dzhon-vebster.html",
+            "title": "Джон Вебстер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhonatan-maberri": {
+            "path": "statti/dzhonatan-maberri.html",
+            "title": "Джонатан Маберрі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhordzh-martin": {
+            "path": "statti/dzhordzh-martin.html",
+            "title": "Джордж Мартін",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhosh-malerman": {
+            "path": "statti/dzhosh-malerman.html",
+            "title": "Джош Малерман",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:dzhovanni-bokkachcho": {
+            "path": "statti/dzhovanni-bokkachcho.html",
+            "title": "Джованні Боккаччо",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:e-t-a-hofman": {
+            "path": "statti/e-t-a-hofman.html",
+            "title": "Е. Т. А. Гофман",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:edhar-allan-po": {
+            "path": "statti/edhar-allan-po.html",
+            "title": "Едгар Аллан По",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:eldzhernon-blekvud": {
+            "path": "statti/eldzhernon-blekvud.html",
+            "title": "Елджернон Блеквуд",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:elizabet-haskell": {
+            "path": "statti/elizabet-haskell.html",
+            "title": "Елізабет Гаскелл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:enn-rays": {
+            "path": "statti/enn-rays.html",
+            "title": "Енн Райс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:enn-redkliff": {
+            "path": "statti/enn-redkliff.html",
+            "title": "Енн Редкліфф",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:evripid": {
+            "path": "statti/evripid.html",
+            "title": "Евріпід",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:frenk-belknep-lonh": {
+            "path": "statti/frenk-belknep-lonh.html",
+            "title": "Френк Белкнеп Лонг",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:frensis-bekon": {
+            "path": "statti/frensis-bekon.html",
+            "title": "Френсіс Бекон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:frits-layber": {
+            "path": "statti/frits-layber.html",
+            "title": "Фріц Лайбер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:giliyan-flinn": {
+            "path": "statti/giliyan-flinn.html",
+            "title": "Ґіліян Флінн",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
         "horror_literature:gothic-to-lovecraft": {
             "path": "statti/gothic-to-lovecraft.html",
             "title": "Жах у літературі: від готики до Лавкрафта",
@@ -1015,12 +1303,540 @@
             "lastmod": "2026-04-30",
             "minutes": 3
         },
+        "horror_literature:greydi-hendriks": {
+            "path": "statti/greydi-hendriks.html",
+            "title": "Ґрейді Гендрікс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:hans-haynts-evers": {
+            "path": "statti/hans-haynts-evers.html",
+            "title": "Ганс Гайнц Еверс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:helen-oyeyemi": {
+            "path": "statti/helen-oyeyemi.html",
+            "title": "Гелен Оєємі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:henri-dzheyms": {
+            "path": "statti/henri-dzheyms.html",
+            "title": "Генрі Джеймс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:henri-kattner": {
+            "path": "statti/henri-kattner.html",
+            "title": "Генрі Каттнер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:hesiod": {
+            "path": "statti/hesiod.html",
+            "title": "Гесіод",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:hi-de-mopassan": {
+            "path": "statti/hi-de-mopassan.html",
+            "title": "Гі де Мопассан",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:horas-volpol": {
+            "path": "statti/horas-volpol.html",
+            "title": "Горас Волпол",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:hovard-lavkraft": {
+            "path": "statti/hovard-lavkraft.html",
+            "title": "Говард Лавкрафт",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:hustav-mayrink": {
+            "path": "statti/hustav-mayrink.html",
+            "title": "Густав Майрінк",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:ito-dzyundzi": {
+            "path": "statti/ito-dzyundzi.html",
+            "title": "Іто Дзюндзі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:karmen-mariya-machado": {
+            "path": "statti/karmen-mariya-machado.html",
+            "title": "Кармен Марія Мачадо",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:klara-riv": {
+            "path": "statti/klara-riv.html",
+            "title": "Клара Рів",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:klark-eshton-smit": {
+            "path": "statti/klark-eshton-smit.html",
+            "title": "Кларк Ештон Сміт",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:klayv-barker": {
+            "path": "statti/klayv-barker.html",
+            "title": "Клайв Баркер",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:kodzi-sudzuki": {
+            "path": "statti/kodzi-sudzuki.html",
+            "title": "Кодзі Судзукі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:kolin-henri-vilson": {
+            "path": "statti/kolin-henri-vilson.html",
+            "title": "Колін Генрі Вілсон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:korol-artur": {
+            "path": "statti/korol-artur.html",
+            "title": "Король Артур",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:kreyh-devidson": {
+            "path": "statti/kreyh-devidson.html",
+            "title": "Крейг Девідсон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:kristofer-marlou": {
+            "path": "statti/kristofer-marlou.html",
+            "title": "Крістофер Марлоу",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:lafkadio-hern": {
+            "path": "statti/lafkadio-hern.html",
+            "title": "Лафкадіо Герн",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:lord-danseni": {
+            "path": "statti/lord-danseni.html",
+            "title": "Лорд Дансені",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:loren-byuks": {
+            "path": "statti/loren-byuks.html",
+            "title": "Лорен Б'юкс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:mark-z-danylevskyy": {
+            "path": "statti/mark-z-danylevskyy.html",
+            "title": "Марк З. Данилевський",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:maykl-murkok": {
+            "path": "statti/maykl-murkok.html",
+            "title": "Майкл Муркок",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:meri-shelli": {
+            "path": "statti/meri-shelli.html",
+            "title": "Мері Шеллі",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:metyu-hrehori-lyuyis": {
+            "path": "statti/metyu-hrehori-lyuyis.html",
+            "title": "Метью Грегорі Льюїс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:mishel-de-nostradamus": {
+            "path": "statti/mishel-de-nostradamus.html",
+            "title": "Мішель де Нострадамус",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:montehyu-rods-dzheyms": {
+            "path": "statti/montehyu-rods-dzheyms.html",
+            "title": "Монтегю Родс Джеймс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:mykhaylo-kotsyubynskyy": {
+            "path": "statti/mykhaylo-kotsyubynskyy.html",
+            "title": "Михайло Коцюбинський",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:mykola-hohol": {
+            "path": "statti/mykola-hohol.html",
+            "title": "Микола Гоголь",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:nataniel-hotorn": {
+            "path": "statti/nataniel-hotorn.html",
+            "title": "Натаніель Готорн",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:nil-geyman": {
+            "path": "statti/nil-geyman.html",
+            "title": "Ніл Ґейман",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:oskar-vayld": {
+            "path": "statti/oskar-vayld.html",
+            "title": "Оскар Вайлд",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:ovidiy": {
+            "path": "statti/ovidiy.html",
+            "title": "Овідій",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:pisnya-pro-nibelunhiv": {
+            "path": "statti/pisnya-pro-nibelunhiv.html",
+            "title": "Пісня про Нібелунгів",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:piter-straub": {
+            "path": "statti/piter-straub.html",
+            "title": "Пітер Страуб",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:pol-trembley": {
+            "path": "statti/pol-trembley.html",
+            "title": "Пол Тремблей",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:remzi-kempbell": {
+            "path": "statti/remzi-kempbell.html",
+            "title": "Ремзі Кемпбелл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:rey-bredberi": {
+            "path": "statti/rey-bredberi.html",
+            "title": "Рей Бредбері",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:richard-metison": {
+            "path": "statti/richard-metison.html",
+            "title": "Річард Метісон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-barton": {
+            "path": "statti/robert-barton.html",
+            "title": "Роберт Бартон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-blokh": {
+            "path": "statti/robert-blokh.html",
+            "title": "Роберт Блох",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-brauninh": {
+            "path": "statti/robert-brauninh.html",
+            "title": "Роберт Браунінг",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-chembers": {
+            "path": "statti/robert-chembers.html",
+            "title": "Роберт Чемберс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-hovard": {
+            "path": "statti/robert-hovard.html",
+            "title": "Роберт Говард",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-luyis-stivenson": {
+            "path": "statti/robert-luyis-stivenson.html",
+            "title": "Роберт Луїс Стівенсон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robert-makkammon": {
+            "path": "statti/robert-makkammon.html",
+            "title": "Роберт Маккаммон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:robin-hud": {
+            "path": "statti/robin-hud.html",
+            "title": "Робін Гуд",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:sharlotta-perkins-hilman": {
+            "path": "statti/sharlotta-perkins-hilman.html",
+            "title": "Шарлотта Перкінс Гілман",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:sheridan-le-fanyu": {
+            "path": "statti/sheridan-le-fanyu.html",
+            "title": "Шерідан Ле Фаню",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:shyrli-dzhekson": {
+            "path": "statti/shyrli-dzhekson.html",
+            "title": "Ширлі Джексон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:silviya-moreno-harsiya": {
+            "path": "statti/silviya-moreno-harsiya.html",
+            "title": "Сільвія Морено-Гарсія",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:sofokl": {
+            "path": "statti/sofokl.html",
+            "title": "Софокл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:stiven-hrem-dzhons": {
+            "path": "statti/stiven-hrem-dzhons.html",
+            "title": "Стівен Грем Джонс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:stiven-kinh": {
+            "path": "statti/stiven-kinh.html",
+            "title": "Стівен Кінг",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:syuzen-hill": {
+            "path": "statti/syuzen-hill.html",
+            "title": "Сьюзен Гілл",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:tomas-lihotti": {
+            "path": "statti/tomas-lihotti.html",
+            "title": "Томас Ліготті",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
         "horror_literature:urban-legends": {
             "path": "statti/urban-legends.html",
             "title": "Міські легенди: література, що прикидається чуткою",
             "section": "horror_literature",
             "lastmod": "2026-04-30",
             "minutes": 2
+        },
+        "horror_literature:v-v-dzheykobs": {
+            "path": "statti/v-v-dzheykobs.html",
+            "title": "В. В. Джейкобс",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vashynhton-irvinh": {
+            "path": "statti/vashynhton-irvinh.html",
+            "title": "Вашингтон Ірвінг",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:verhiliy": {
+            "path": "statti/verhiliy.html",
+            "title": "Вергілій",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vilyam-bleyk": {
+            "path": "statti/vilyam-bleyk.html",
+            "title": "Вільям Блейк",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vilyam-houp-khodzhson": {
+            "path": "statti/vilyam-houp-khodzhson.html",
+            "title": "Вільям Гоуп Ходжсон",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vilyam-piter-bletti": {
+            "path": "statti/vilyam-piter-bletti.html",
+            "title": "Вільям Пітер Блетті",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vilyam-shekspir": {
+            "path": "statti/vilyam-shekspir.html",
+            "title": "Вільям Шекспір",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
+        },
+        "horror_literature:vilyam-tomas-bekford": {
+            "path": "statti/vilyam-tomas-bekford.html",
+            "title": "Вільям Томас Бекфорд",
+            "section": "horror_literature",
+            "lastmod": "2026-11-25",
+            "minutes": 1,
+            "stub": true
         },
         "horror_movies:cult-horror-films": {
             "path": "statti/cult-horror-films.html",
